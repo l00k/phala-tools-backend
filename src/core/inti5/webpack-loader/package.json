@@ -1,0 +1,12 @@
+{
+    "name": "@inti5/webpack-loader",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inti5/utils": "*",
+        "lodash": "^4.17.21"
+    }
+}

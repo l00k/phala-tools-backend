@@ -1,0 +1,6 @@
+[submodule "src/core/inti5"]
+	path = src/core/inti5
+	url = git@github.com:inti5/inti5.git
+[submodule "src/core/app-backend"]
+	path = src/core/app-backend
+	url = git@github.com:inti5/app-backend.git

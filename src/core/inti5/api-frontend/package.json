@@ -1,0 +1,17 @@
+{
+    "name": "@inti5/api-frontend",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inti5/api": "*",
+        "@inti5/configuration": "*",
+        "@inti5/object-manager": "*",
+        "@inti5/utils": "*",
+        "qs": "^6.10.2",
+        "pluralize": "^8.0.0",
+        "jshashes": "^1.0.8"
+    }
+}

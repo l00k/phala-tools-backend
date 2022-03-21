@@ -1,0 +1,11 @@
+{
+    "name": "@inti5/configuration",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "lodash": "^4.17.21"
+    }
+}

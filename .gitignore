@@ -1,0 +1,9 @@
+/.db-data
+/src/etc/local
+/var
+
+node_modules
+vendor
+
+.env
+yarn-error.log

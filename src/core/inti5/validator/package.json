@@ -1,0 +1,15 @@
+{
+    "name": "@inti5/validator",
+    "version": "0.0.1",
+    "license": "MIT",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inti5/utils": "^0.0.1",
+        "lodash": "^4.17.21",
+        "reflect-metadata": "^0.1.13",
+        "validate.js": "^0.13.1"
+    }
+}

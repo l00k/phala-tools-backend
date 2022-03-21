@@ -1,0 +1,13 @@
+{
+    "name": "@inti5/event-bus",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inti5/object-manager": "*",
+        "lodash": "^4.17.21",
+        "js-event-bus": "^1.1.1"
+    }
+}

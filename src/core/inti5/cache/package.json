@@ -1,0 +1,13 @@
+{
+    "name": "@inti5/cache",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inti5/object-manager": "*",
+        "lodash": "^4.17.21",
+        "jshashes": "^1.0.8"
+    }
+}

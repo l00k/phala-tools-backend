@@ -1,0 +1,11 @@
+{
+    "name": "@inti5/object-manager",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "reflect-metadata": "^0.1.13"
+    }
+}

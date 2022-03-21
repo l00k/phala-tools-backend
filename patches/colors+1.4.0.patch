@@ -1,0 +1,34 @@
+diff --git a/node_modules/colors/index.d.ts b/node_modules/colors/index.d.ts
+index baa7068..a1872d1 100644
+--- a/node_modules/colors/index.d.ts
++++ b/node_modules/colors/index.d.ts
+@@ -20,6 +20,14 @@ export interface Color {
+     gray: Color;
+     grey: Color;
+ 
++    brightRed: Color;
++    brightGreen: Color;
++    brightYellow: Color;
++    brightBlue: Color;
++    brightMagenta: Color;
++    brightCyan: Color;
++    brightWhite: Color;
++
+     bgBlack: Color;
+     bgRed: Color;
+     bgGreen: Color;
+@@ -66,6 +74,14 @@ export const white: Color;
+ export const gray: Color;
+ export const grey: Color;
+ 
++export const brightRed: Color;
++export const brightGreen: Color;
++export const brightYellow: Color;
++export const brightBlue: Color;
++export const brightMagenta: Color;
++export const brightCyan: Color;
++export const brightWhite: Color;
++
+ export const bgBlack: Color;
+ export const bgRed: Color;
+ export const bgGreen: Color;

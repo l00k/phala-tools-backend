@@ -1,0 +1,17 @@
+{
+    "name": "@inti5/api-backend",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inti5/api": "*",
+        "@inti5/express-router": "*",
+        "pluralize": "^8.0.0"
+    },
+    "devDependencies": {
+        "@mikro-orm/core": "*",
+        "express": "*"
+    }
+}

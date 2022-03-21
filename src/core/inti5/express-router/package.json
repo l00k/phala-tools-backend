@@ -1,0 +1,18 @@
+{
+    "name": "@inti5/express-router",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inti5/object-manager": "*",
+        "@inti5/utils": "*",
+        "@inti5/validator": "*",
+        "colors": "^1.4.0",
+        "lodash": "^4.17.21"
+    },
+    "devDependencies": {
+        "express": "*"
+    }
+}

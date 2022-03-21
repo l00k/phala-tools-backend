@@ -1,0 +1,12 @@
+{
+    "name": "@inti5/utils",
+    "version": "0.0.1",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "colors": "^1.4.0",
+        "lodash": "^4.17.21"
+    }
+}

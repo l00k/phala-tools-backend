@@ -1,0 +1,33 @@
+{
+    "name": "@inti5/monorepo",
+    "version": "0.0.1",
+    "private": true,
+    "workspaces": [
+        "./*"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "postinstall": "patch-package"
+    },
+    "dependencies": {
+        "patch-package": "^6.4.7",
+        "postinstall-postinstall": "^2.1.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^27.0.3",
+        "@types/node": "^16.11.12",
+        "codecov": "^3.8.3",
+        "jest": "^27.4.4",
+        "jest-chain": "^1.1.5",
+        "ts-jest": "^27.1.1",
+        "ts-node": "^10.4.0",
+        "ts-node-dev": "^1.1.8",
+        "tslib": "^2.3.1",
+        "typescript": "^4.5.3"
+    },
+    "engines": {
+        "node": "^14.0.0"
+    }
+}

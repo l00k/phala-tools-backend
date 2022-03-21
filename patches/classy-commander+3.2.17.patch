@@ -1,0 +1,13 @@
+diff --git a/node_modules/classy-commander/classy.js b/node_modules/classy-commander/classy.js
+index 5e8bf46..2706231 100644
+--- a/node_modules/classy-commander/classy.js
++++ b/node_modules/classy-commander/classy.js
+@@ -94,7 +94,7 @@ var Commander = /** @class */ (function () {
+             console.error();
+             process.exit(1);
+         });
+-        cli.parse(args);
++        return cli.parseAsync(args);
+     };
+     Commander.prototype.getPackageVersion = function (packageFileName) {
+         var exists = fs.pathExistsSync(packageFileName);
