@@ -11,9 +11,12 @@
         "api:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts api",
         "api:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts api",
         
+        "process": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts process",
+        "process:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts process",
+        "process:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts process",
+        
         "postinstall": "patch-package"
     },
-    "main": "src/main.ts",
     "workspaces": [
         "src/core/inti5/*",
         "src/core/app-backend",

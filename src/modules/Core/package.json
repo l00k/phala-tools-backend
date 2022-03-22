@@ -1,7 +1,0 @@
-{
-    "name": "@app/core",
-    "version": "1.0.0",
-    "dependencies": {
-        "@datasert/cronjs-matcher": "^1.1.0"
-    }
-}

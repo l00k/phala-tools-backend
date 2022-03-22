@@ -1,5 +1,7 @@
 export default {
-    core: {},
+    core: {
+        jwtSecret: 'Top.Secret.Value',
+    },
     service: {
         orm: require('./services/orm').default
     },

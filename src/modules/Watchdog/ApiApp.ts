@@ -1,5 +1,6 @@
 import { AbstractApp } from '@inti5/app-backend/Module/AbstractApp';
-import { ExpressConfig, ExpressFactory } from '@inti5/express-ext/Factory';
+import { Configuration } from '@inti5/configuration';
+import { ExpressConfig, ExpressFactory } from '@inti5/express-ext';
 import { ObjectManager } from '@inti5/object-manager';
 
 
@@ -9,13 +10,13 @@ export class ApiApp
     
     protected async main ()
     {
-        const expressFactory = ObjectManager.getSingleton()
-            .getInstance(ExpressFactory);
+        const configuration = Configuration.getSingleton();
+        const expressFactory = ObjectManager.getSingleton().getInstance(ExpressFactory);
         
         const config : ExpressConfig = {
             listenOnPort: Number(process.env.API_PORT),
             https: false,
-            jwtSecret: process.env.JWT_SECRET,
+            jwtSecret: configuration.get('core.jwtSecret'),
         };
         
         await expressFactory.create(config);
