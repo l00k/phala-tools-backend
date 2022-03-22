@@ -11,9 +11,7 @@ import * as Trans from 'class-transformer';
 @ORM.Entity({
     tableName: 'watchdog_user',
 })
-@ORM.Unique({
-    properties: [ 'messagingChannel', 'userId' ]
-})
+@ORM.Unique({ properties: [ 'msgChannel', 'msgUserId' ] })
 export class User
     extends AbstractModel<User>
 {
@@ -26,19 +24,16 @@ export class User
     
     
     @ORM.Enum({ items: Object.values(MessagingChannel) })
-    public messagingChannel : MessagingChannel;
+    public msgChannel : MessagingChannel;
     
-    @ORM.Property()
-    public userId : string;
-    
-    @ORM.Property()
-    public chatId : string;
+    @ORM.Property({ index: true })
+    public msgUserId : string;
     
     @ORM.Property({ nullable: true })
     public token : string;
     
     @ORM.Property()
-    public name : string;
+    public username : string;
     
     
     @ORM.Property({ onCreate: () => new Date() })

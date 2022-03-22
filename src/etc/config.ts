@@ -1,6 +1,19 @@
 export default {
     core: {
-        jwtSecret: 'Top.Secret.Value',
+        jwt: {
+            accessToken: {
+                privateKey: 'TOP.SECRET.VALUE',
+                options: {
+                    expiresIn: 30 * 60,
+                }
+            },
+            refreshToken: {
+                privateKey: 'TOP.SECRET.VALUE',
+                options: {
+                    expiresIn: 24 * 60 * 60,
+                }
+            },
+        },
     },
     service: {
         orm: require('./services/orm').default
@@ -8,13 +21,14 @@ export default {
     module: {
         messaging: {
             discord: {
-                botToken: null,
-                redirectMsgTo: null,
+                botToken: 'TOP.SECRET.VALUE',
+                clientId: 'TOP.SECRET.VALUE',
+                clientSecret: 'TOP.SECRET.VALUE',
+                redirectUri: 'https://phala.100k.dev/watchdog'
             },
             telegram: {
-                botToken: null,
-                redirectMsgTo: null,
-            },
+                botToken: 'TOP.SECRET.VALUE',
+            }
         },
         polkadot: {
             api: {
@@ -27,7 +41,7 @@ export default {
             }
         },
         watchdog: {
-            secureKey: 'Top.Secret.Value'
+            secureKey: 'TOP.SECRET.VALUE'
         },
         uptimeNotifier: {
             heartbeatUrl: null

@@ -1,4 +1,4 @@
-import { Task } from '#/Core/Service/Tasker/Annotation';
+import { Task } from '#/AppBackend/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { WorkerState } from '#/Phala/Api/Worker';
@@ -106,8 +106,8 @@ export class UnresponsiveWorkerHandler
                     : `${unresponsiveCount} workers are in unresponsive state`;
                 
                 this.notificationAggregator.aggregate(
-                    observation.user.messagingChannel,
-                    observation.user.chatId,
+                    observation.user.msgChannel,
+                    observation.user.msgUserId,
                     text
                 );
             }

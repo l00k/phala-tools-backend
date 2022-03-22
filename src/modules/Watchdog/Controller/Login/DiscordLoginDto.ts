@@ -1,7 +1,7 @@
 import { Assert } from '@inti5/validator/Object';
 
 
-export class DiscordDto
+export class DiscordLoginDto
 {
     
     @Assert({

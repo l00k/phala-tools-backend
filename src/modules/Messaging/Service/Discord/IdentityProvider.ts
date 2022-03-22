@@ -2,7 +2,7 @@ import { DiscordConfig } from '#/Messaging/Domain/types';
 import { REST } from '@discordjs/rest';
 import { Config } from '@inti5/configuration';
 import { InitializeSymbol } from '@inti5/object-manager';
-import { RESTPostOAuth2AccessTokenResult } from 'discord-api-types/v10';
+import { APIUser, RESTPostOAuth2AccessTokenResult } from 'discord-api-types';
 import { Routes } from 'discord-api-types/v9';
 
 
@@ -23,9 +23,9 @@ export class IdentityProvider
     }
     
     
-    public async getAccessTokenViaCode (code : string): Promise<RESTPostOAuth2AccessTokenResult>
+    public async getAccessTokenViaCode (code : string) : Promise<RESTPostOAuth2AccessTokenResult>
     {
-        return <any> await this.botRest.post(
+        return <any>await this.botRest.post(
             Routes.oauth2TokenExchange(),
             {
                 passThroughBody: true,
@@ -44,15 +44,15 @@ export class IdentityProvider
         );
     }
     
-    public async getIdentity (accessToken : string, tokenType : string)
+    public async getIdentity (accessToken : string) : Promise<APIUser>
     {
         const userRest = new REST({ version: '9' });
         userRest.setToken(accessToken);
         
-        return await userRest.get(
+        return <any>await userRest.get(
             Routes.user(),
             {
-                authPrefix: <any> tokenType
+                authPrefix: 'Bearer'
             }
         );
     }

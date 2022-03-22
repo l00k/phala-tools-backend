@@ -60,8 +60,8 @@ export class ContributionHandler
                 + '`#' + onChainStakePoolId + '`';
             
             this.notificationAggregator.aggregate(
-                observation.user.messagingChannel,
-                observation.user.chatId,
+                observation.user.msgChannel,
+                observation.user.msgUserId,
                 text
             );
         }

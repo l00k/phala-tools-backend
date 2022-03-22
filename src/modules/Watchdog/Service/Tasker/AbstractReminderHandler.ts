@@ -1,5 +1,5 @@
-import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
-import { AbstractHandler } from '#/Core/Service/Tasker/AbstractHandler';
+import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
+import { AbstractHandler } from '#/AppBackend/Service/Tasker/AbstractHandler';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { MessagingProvider } from '#/Messaging/Service/MessagingProvider';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';

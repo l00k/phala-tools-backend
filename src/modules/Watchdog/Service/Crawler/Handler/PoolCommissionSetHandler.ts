@@ -68,8 +68,8 @@ export class PoolCommissionSetHandler
                 + ' by `' + Math.abs(commissionDelta).toFixed(1) + '%` to `' + newCommissionPercent.toFixed(1) + '%`';
             
             this.notificationAggregator.aggregate(
-                observation.user.messagingChannel,
-                observation.user.chatId,
+                observation.user.msgChannel,
+                observation.user.msgUserId,
                 text
             );
         }

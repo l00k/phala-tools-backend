@@ -1,4 +1,4 @@
-import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
+import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
 import { InitializeSymbol, Inject } from '@inti5/object-manager';
 import { NodeState } from '#/Watchdog/Domain/Model/MetricState/NodeState';
 import { EntityManager, SqlEntityRepository } from '@mikro-orm/mysql';

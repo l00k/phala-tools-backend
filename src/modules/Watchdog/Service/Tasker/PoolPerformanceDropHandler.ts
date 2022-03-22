@@ -1,6 +1,6 @@
-import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
-import { AbstractHandler } from '#/Core/Service/Tasker/AbstractHandler';
-import { Task } from '#/Core/Service/Tasker/Annotation';
+import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
+import { AbstractHandler } from '#/AppBackend/Service/Tasker/AbstractHandler';
+import { Task } from '#/AppBackend/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
@@ -110,8 +110,8 @@ export class PoolPerformanceDropHandler
                     const text = '`#' + onChainId + '` rewards performance drop of `' + dropPercent.toFixed(1) + '%`';
                     
                     this.notificationAggregator.aggregate(
-                        observation.user.messagingChannel,
-                        observation.user.chatId,
+                        observation.user.msgChannel,
+                        observation.user.msgUserId,
                         text
                     );
                 }

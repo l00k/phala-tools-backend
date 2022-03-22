@@ -1,6 +1,6 @@
-import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
-import { AbstractHandler } from '#/Core/Service/Tasker/AbstractHandler';
-import { Task } from '#/Core/Service/Tasker/Annotation';
+import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
+import { AbstractHandler } from '#/AppBackend/Service/Tasker/AbstractHandler';
+import { Task } from '#/AppBackend/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { NodeIssue } from '#/Watchdog/Domain/Model/Issue/NodeIssue';
@@ -56,8 +56,8 @@ export class NodeIssuesHandler
                     + verification.issues.join('\n');
                 
                 this.notificationAggregator.aggregate(
-                    nodeState.owner.messagingChannel,
-                    nodeState.owner.chatId,
+                    nodeState.owner.msgChannel,
+                    nodeState.owner.msgUserId,
                     text
                 );
             }

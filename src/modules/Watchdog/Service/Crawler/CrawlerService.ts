@@ -1,5 +1,5 @@
-import { AppState } from '#/Core/Domain/Model/AppState';
-import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
+import { AppState } from '#/AppBackend/Domain/Model/AppState';
+import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { CrawlerState } from '#/Watchdog/Domain/Model/AppState/CrawlerState';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';

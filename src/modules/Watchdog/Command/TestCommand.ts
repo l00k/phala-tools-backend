@@ -22,7 +22,7 @@ export class DumpCommand
         const service = ObjectManager.getSingleton()
             .getInstance(IdentityProvider);
         
-        const result = await service.getIdentity('JkHrgrWGbum4unL4BEUv6D3clwuJns', 'Bearer');
+        const result = await service.getIdentity('JkHrgrWGbum4unL4BEUv6D3clwuJns');
         console.dir(result);
     }
     

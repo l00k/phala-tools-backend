@@ -27,8 +27,7 @@
         ],
         "paths": {
             "#/*": ["./src/modules/*"],
-            "@inti5/*": ["./src/core/inti5/*"],
-            "@inti5/app-backend/*": ["./src/core/inti5/app-backend/*"],
+            "@inti5/*": ["./src/core/*"],
             "*": [
                 "./src/*",
                 "./tests/*"

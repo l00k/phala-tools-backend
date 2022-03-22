@@ -1,6 +1,6 @@
-import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
-import { AbstractHandler } from '#/Core/Service/Tasker/AbstractHandler';
-import { Task } from '#/Core/Service/Tasker/Annotation';
+import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
+import { AbstractHandler } from '#/AppBackend/Service/Tasker/AbstractHandler';
+import { Task } from '#/AppBackend/Service/Tasker/Annotation';
 import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
@@ -96,8 +96,8 @@ export class ClaimableRewardsHandler
                     ;
                     
                     this.notificationAggregator.aggregate(
-                        observation.user.messagingChannel,
-                        observation.user.chatId,
+                        observation.user.msgChannel,
+                        observation.user.msgUserId,
                         text
                     );
                 }
