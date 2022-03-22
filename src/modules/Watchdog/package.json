@@ -1,0 +1,18 @@
+{
+    "name": "@app/watchdog",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "cli-table": "^0.3.6",
+        "colors": "^1.4.0",
+        "deep-object-diff": "^1.1.0",
+        "moment": "^2.29.1",
+        "moment-duration-format": "^2.3.2",
+        "numbro": "^2.3.5"
+    },
+    "devDependencies": {
+        "@types/moment-duration-format": "^2.2.3",
+        "@types/prompts": "^2.0.14",
+        "@types/ssh2": "^0.5.48"
+    }
+}

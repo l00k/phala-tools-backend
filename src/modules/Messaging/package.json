@@ -1,0 +1,11 @@
+{
+    "name": "@app/messaging",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "discord.js": "^13.6.0",
+        "@discordjs/rest": "^0.3.0",
+        "discord-api-types": "^0.29.0",
+        "telegraf": "^4.7.0"
+    }
+}

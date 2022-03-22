@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+    db:
+        image: mysql:5.7
+        command: [ '--skip-name-resolve' ]
+        user: "1000:1000"
+        restart: "no"
+        env_file: .env
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=$DB_NAME
+            - MYSQL_USER=$DB_USER
+            - MYSQL_PASSWORD=$DB_PASSWORD
+        ports:
+            - $DB_PORT_EXTERNAL:3306
+        volumes:
+            - ./.db-data:/var/lib/mysql
+            - ./etc/mysql.conf.d:/etc/mysql/conf.d
+
+    dba:
+        image: phpmyadmin:5
+        restart: "no"
+        env_file: .env
+        ports:
+            - $PMA_PORT_EXTERNAL:80
+        environment:
+            PMA_HOST: db
+            PMA_USER: $DB_NAME
+            PMA_PASSWORD: $DB_PASSWORD
+        volumes:
+            - ./etc/pma/config.header.inc.php:/etc/phpmyadmin/config.header.inc.php:rw
+            - ./etc/pma/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:rw

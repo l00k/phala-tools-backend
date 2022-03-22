@@ -1,0 +1,45 @@
+{
+    "name": "@100k/phala-watchdog-server",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "cli": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts cli",
+        "cli:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts cli",
+        "cli:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts cli",
+        
+        "api": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts api",
+        "api:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts api",
+        "api:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts api",
+        
+        "process": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts process",
+        "process:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts process",
+        "process:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts process",
+        
+        "postinstall": "patch-package"
+    },
+    "workspaces": [
+        "src/core/inti5/*",
+        "src/core/app-backend",
+        "src/modules/*"
+    ],
+    "dependencies": {
+        "patch-package": "^6.4.7",
+        "postinstall-postinstall": "^2.1.0",
+        "ts-node": "^9.1.1",
+        "tsc-watch": "^4.2.9",
+        "tsconfig-paths": "^3.12.0",
+        "typescript": "^4.2.4"
+    },
+    "devDependencies": {
+        "ts-node-dev": "^1.1.1"
+    },
+    "mikro-orm": {
+        "useTsNode": true,
+        "configPaths": [
+            "./src/etc/services/orm.ts"
+        ]
+    },
+    "engines": {
+        "node": ">=16.14.0"
+    }
+}
