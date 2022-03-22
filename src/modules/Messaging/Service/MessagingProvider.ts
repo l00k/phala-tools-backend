@@ -1,15 +1,17 @@
+import { DiscordConfig, TelegramConfig } from '#/Messaging/Domain/types';
 import { REST } from '@discordjs/rest';
 import { Config } from '@inti5/configuration';
 import { InitializeSymbol, Singleton } from '@inti5/object-manager';
-import axios from 'axios';
 import { Routes } from 'discord-api-types/v9';
-import { Channel, PartialGroupDMChannel } from 'discord.js';
+import { Message, PartialGroupDMChannel } from 'discord.js';
+import { Telegram, } from 'telegraf';
+import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 
 
 export enum MessagingChannel
 {
-    Discord = 'Discord',
-    Telegram = 'Telegram',
+    Discord = 'discord',
+    Telegram = 'telegram',
 }
 
 
@@ -17,57 +19,65 @@ export enum MessagingChannel
 export class MessagingProvider
 {
     
-    @Config('module.messaging.discord.botToken')
-    protected discordBotToken : string;
+    @Config('module.messaging.discord')
+    protected discordConfig : DiscordConfig;
     
-    @Config('module.messaging.telegram.botToken')
-    protected telegramBotToken : string;
-    
-    @Config('module.messaging.redirectAllMessagesTo')
-    protected redirectAllMessagesTo : string;
+    @Config('module.messaging.telegram')
+    protected telegramConfig : TelegramConfig;
     
     
-    protected rest : REST;
+    protected discordRest : REST;
+    
+    protected telegram : Telegram;
     
     
     public [InitializeSymbol] ()
     {
-        this.rest = new REST({ version: '9' });
-        this.rest.setToken(this.discordBotToken);
+        this.discordRest = new REST({ version: '10' });
+        this.discordRest.setToken(this.discordConfig.botToken);
+        
+        this.telegram = new Telegram(this.telegramConfig.botToken);
     }
     
     
     public async sendMessage (
         channel : MessagingChannel,
-        recipient : string,
+        chatId : string,
         text : string
-    ) : Promise<boolean>
+    ) : Promise<any>
     {
         if (channel == MessagingChannel.Discord) {
-            return this.sendMessageViaDiscord(recipient, text);
+            return this.sendMessageViaDiscord(chatId, text);
         }
         else if (channel == MessagingChannel.Telegram) {
-            return this.sendMessageViaDiscord(recipient, text);
+            return this.sendMessageViaTelegram(chatId, text);
         }
         
-        return false;
+        return null;
     }
     
     protected async sendMessageViaDiscord (
-        userId : string,
+        chatId : string,
         text : string
-    ) : Promise<boolean>
+    ) : Promise<Message>
     {
-        const channel : PartialGroupDMChannel = <any> await this.rest.post(
+        if (this.discordConfig.redirectMsgTo) {
+            text = `## Redirected from ${chatId}\n` + text;
+            chatId = this.discordConfig.redirectMsgTo;
+        }
+        
+        // open channel
+        const channel : PartialGroupDMChannel = <any>await this.discordRest.post(
             Routes.userChannels(),
             {
                 body: {
-                    recipient_id: '735325356239880210'
+                    recipient_id: chatId
                 }
             }
         );
         
-        const message = <any> await this.rest.post(
+        // send message
+        return <any>this.discordRest.post(
             Routes.channelMessages(channel.id),
             {
                 body: {
@@ -75,42 +85,29 @@ export class MessagingProvider
                 }
             }
         );
-        
-        console.dir(message);
-        
-        return true;
     }
     
     protected async sendMessageViaTelegram (
         chatId : string,
         text : string
-    ) : Promise<boolean>
+    ) : Promise<ExtraReplyMessage>
     {
-        const botUrl = `https://api.telegram.org/bot${this.telegramBotToken}/sendMessage`;
-        
-        if (this.redirectAllMessagesTo) {
+        if (this.telegramConfig.redirectMsgTo) {
             text = `## Redirected from ${chatId}\n` + text;
-            chatId = this.redirectAllMessagesTo;
+            chatId = this.telegramConfig.redirectMsgTo;
         }
         
         try {
-            const response = await axios.get(
-                botUrl,
-                {
-                    params: {
-                        parse_mode: 'markdown',
-                        chat_id: chatId,
-                        text: text,
-                    }
-                }
+            return <any>this.telegram.sendMessage(
+                chatId,
+                text,
+                { parse_mode: 'MarkdownV2' }
             );
-            
-            return response.status === 200;
         }
         catch (e) {
         }
         
-        return false;
+        return null;
     }
     
 }

@@ -1,3 +1,4 @@
+import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 import { AbstractModel } from '@inti5/app-backend/Module/AbstractModel';
@@ -8,7 +9,10 @@ import * as Trans from 'class-transformer';
 
 
 @ORM.Entity({
-    tableName: 'watchdog_user'
+    tableName: 'watchdog_user',
+})
+@ORM.Unique({
+    properties: [ 'messagingChannel', 'userId' ]
 })
 export class User
     extends AbstractModel<User>
@@ -20,11 +24,22 @@ export class User
     @ORM.PrimaryKey()
     public id : number;
     
-    @ORM.Property({ unique: true })
-    public tgUserId : string;
+    
+    @ORM.Enum({ items: Object.values(MessagingChannel) })
+    public messagingChannel : MessagingChannel;
     
     @ORM.Property()
-    public tgName : string;
+    public userId : string;
+    
+    @ORM.Property()
+    public chatId : string;
+    
+    @ORM.Property({ nullable: true })
+    public token : string;
+    
+    @ORM.Property()
+    public name : string;
+    
     
     @ORM.Property({ onCreate: () => new Date() })
     public createdAt : Date = new Date();

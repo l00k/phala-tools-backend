@@ -94,8 +94,12 @@ export class ClaimableRewardsHandler
                         + 'Stake pool: `#' + onChainStakePool.pid + '`\n'
                         + 'Amount: `' + Utility.formatCoin(availableRewards, true) + '`\n'
                     ;
-                    // todo ld 2022-03-14 16:49:07
-                    this.notificationAggregator.aggregate(MessagingChannel.Telegram, observation.user.tgUserId, text);
+                    
+                    this.notificationAggregator.aggregate(
+                        observation.user.messagingChannel,
+                        observation.user.chatId,
+                        text
+                    );
                 }
             }
         });

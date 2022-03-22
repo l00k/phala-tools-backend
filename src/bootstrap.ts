@@ -1,4 +1,5 @@
 import { ObjectManager } from '@inti5/object-manager';
+import { timeout } from '@inti5/utils/Timeout';
 import dotenv from 'dotenv';
 
 globalThis['__basedir'] = __dirname;
@@ -29,7 +30,6 @@ const component = process.argv[2];
         await app.run();
     }
     
-    // todo ld 2022-03-18 09:44:18
     await timeout(
         async() => await objectManager.releaseAll(),
         5000

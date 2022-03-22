@@ -7,11 +7,11 @@ export default {
         messaging: {
             discord: {
                 botToken: null,
-                redirectAllMessagesTo: null,
+                redirectMsgTo: null,
             },
             telegram: {
                 botToken: null,
-                redirectAllMessagesTo: null,
+                redirectMsgTo: null,
             },
         },
         polkadot: {

@@ -1,9 +1,10 @@
+import { Account } from '#/Watchdog/Domain/Model/Account';
+import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
+import { StakePoolObservationConfiguration } from '#/Watchdog/Domain/Model/StakePoolObservationConfiguration';
+import { User } from '#/Watchdog/Domain/Model/User';
+import { AbstractModel } from '@inti5/app-backend/Module/AbstractModel';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
-import { AbstractModel } from '@inti5/app-backend/Module/AbstractModel';
-import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
-import { User } from '#/Watchdog/Domain/Model/User';
-import { Account } from '#/Watchdog/Domain/Model/Account';
 
 
 export enum NotificationType
@@ -30,29 +31,33 @@ type LastNotifications = {
 export class StakePoolObservation
     extends AbstractModel<StakePoolObservation>
 {
-
-
+    
+    
     @ORM.PrimaryKey()
     public id : number;
-
-
+    
+    
     @ORM.ManyToOne(() => User, { eager: true })
     public user : User;
-
+    
     @ORM.ManyToOne(() => StakePool, { eager: true })
     public stakePool : StakePool;
-
-    @ORM.ManyToOne(() => Account, { eager: true })
+    
+    @ORM.ManyToOne(() => Account, { nullable: true, eager: true })
     public account : Account;
-
+    
     @ORM.Enum({ items: () => ObservationMode, nullable: true })
     public mode : ObservationMode;
-
-
+    
+    
+    @ORM.Property({ type: ORM.JsonType })
+    public config : StakePoolObservationConfiguration = new StakePoolObservationConfiguration();
+    
+    
     @ORM.Property({ type: ORM.JsonType })
     public lastNotifications : LastNotifications = {};
-
-
+    
+    
     public constructor (data? : Partial<StakePoolObservation>, entityManager? : EntityManager)
     {
         super(data, entityManager);
@@ -60,15 +65,15 @@ export class StakePoolObservation
             this.assign(data, { em: entityManager });
         }
     }
-
+    
     public getLastNotification (notificationType : NotificationType) : number
     {
         return this.lastNotifications[notificationType];
     }
-
+    
     public updateLastNotification (notificationType : NotificationType)
     {
         this.lastNotifications[notificationType] = Date.now();
     }
-
+    
 }

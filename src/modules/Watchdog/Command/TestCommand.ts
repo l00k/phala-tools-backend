@@ -1,4 +1,5 @@
-import { MessagingChannel, MessagingProvider } from '#/Messaging/Service/MessagingProvider';
+import { IdentityProvider } from '#/Messaging/Service/Discord/IdentityProvider';
+import { CrawlerService } from '#/Watchdog/Service/Crawler/CrawlerService';
 import { DependencyInjection, ObjectManager } from '@inti5/object-manager';
 import * as CLI from 'classy-commander';
 
@@ -11,14 +12,18 @@ export class DumpCommand
     
     public async execute () : Promise<void>
     {
-        const discord = ObjectManager.getSingleton()
-            .getInstance(MessagingProvider);
+        const service = ObjectManager.getSingleton()
+            .getInstance(IdentityProvider);
         
-        await discord.sendMessage(
-            MessagingChannel.Discord,
-            'l00k#1990',
-            'Test'
-        );
+    }
+    
+    public async loginDiscord () : Promise<void>
+    {
+        const service = ObjectManager.getSingleton()
+            .getInstance(IdentityProvider);
+        
+        const result = await service.getIdentity('JkHrgrWGbum4unL4BEUv6D3clwuJns', 'Bearer');
+        console.dir(result);
     }
     
 }

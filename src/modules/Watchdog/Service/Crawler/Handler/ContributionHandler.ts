@@ -1,4 +1,3 @@
-import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
@@ -14,11 +13,11 @@ import { Inject, Injectable } from '@inti5/object-manager';
 export class ContributionHandler
     extends AbstractHandler
 {
-
+    
     @Inject({ ctorArgs: [ '🤑 New contribution in your pool' ] })
     protected notificationAggregator : NotificationAggregator;
-
-
+    
+    
     @Listen([
         EventType.Contribution
     ])
@@ -26,18 +25,18 @@ export class ContributionHandler
     {
         const stakePoolRepository = this.entityManager.getRepository(StakePool);
         const stakePoolObservationRepository = this.entityManager.getRepository(StakePoolObservation);
-
+        
         const onChainStakePoolId : number = Number(event.data[0]);
         const delegator : string = String(event.data[1]);
         const stakedAmount : number = PhalaUtility.parseRawAmount(Number(event.data[2]));
-
+        
         // fetch stake pool
         const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: onChainStakePoolId });
         if (!stakePool) {
             // no stake pool entry
             return false;
         }
-
+        
         // inform owners (only!)
         const stakePoolObservations = await stakePoolObservationRepository.find(
             {
@@ -49,22 +48,25 @@ export class ContributionHandler
             // no stake pool observations
             return false;
         }
-
+        
         for (const observation of stakePoolObservations) {
             const threshold = observation.user.getConfig('contributionThreshold');
             if (stakedAmount < threshold) {
                 continue;
             }
-
+            
             const text = '`' + Utility.formatAddress(delegator) + '` staked '
                 + '`' + Utility.formatCoin(stakedAmount, true) + '` into pool '
                 + '`#' + onChainStakePoolId + '`';
-
-            // todo ld 2022-03-14 16:49:07
-            this.notificationAggregator.aggregate(MessagingChannel.Telegram, observation.user.tgUserId, text);
+            
+            this.notificationAggregator.aggregate(
+                observation.user.messagingChannel,
+                observation.user.chatId,
+                text
+            );
         }
-
+        
         return true;
     }
-
+    
 }

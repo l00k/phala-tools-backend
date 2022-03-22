@@ -1,7 +1,6 @@
 import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
 import { AbstractHandler } from '#/Core/Service/Tasker/AbstractHandler';
 import { Task } from '#/Core/Service/Tasker/Annotation';
-import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
@@ -67,10 +66,9 @@ export class PendingWithdrawalHandler
                 for (const observation of observations) {
                     const text = '`#' + onChainPoolId + '` total `' + totalText + '`';
                     
-                    // todo ld 2022-03-14 16:49:07
                     this.notificationAggregator.aggregate(
-                        MessagingChannel.Telegram,
-                        observation.user.tgUserId,
+                        observation.user.messagingChannel,
+                        observation.user.chatId,
                         text
                     );
                 }

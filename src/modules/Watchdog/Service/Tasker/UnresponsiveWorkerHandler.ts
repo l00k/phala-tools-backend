@@ -1,13 +1,12 @@
 import { Task } from '#/Core/Service/Tasker/Annotation';
-import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { WorkerState } from '#/Phala/Api/Worker';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
+import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
 import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
 import { AbstractReminderHandler } from '#/Watchdog/Service/Tasker/AbstractReminderHandler';
-import { Utility } from '#/Watchdog/Utility/Utility';
 import { Inject, Injectable } from '@inti5/object-manager';
 
 
@@ -23,6 +22,9 @@ export class UnresponsiveWorkerHandler
     protected notificationAggregator : NotificationAggregator;
     
     
+    protected unresponsiveWorkersCounter : { [onChainId : number] : number } = {};
+    
+    
     @Task({
         cronExpr: '*/15 * * * *'
     })
@@ -35,28 +37,81 @@ export class UnresponsiveWorkerHandler
             const workerState : typeof KhalaTypes.MinerInfo =
                 <any>(await this.api.query.phalaMining.miners(issue.workerAccount)).toJSON();
             
-            if (
-                !workerState
-                || workerState.state != WorkerState.MiningUnresponsive
-            ) {
-                // issue already resolved
-                this.entityManager.remove(issue);
-                continue;
+            // todo ld 2022-03-21 22:02:41
+            // if (
+            //     !workerState
+            //     || workerState.state != WorkerState.MiningUnresponsive
+            // ) {
+            //     // issue already resolved
+            //     this.entityManager.remove(issue);
+            //     continue;
+            // }
+            
+            if (!this.unresponsiveWorkersCounter[issue.stakePool.onChainId]) {
+                this.unresponsiveWorkersCounter[issue.stakePool.onChainId] = 0;
             }
             
-            const observations : StakePoolObservation[] = await observationRepository.find({
-                stakePool: issue.stakePool,
-                mode: ObservationMode.Owner,
-            });
-            
-            for (const observation of observations) {
-                const text = '`#' + String(issue.stakePool.onChainId).padEnd(6, ' ') + Utility.formatPublicKey(issue.workerPubKey) + '`';
-                // todo ld 2022-03-14 16:49:07
-                this.notificationAggregator.aggregate(MessagingChannel.Telegram, observation.user.tgUserId, text, String(issue.stakePool.id));
-            }
+            ++this.unresponsiveWorkersCounter[issue.stakePool.onChainId];
         }
         
         return true;
+    }
+    
+    public async postProcess ()
+    {
+        await this.prepareMessages();
+        
+        // clear counters
+        this.unresponsiveWorkersCounter = {};
+        
+        await super.postProcess();
+    }
+    
+    protected async prepareMessages ()
+    {
+        const stakePoolRepository = this.entityManager.getRepository(StakePool);
+        const stakePoolObservationRepository = this.entityManager.getRepository(StakePoolObservation);
+        
+        for (const [ onChainId, unresponsiveCount ] of Object.entries(this.unresponsiveWorkersCounter)) {
+            if (unresponsiveCount == 0) {
+                continue;
+            }
+        
+            // fetch stake pool
+            const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: Number(onChainId) });
+            if (!stakePool) {
+                // no stake pool entry
+                continue;
+            }
+            
+            // inform owners (only!)
+            const stakePoolObservations = await stakePoolObservationRepository.find(
+                {
+                    stakePool,
+                    mode: ObservationMode.Owner,
+                }
+            );
+            if (!stakePoolObservations.length) {
+                // no stake pool observations
+                return;
+            }
+            
+            for (const observation of stakePoolObservations) {
+                if (observation.user.getConfig('delayUnresponsiveWorkerNotification')) {
+                    continue;
+                }
+                
+                const text = unresponsiveCount == 1
+                    ? `1 worker is in unresponsive state`
+                    : `${unresponsiveCount} workers are in unresponsive state`;
+                
+                this.notificationAggregator.aggregate(
+                    observation.user.messagingChannel,
+                    observation.user.chatId,
+                    text
+                );
+            }
+        }
     }
     
 }

@@ -1,7 +1,6 @@
 import { EntityManagerWrapper } from '#/Core/Service/EntityManagerWrapper';
 import { AbstractHandler } from '#/Core/Service/Tasker/AbstractHandler';
 import { Task } from '#/Core/Service/Tasker/Annotation';
-import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
@@ -109,8 +108,12 @@ export class PoolPerformanceDropHandler
                 const exceedThreshold : boolean = dropPercent > observation.user.getConfig('poolPerformanceDropThreshold');
                 if (exceedThreshold) {
                     const text = '`#' + onChainId + '` rewards performance drop of `' + dropPercent.toFixed(1) + '%`';
-                    // todo ld 2022-03-14 16:49:07
-                    this.notificationAggregator.aggregate(MessagingChannel.Telegram, observation.user.tgUserId, text);
+                    
+                    this.notificationAggregator.aggregate(
+                        observation.user.messagingChannel,
+                        observation.user.chatId,
+                        text
+                    );
                 }
             }
         });
