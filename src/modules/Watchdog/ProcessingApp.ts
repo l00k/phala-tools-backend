@@ -1,4 +1,4 @@
-import { AbstractApp } from '@inti5/app-backend/Module/AbstractApp';
+import { AbstractApp } from '#/AppBackend/Module/AbstractApp';
 import { CrawlerService } from '#/Watchdog/Service/Crawler/CrawlerService';
 import { ObjectManager } from '@inti5/object-manager';
 import { TaskerService } from '#/Core/Service/Tasker/TaskerService';

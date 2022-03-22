@@ -1,6 +1,6 @@
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
-import { AbstractModel } from '@inti5/app-backend/Module/AbstractModel';
+import { AbstractModel } from '#/AppBackend/Module/AbstractModel';
 import { Account } from '#/Watchdog/Domain/Model/Account';
 
 

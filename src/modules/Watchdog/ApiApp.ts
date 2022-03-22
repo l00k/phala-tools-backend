@@ -1,4 +1,4 @@
-import { AbstractApp } from '@inti5/app-backend/Module/AbstractApp';
+import { AbstractApp } from '#/AppBackend/Module/AbstractApp';
 import { Configuration } from '@inti5/configuration';
 import { ExpressConfig, ExpressFactory } from '@inti5/express-ext';
 import { ObjectManager } from '@inti5/object-manager';

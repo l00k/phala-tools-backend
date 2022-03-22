@@ -4,7 +4,7 @@ import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { CrawlerState } from '#/Watchdog/Domain/Model/AppState/CrawlerState';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Event } from '#/Watchdog/Service/Crawler/Event';
-import { Exception } from '@inti5/app-backend/Exception';
+import { Exception } from '#/AppBackend/Exception';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { EntityManager } from '@mikro-orm/mysql';
