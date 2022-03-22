@@ -18,8 +18,7 @@
         "postinstall": "patch-package"
     },
     "workspaces": [
-        "src/core/inti5/*",
-        "src/core/app-backend",
+        "src/core/*",
         "src/modules/*"
     ],
     "dependencies": {
