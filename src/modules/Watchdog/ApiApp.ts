@@ -16,7 +16,7 @@ export class ApiApp
         const config : ExpressConfig = {
             listenOnPort: Number(process.env.API_PORT),
             https: false,
-            jwtSecret: configuration.get('core.jwtSecret'),
+            jwtAccessTokenPrivateKey: configuration.get('core.jwt.accessToken.privateKey'),
         };
         
         await expressFactory.create(config);
