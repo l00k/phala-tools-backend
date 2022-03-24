@@ -1,4 +1,4 @@
-import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
+import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { UpdateDto } from '#/Watchdog/Controller/NodeState/UpdateDto';
 import { NodeState } from '#/Watchdog/Domain/Model/MetricState/NodeState';
 import { ActionResult, Controller, Endpoint } from '@inti5/express-ext';

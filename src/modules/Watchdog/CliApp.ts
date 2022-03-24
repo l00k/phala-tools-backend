@@ -1,4 +1,4 @@
-import { AbstractCliApp } from '#/AppBackend/Module/AbstractCliApp';
+import { AbstractCliApp } from '#/BackendCore/Module/AbstractCliApp';
 import * as CLI from 'classy-commander';
 
 

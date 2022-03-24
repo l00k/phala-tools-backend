@@ -7,7 +7,7 @@ import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { ApiPromise } from '@polkadot/api';
 import { MessagingProvider } from '#/Messaging/Service/MessagingProvider';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
-import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
+import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import colors from 'colors';
 
 

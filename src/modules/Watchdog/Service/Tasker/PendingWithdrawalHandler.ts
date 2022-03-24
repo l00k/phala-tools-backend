@@ -1,6 +1,6 @@
-import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
-import { AbstractHandler } from '#/AppBackend/Service/Tasker/AbstractHandler';
-import { Task } from '#/AppBackend/Service/Tasker/Annotation';
+import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
+import { AbstractHandler } from '#/BackendCore/Service/Tasker/AbstractHandler';
+import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';

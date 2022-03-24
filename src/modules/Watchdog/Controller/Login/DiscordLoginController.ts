@@ -1,5 +1,5 @@
-import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
-import { JwtSigner } from '#/AppBackend/Service/JwtSigner';
+import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
+import { JwtSigner } from '#/BackendCore/Service/JwtSigner';
 import { IdentityProvider as DiscordIdentityProvider } from '#/Messaging/Service/Discord/IdentityProvider';
 import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import { DiscordLoginDto } from '#/Watchdog/Controller/Login/DiscordLoginDto';

@@ -1,5 +1,5 @@
-import { EntityManagerWrapper } from '#/AppBackend/Service/EntityManagerWrapper';
-import { JwtSigner } from '#/AppBackend/Service/JwtSigner';
+import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
+import { JwtSigner } from '#/BackendCore/Service/JwtSigner';
 import { TelegramConfig } from '#/Messaging/Domain/types';
 import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import { TelegramLoginDto } from '#/Watchdog/Controller/Login/TelegramLoginDto';

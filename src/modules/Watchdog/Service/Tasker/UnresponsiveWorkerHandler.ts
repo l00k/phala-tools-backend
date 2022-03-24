@@ -1,4 +1,4 @@
-import { Task } from '#/AppBackend/Service/Tasker/Annotation';
+import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { WorkerState } from '#/Phala/Api/Worker';

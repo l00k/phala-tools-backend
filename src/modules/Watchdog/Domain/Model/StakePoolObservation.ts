@@ -2,7 +2,7 @@ import { Account } from '#/Watchdog/Domain/Model/Account';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
 import { StakePoolObservationConfiguration } from '#/Watchdog/Domain/Model/StakePoolObservationConfiguration';
 import { User } from '#/Watchdog/Domain/Model/User';
-import { AbstractModel } from '#/AppBackend/Domain/Model/AbstractModel';
+import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 
