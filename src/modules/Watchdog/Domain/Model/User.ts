@@ -1,5 +1,6 @@
 import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
 import * as ORM from '@mikro-orm/core';
+import { Annotation as API } from '@inti5/api-backend';
 import { EntityManager } from '@mikro-orm/mysql';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
@@ -12,6 +13,7 @@ import * as Trans from 'class-transformer';
     tableName: 'watchdog_user',
 })
 @ORM.Unique({ properties: [ 'msgChannel', 'msgUserId' ] })
+@API.Resource('Watchdog/User')
 export class User
     extends AbstractModel<User>
 {
@@ -20,10 +22,18 @@ export class User
 
     
     @ORM.PrimaryKey()
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public id : number;
     
     
     @ORM.Enum({ items: Object.values(MessagingChannel) })
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public msgChannel : MessagingChannel;
     
     @ORM.Property({ index: true })
@@ -33,17 +43,33 @@ export class User
     public token : string;
     
     @ORM.Property()
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public username : string;
     
     
     @ORM.Property({ onCreate: () => new Date() })
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public createdAt : Date = new Date();
     
     @ORM.Property({ onUpdate: () => new Date() })
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public updatedAt : Date = new Date();
     
     
     @ORM.Property({ type: ORM.JsonType })
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public config : UserConfiguration = new UserConfiguration();
     
     @ORM.ManyToMany(() => Account)

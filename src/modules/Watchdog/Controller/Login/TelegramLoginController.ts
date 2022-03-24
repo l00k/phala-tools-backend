@@ -60,7 +60,9 @@ export class TelegramLoginController
     
     protected async verifyTelegramLogin (telegramUser : TelegramLoginDto)
     {
-        const fields = [ 'auth_date', 'first_name', 'id', 'last_name', 'photo_url', 'username', ];
+        const fields = Object.keys(telegramUser)
+            .filter(field => [ 'hash' ].includes(field))
+            .sort();
         const text = fields
             .map(field => `${field}=${telegramUser[field]}`)
             .join('\n');

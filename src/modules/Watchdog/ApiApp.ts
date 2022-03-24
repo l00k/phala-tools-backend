@@ -1,4 +1,5 @@
 import { AbstractApp } from '#/BackendCore/Module/AbstractApp';
+import * as Api from '@inti5/api-backend';
 import { Configuration } from '@inti5/configuration';
 import { ExpressConfig, ExpressFactory } from '@inti5/express-ext';
 import { ObjectManager } from '@inti5/object-manager';
@@ -20,6 +21,11 @@ export class ApiApp
         };
         
         await expressFactory.create(config);
+        
+        // bootstrap api
+        const apiService = ObjectManager.getSingleton()
+            .getInstance(Api.Service);
+        apiService.bootstrap();
         
         return new Promise(solve => {
             process.once('SIGINT', () => solve(true));

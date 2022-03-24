@@ -50,6 +50,7 @@ export class DiscordLoginController
             });
         }
         catch (e) {
+            console.error(e);
             return false;
         }
     }

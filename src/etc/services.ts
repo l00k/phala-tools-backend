@@ -1,4 +1,4 @@
-import { OrmFactory } from '@inti5/app-backend/ORM/Factory';
+import { OrmFactory } from '#/BackendCore/ORM/Factory';
 import { ObjectManager } from '@inti5/object-manager';
 
 

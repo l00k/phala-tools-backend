@@ -24,7 +24,7 @@ export default {
                 botToken: 'TOP.SECRET.VALUE',
                 clientId: 'TOP.SECRET.VALUE',
                 clientSecret: 'TOP.SECRET.VALUE',
-                redirectUri: 'https://phala.100k.dev/watchdog'
+                redirectUri: 'https://phala.100k.dev/watchdog/login/discord',
             },
             telegram: {
                 botToken: 'TOP.SECRET.VALUE',
