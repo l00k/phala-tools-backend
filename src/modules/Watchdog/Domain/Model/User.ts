@@ -1,11 +1,11 @@
-import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
-import * as ORM from '@mikro-orm/core';
-import { Annotation as API } from '@inti5/api-backend';
-import { EntityManager } from '@mikro-orm/mysql';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
-import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { Account } from '#/Watchdog/Domain/Model/Account';
+import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
 import { UserConfiguration } from '#/Watchdog/Domain/Model/UserConfiguration';
+import { Annotation as API } from '@inti5/api-backend';
+import * as ORM from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/mysql';
 import * as Trans from 'class-transformer';
 
 
@@ -17,9 +17,9 @@ import * as Trans from 'class-transformer';
 export class User
     extends AbstractModel<User>
 {
-
+    
     public static readonly MAX_NODE_COUNT = 3;
-
+    
     
     @ORM.PrimaryKey()
     @API.Id()
@@ -63,7 +63,7 @@ export class User
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property()
+    @API.Property(() => UserConfiguration)
     @API.Groups([
         'Watchdog/User',
     ])
@@ -73,6 +73,10 @@ export class User
     public accounts : ORM.Collection<Account>;
     
     @ORM.OneToMany(() => StakePoolObservation, o => o.user)
+    @API.Property(() => StakePoolObservation)
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public stakePoolObservations : ORM.Collection<StakePoolObservation>;
     
     
@@ -88,7 +92,7 @@ export class User
         }
     }
     
-    public getConfig <K extends keyof UserConfiguration>(key : K) : UserConfiguration[K]
+    public getConfig<K extends keyof UserConfiguration> (key : K) : UserConfiguration[K]
     {
         if (this.config[key] === undefined) {
             this.config = Trans.plainToClassFromExist(new UserConfiguration(), this.config);

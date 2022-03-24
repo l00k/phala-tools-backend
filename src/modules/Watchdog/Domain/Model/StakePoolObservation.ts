@@ -5,6 +5,7 @@ import { User } from '#/Watchdog/Domain/Model/User';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
+import { Annotation as API } from 'core/api-backend';
 
 
 export enum NotificationType
@@ -28,12 +29,17 @@ type LastNotifications = {
 @ORM.Entity({
     tableName: 'watchdog_stakepool_observation'
 })
+@API.Resource('Watchdog/StakePoolObservation')
 export class StakePoolObservation
     extends AbstractModel<StakePoolObservation>
 {
     
     
     @ORM.PrimaryKey()
+    @API.Id()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public id : number;
     
     
@@ -41,20 +47,40 @@ export class StakePoolObservation
     public user : User;
     
     @ORM.ManyToOne(() => StakePool, { eager: true })
+    @API.Property(() => StakePool)
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public stakePool : StakePool;
     
     @ORM.ManyToOne(() => Account, { nullable: true, eager: true })
+    @API.Property(() => Account)
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public account : Account;
     
     @ORM.Enum({ items: () => ObservationMode, nullable: true })
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public mode : ObservationMode;
     
     
     @ORM.Property({ type: ORM.JsonType })
+    @API.Property(() => StakePoolObservationConfiguration)
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public config : StakePoolObservationConfiguration = new StakePoolObservationConfiguration();
     
     
     @ORM.Property({ type: ORM.JsonType })
+    @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     public lastNotifications : LastNotifications = {};
     
     

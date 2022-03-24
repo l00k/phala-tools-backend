@@ -33,7 +33,10 @@ export class UserController
         const entityManager = this.entityManagerWrapper.getDirectEntityManager();
         const userRepository = entityManager.getRepository(User);
         
-        return userRepository.findOne({ id: authData.userId });
+        return await userRepository.findOne(
+            { id: authData.userId },
+            [ 'stakePoolObservations' ]
+        );
     }
     
 }
