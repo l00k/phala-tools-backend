@@ -5,7 +5,7 @@ import { User } from '#/Watchdog/Domain/Model/User';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
-import { Annotation as API } from 'core/api-backend';
+import { Annotation as API } from '@inti5/api-backend';
 
 
 export enum NotificationType

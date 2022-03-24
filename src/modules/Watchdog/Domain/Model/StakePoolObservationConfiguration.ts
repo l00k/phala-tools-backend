@@ -1,8 +1,7 @@
-import * as Trans from 'class-transformer';
-import { Assert } from '@inti5/validator/Object';
+import { Annotation as API } from 'core/api-backend';
 
 
-@Trans.Exclude()
+@API.Resource('Watchdog/StakePoolObservation/Configuration')
 export class StakePoolObservationConfiguration
 {
 

@@ -2,7 +2,7 @@ import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account } from '#/Watchdog/Domain/Model/Account';
-import { Annotation as API } from 'core/api-backend';
+import { Annotation as API } from '@inti5/api-backend';
 
 
 

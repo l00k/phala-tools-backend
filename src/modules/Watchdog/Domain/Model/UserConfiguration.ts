@@ -1,12 +1,13 @@
-import * as Trans from 'class-transformer';
+import { Annotation as API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
 
 
-@Trans.Exclude()
+@API.Resource('Watchdog/User/Configuration')
 export class UserConfiguration
 {
-
-    @Trans.Expose()
+    
+    @API.Property()
+    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -15,8 +16,9 @@ export class UserConfiguration
         },
     })
     public claimRewardsThreshold : number = 100;
-
-    @Trans.Expose()
+    
+    @API.Property()
+    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -25,8 +27,9 @@ export class UserConfiguration
         },
     })
     public changeCommissionThreshold : number = 1;
-
-    @Trans.Expose()
+    
+    @API.Property()
+    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -34,8 +37,9 @@ export class UserConfiguration
         },
     })
     public contributionThreshold : number = 1000;
-
-    @Trans.Expose()
+    
+    @API.Property()
+    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -43,8 +47,9 @@ export class UserConfiguration
         },
     })
     public withdrawalThreshold : number = 10000;
-
-    @Trans.Expose()
+    
+    @API.Property()
+    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -52,8 +57,9 @@ export class UserConfiguration
         },
     })
     public poolPerformanceDropThreshold : number = 25;
-
-    @Trans.Expose()
+    
+    @API.Property()
+    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {

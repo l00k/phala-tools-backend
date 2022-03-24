@@ -7,8 +7,8 @@ import { User } from '#/Watchdog/Domain/Model/User';
 import { Body, Controller, Endpoint } from '@inti5/express-ext';
 import { Inject } from '@inti5/object-manager';
 import { Assert } from '@inti5/validator/Method';
-import { Config } from 'core/configuration';
-import { Logger } from 'core/utils/Logger';
+import { Config } from '@inti5/configuration';
+import { Logger } from '@inti5/utils/Logger';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 
