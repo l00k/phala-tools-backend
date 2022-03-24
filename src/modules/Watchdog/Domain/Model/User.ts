@@ -22,10 +22,7 @@ export class User
 
     
     @ORM.PrimaryKey()
-    @API.Property()
-    @API.Groups([
-        'Watchdog/User',
-    ])
+    @API.Id()
     public id : number;
     
     
