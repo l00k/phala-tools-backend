@@ -1,4 +1,4 @@
-import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
+import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import * as ORM from '@mikro-orm/core';
 import { Annotation as API } from '@inti5/api-backend';
 import { EntityManager } from '@mikro-orm/mysql';

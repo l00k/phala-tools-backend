@@ -1,7 +1,7 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { JwtSigner } from '#/BackendCore/Service/JwtSigner';
 import { TelegramConfig } from '#/Messaging/Domain/types';
-import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
+import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { TelegramLoginDto } from '#/Watchdog/Controller/Login/TelegramLoginDto';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Body, Controller, Endpoint } from '@inti5/express-ext';

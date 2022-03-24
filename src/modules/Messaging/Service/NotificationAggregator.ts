@@ -1,4 +1,5 @@
-import { MessagingChannel, MessagingProvider } from '#/Messaging/Service/MessagingProvider';
+import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
+import { MessagingProvider } from '#/Messaging/Service/MessagingProvider';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 

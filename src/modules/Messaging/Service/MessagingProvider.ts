@@ -1,3 +1,4 @@
+import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { DiscordConfig, TelegramConfig } from '#/Messaging/Domain/types';
 import { REST } from '@discordjs/rest';
 import { Config } from '@inti5/configuration';
@@ -6,13 +7,6 @@ import { Routes } from 'discord-api-types/v9';
 import { Message, PartialGroupDMChannel } from 'discord.js';
 import { Telegram, } from 'telegraf';
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
-
-
-export enum MessagingChannel
-{
-    Discord = 'discord',
-    Telegram = 'telegram',
-}
 
 
 @Singleton()

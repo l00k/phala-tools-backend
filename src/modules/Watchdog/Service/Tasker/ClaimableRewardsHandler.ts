@@ -1,7 +1,7 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { AbstractHandler } from '#/BackendCore/Service/Tasker/AbstractHandler';
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
-import { MessagingChannel } from '#/Messaging/Service/MessagingProvider';
+import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
