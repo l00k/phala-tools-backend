@@ -17,9 +17,7 @@ export class TelegramLoginDto
     })
     public firstName : string;
     
-    @Assert({
-        presence: true,
-    })
+    @Assert()
     public lastName : string;
     
     @Assert({
