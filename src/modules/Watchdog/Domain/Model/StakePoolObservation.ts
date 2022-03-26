@@ -77,7 +77,7 @@ export class StakePoolObservation
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property()
+    @API.Property(() => Object)
     @API.Groups([
         'Watchdog/User',
     ])
