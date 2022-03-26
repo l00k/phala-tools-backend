@@ -14,16 +14,16 @@ export class PoolCommissionSetHandler
 {
     
     @Inject({ ctorArgs: [ '🚨 Pool owner changed commission' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     
     @Listen([
         EventType.PoolCommissionSet
     ])
-    protected async handle (event : Event) : Promise<boolean>
+    protected async _handle (event : Event) : Promise<boolean>
     {
-        const stakePoolRepository = this.entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const onChainId : number = Number(event.data[0]);
         const newCommissionPercent : number = Number(event.data[1]) / 10000;
@@ -49,10 +49,10 @@ export class PoolCommissionSetHandler
         
         // fetch previous commission value
         const previousBlockHash : string =
-            (await this.api.rpc.chain.getBlockHash(event.blockNumber - 1)).toString();
+            (await this._api.rpc.chain.getBlockHash(event.blockNumber - 1)).toString();
         
         const onChainStakePoolBefore : typeof KhalaTypes.PoolInfo =
-            <any>(await this.api.query.phalaStakePool.stakePools.at(previousBlockHash, onChainId)).toJSON();
+            <any>(await this._api.query.phalaStakePool.stakePools.at(previousBlockHash, onChainId)).toJSON();
         
         const previousCommissionPercent = onChainStakePoolBefore.payoutCommission / 10000;
         const commissionDelta = newCommissionPercent - previousCommissionPercent;
@@ -67,7 +67,7 @@ export class PoolCommissionSetHandler
                 + (commissionDelta < 0 ? 'decreased' : 'increased')
                 + ' by `' + Math.abs(commissionDelta).toFixed(1) + '%` to `' + newCommissionPercent.toFixed(1) + '%`';
             
-            this.notificationAggregator.aggregate(
+            this._notificationAggregator.aggregate(
                 observation.user.msgChannel,
                 observation.user.msgUserId,
                 text

@@ -13,17 +13,17 @@ export class NodeStateController
 {
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
     
-    protected nodeStateRepository : EntityRepository<NodeState>;
+    protected _nodeStateRepository : EntityRepository<NodeState>;
     
     
     public async [InitializeSymbol] ()
     {
-        this.entityManager = this.entityManagerWrapper.getDirectEntityManager();
-        this.nodeStateRepository = this.entityManager.getRepository(NodeState);
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._nodeStateRepository = this._entityManager.getRepository(NodeState);
     }
     
     @Endpoint.POST('/node-state', {
@@ -37,14 +37,14 @@ export class NodeStateController
         nodeStateUpdateDto : UpdateDto
     )
     {
-        const nodeState = await this.nodeStateRepository.findOne({ nodeKey: nodeStateUpdateDto.nodeKey });
+        const nodeState = await this._nodeStateRepository.findOne({ nodeKey: nodeStateUpdateDto.nodeKey });
         if (!nodeState) {
             throw new ActionResult({ code: 404 });
         }
         
         nodeState.assign(nodeStateUpdateDto, { onlyProperties: true });
         
-        await this.entityManager.flush();
+        await this._entityManager.flush();
         
         return true;
     }

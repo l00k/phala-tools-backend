@@ -89,29 +89,29 @@ export class Subscan
     
     
     @Config('module.polkadot.subscan.baseUrl')
-    protected subscanBaseUrl : string;
+    protected _subscanBaseUrl : string;
     
     @Inject({ ctorArgs: [Subscan.SERVICE_NAME] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
-    protected axios : AxiosInstance;
+    protected _axios : AxiosInstance;
     
     
     public [InitializeSymbol] ()
     {
-        this.axios = Axios.create({
-            baseURL: this.subscanBaseUrl,
+        this._axios = Axios.create({
+            baseURL: this._subscanBaseUrl,
         });
     }
     
     public async get(url : string, config? : AxiosRequestConfig): Promise<AxiosResponse<SubscanResponse>>
     {
-        return <any> this.axios.get(url, config);
+        return <any> this._axios.get(url, config);
     }
     
     public async post(url : string, data? : any, config? : AxiosRequestConfig): Promise<AxiosResponse<SubscanResponse>>
     {
-        return <any> this.axios.post(url, data, config);
+        return <any> this._axios.post(url, data, config);
     }
     
     public async *getExtrinsics(filters : ExtrinsicFilter, ascendingOrder : boolean = true): AsyncGenerator<Extrinsic[], void, void>
@@ -150,7 +150,7 @@ export class Subscan
                 }
             }
             catch (e) {
-                this.logger.log('Request failed. Retrying in 1s');
+                this._logger.log('Request failed. Retrying in 1s');
                 await sleep(1000);
                 continue;
             }
@@ -188,7 +188,7 @@ export class Subscan
             }
             
             const percent = (1 - filters.page / pagesNum) * 100;
-            this.logger.log('Requesting next page. Progres: ', `${percent.toFixed(1)}%`);
+            this._logger.log('Requesting next page. Progres: ', `${percent.toFixed(1)}%`);
         }
     }
     
@@ -228,7 +228,7 @@ export class Subscan
                 }
             }
             catch (e) {
-                this.logger.log('Request failed. Retrying in 1s');
+                this._logger.log('Request failed. Retrying in 1s');
                 await sleep(1000);
                 continue;
             }
@@ -267,7 +267,7 @@ export class Subscan
             }
             
             const percent = (1 - filters.page / pagesNum) * 100;
-            this.logger.log('Requesting next page. Progres: ', `${percent.toFixed(1)}%`);
+            this._logger.log('Requesting next page. Progres: ', `${percent.toFixed(1)}%`);
         }
     }
     

@@ -13,9 +13,9 @@ export class Subscan
     protected static readonly SERVICE_NAME : string = 'PhalaSubscan';
     
     @Config('module.phala.subscan.baseUrl')
-    protected subscanBaseUrl : string = null;
+    protected _subscanBaseUrl : string = null;
     
     @Inject({ ctorArgs: [ Subscan.SERVICE_NAME ] })
-    protected logger : Logger = null;
+    protected _logger : Logger = null;
     
 }

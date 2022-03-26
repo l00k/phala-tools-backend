@@ -6,9 +6,9 @@ export class CliApp
     extends AbstractCliApp
 {
     
-    protected async main ()
+    protected async _main ()
     {
-        this.moduleLoader.load(['Command']);
+        this._moduleLoader.load(['Command']);
         
         const argv = process.argv.splice(1);
         await CLI.execute(argv);

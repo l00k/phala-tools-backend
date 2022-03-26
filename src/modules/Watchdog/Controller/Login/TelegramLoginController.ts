@@ -18,16 +18,16 @@ export class TelegramLoginController
 {
     
     @Inject({ ctorArgs: [ TelegramLoginController.name ] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected jwtSigner : JwtSigner;
+    protected _jwtSigner : JwtSigner;
     
     @Config('module.messaging.telegram')
-    protected telegramConfig : TelegramConfig;
+    protected _telegramConfig : TelegramConfig;
     
     
     @Endpoint.POST('/login/telegram', {
@@ -42,14 +42,14 @@ export class TelegramLoginController
     )
     {
         try {
-            const verified = this.verifyTelegramLogin(body);
+            const verified = this._verifyTelegramLogin(body);
             if (!verified) {
                 return false;
             }
             
-            const user = await this.getOrCreateUser(body);
+            const user = await this._getOrCreateUser(body);
             
-            return this.jwtSigner.createTokens({
+            return this._jwtSigner.createTokens({
                 userId: user.id,
             });
         }
@@ -58,7 +58,7 @@ export class TelegramLoginController
         }
     }
     
-    protected async verifyTelegramLogin (telegramUser : TelegramLoginDto)
+    protected async _verifyTelegramLogin (telegramUser : TelegramLoginDto)
     {
         const fields = Object.keys(telegramUser)
             .filter(field => [ 'hash' ].includes(field))
@@ -68,7 +68,7 @@ export class TelegramLoginController
             .join('\n');
         
         const secretKey = crypto.createHash('sha256')
-            .update(this.telegramConfig.botToken)
+            .update(this._telegramConfig.botToken)
             .digest('hex');
         
         const hmac = crypto.createHmac('sha256', secretKey)
@@ -78,9 +78,9 @@ export class TelegramLoginController
         return hmac === telegramUser.hash;
     }
     
-    protected async getOrCreateUser (telegramUser : TelegramLoginDto) : Promise<User>
+    protected async _getOrCreateUser (telegramUser : TelegramLoginDto) : Promise<User>
     {
-        const entityManager = this.entityManagerWrapper.getDirectEntityManager();
+        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
         const userRepository = entityManager.getRepository(User);
         
         let user = await userRepository.findOne({

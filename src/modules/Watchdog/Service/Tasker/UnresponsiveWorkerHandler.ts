@@ -19,10 +19,10 @@ export class UnresponsiveWorkerHandler
     
     
     @Inject({ ctorArgs: [ '🚨 Worker still in unresponsive state' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     
-    protected unresponsiveWorkersCounter : { [onChainId : number] : number } = {};
+    protected _unresponsiveWorkersCounter : { [onChainId : number] : number } = {};
     
     
     @Task({
@@ -30,12 +30,12 @@ export class UnresponsiveWorkerHandler
     })
     public async handle () : Promise<boolean>
     {
-        const issues : UnresponsiveWorker[] = await this.loadIssues();
-        const observationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const issues : UnresponsiveWorker[] = await this._loadIssues();
+        const observationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         for (const issue of issues) {
             const workerState : typeof KhalaTypes.MinerInfo =
-                <any>(await this.api.query.phalaMining.miners(issue.workerAccount)).toJSON();
+                <any>(await this._api.query.phalaMining.miners(issue.workerAccount)).toJSON();
             
             // todo ld 2022-03-21 22:02:41
             // if (
@@ -47,11 +47,11 @@ export class UnresponsiveWorkerHandler
             //     continue;
             // }
             
-            if (!this.unresponsiveWorkersCounter[issue.stakePool.onChainId]) {
-                this.unresponsiveWorkersCounter[issue.stakePool.onChainId] = 0;
+            if (!this._unresponsiveWorkersCounter[issue.stakePool.onChainId]) {
+                this._unresponsiveWorkersCounter[issue.stakePool.onChainId] = 0;
             }
             
-            ++this.unresponsiveWorkersCounter[issue.stakePool.onChainId];
+            ++this._unresponsiveWorkersCounter[issue.stakePool.onChainId];
         }
         
         return true;
@@ -59,20 +59,20 @@ export class UnresponsiveWorkerHandler
     
     public async postProcess ()
     {
-        await this.prepareMessages();
+        await this._prepareMessages();
         
         // clear counters
-        this.unresponsiveWorkersCounter = {};
+        this._unresponsiveWorkersCounter = {};
         
         await super.postProcess();
     }
     
-    protected async prepareMessages ()
+    protected async _prepareMessages ()
     {
-        const stakePoolRepository = this.entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
         
-        for (const [ onChainId, unresponsiveCount ] of Object.entries(this.unresponsiveWorkersCounter)) {
+        for (const [ onChainId, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
             if (unresponsiveCount == 0) {
                 continue;
             }
@@ -105,7 +105,7 @@ export class UnresponsiveWorkerHandler
                     ? `1 worker is in unresponsive state`
                     : `${unresponsiveCount} workers are in unresponsive state`;
                 
-                this.notificationAggregator.aggregate(
+                this._notificationAggregator.aggregate(
                     observation.user.msgChannel,
                     observation.user.msgUserId,
                     text

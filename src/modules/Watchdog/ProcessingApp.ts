@@ -8,7 +8,7 @@ export class ProcessingApp
     extends AbstractApp
 {
 
-    protected async main ()
+    protected async _main ()
     {
         const objectManager = ObjectManager.getSingleton();
 

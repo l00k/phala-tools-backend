@@ -15,16 +15,16 @@ export class ContributionHandler
 {
     
     @Inject({ ctorArgs: [ '🤑 New contribution in your pool' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     
     @Listen([
         EventType.Contribution
     ])
-    protected async handle (event : Event) : Promise<boolean>
+    protected async _handle (event : Event) : Promise<boolean>
     {
-        const stakePoolRepository = this.entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const onChainStakePoolId : number = Number(event.data[0]);
         const delegator : string = String(event.data[1]);
@@ -59,7 +59,7 @@ export class ContributionHandler
                 + '`' + Utility.formatCoin(stakedAmount, true) + '` into pool '
                 + '`#' + onChainStakePoolId + '`';
             
-            this.notificationAggregator.aggregate(
+            this._notificationAggregator.aggregate(
                 observation.user.msgChannel,
                 observation.user.msgUserId,
                 text

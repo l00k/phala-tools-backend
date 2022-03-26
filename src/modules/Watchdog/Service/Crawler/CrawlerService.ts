@@ -27,51 +27,51 @@ export class CrawlerService
     
     
     @Inject({ ctorArgs: [ CrawlerService.name ] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected apiProvider : ApiProvider;
+    protected _apiProvider : ApiProvider;
     
     @Inject({ tag: 'pw.crawler.handler' })
-    protected handlers : { [key : string] : AbstractHandler };
+    protected _handlers : { [key : string] : AbstractHandler };
     
     
-    protected txEntityManager : EntityManager;
+    protected _txEntityManager : EntityManager;
     
-    protected api : ApiPromise;
+    protected _api : ApiPromise;
     
     
-    protected appState : AppState<CrawlerState>;
+    protected _appState : AppState<CrawlerState>;
     
-    protected finalizedBlockNumber : number;
+    protected _finalizedBlockNumber : number;
     
     
     public async run ()
     {
-        await this.init();
-        this.logger.log('Crawler ready');
+        await this._init();
+        this._logger.log('Crawler ready');
         
-        if (!this.handlers) {
-            this.logger.debug('No handlers');
+        if (!this._handlers) {
+            this._logger.debug('No handlers');
         }
         
         // await handlers init
-        for (const handler of Object.values(this.handlers)) {
+        for (const handler of Object.values(this._handlers)) {
             await handler.init();
         }
         
-        this.logger.log('Handlers initiated');
+        this._logger.log('Handlers initiated');
         
         // fetch basic api data
-        const finalizedHead = await this.api.rpc.chain.getFinalizedHead();
-        const finalizedBlockHeader : Header = await this.api.rpc.chain.getHeader(finalizedHead);
-        this.finalizedBlockNumber = finalizedBlockHeader.number.toNumber();
+        const finalizedHead = await this._api.rpc.chain.getFinalizedHead();
+        const finalizedBlockHeader : Header = await this._api.rpc.chain.getHeader(finalizedHead);
+        this._finalizedBlockNumber = finalizedBlockHeader.number.toNumber();
         
         // todo ld 2022-03-21 20:18:30
-        this.appState.value.lastFetchedBlock = 758240;
+        this._appState.value.lastFetchedBlock = 758240;
         // this.appState.value.lastFetchedBlock = Math.max(
         //     this.appState.value.lastFetchedBlock,
         //     this.finalizedBlockNumber - CrawlerService.BLOCK_HISTORY
@@ -80,37 +80,37 @@ export class CrawlerService
         // process chunks
         // todo ld 2022-03-21 19:54:48
         while (true) {
-            const blockDelta = this.finalizedBlockNumber - this.appState.value.lastFetchedBlock;
+            const blockDelta = this._finalizedBlockNumber - this._appState.value.lastFetchedBlock;
             if (blockDelta <= 0) {
                 break;
             }
             
-            this.logger.log(`Fetching ${CrawlerService.BLOCK_CHUNK} blocks chunk (${blockDelta} left)`);
+            this._logger.log(`Fetching ${CrawlerService.BLOCK_CHUNK} blocks chunk (${blockDelta} left)`);
             
-            const result = await this.fetchBlocksChunk();
+            const result = await this._fetchBlocksChunk();
             if (!result) {
                 return;
             }
         }
     }
     
-    protected async init ()
+    protected async _init ()
     {
-        this.api = await this.apiProvider.getApi();
+        this._api = await this._apiProvider.getApi();
         
         // fetch app state
-        const entityManager = await this.entityManagerWrapper.getDirectEntityManager();
+        const entityManager = await this._entityManagerWrapper.getDirectEntityManager();
         const appStateRepository = entityManager.getRepository(AppState);
         
-        this.appState = await appStateRepository.findOne(CrawlerState.ID);
+        this._appState = await appStateRepository.findOne(CrawlerState.ID);
         
-        if (!this.appState) {
-            this.appState = new AppState({
+        if (!this._appState) {
+            this._appState = new AppState({
                 id: CrawlerState.ID,
                 value: new CrawlerState(),
             });
             
-            appStateRepository.persist(this.appState);
+            appStateRepository.persist(this._appState);
             appStateRepository.flush();
         }
     }
@@ -119,29 +119,29 @@ export class CrawlerService
     /*
      * Fetching new blocks
      */
-    protected async fetchBlocksChunk ()
+    protected async _fetchBlocksChunk ()
     {
-        let blockNumber = this.appState.value.lastFetchedBlock;
+        let blockNumber = this._appState.value.lastFetchedBlock;
         
         const lastBlockToIndex = Math.min(
-            this.finalizedBlockNumber,
+            this._finalizedBlockNumber,
             blockNumber + CrawlerService.BLOCK_CHUNK
         );
         
-        await this.entityManagerWrapper.transaction(async(txEntitiyManager) => {
-            this.txEntityManager = txEntitiyManager;
+        await this._entityManagerWrapper.transaction(async(txEntitiyManager) => {
+            this._txEntityManager = txEntitiyManager;
             
             while (blockNumber < lastBlockToIndex) {
                 ++blockNumber;
                 
-                this.logger.log('New block', blockNumber);
-                await this.fetchNextNewBlock(blockNumber);
+                this._logger.log('New block', blockNumber);
+                await this._fetchNextNewBlock(blockNumber);
             }
             
             // chunk post processing
-            this.logger.log('Handlers post processing');
+            this._logger.log('Handlers post processing');
             
-            for (const handler of Object.values(this.handlers)) {
+            for (const handler of Object.values(this._handlers)) {
                 handler.beforeHandle(txEntitiyManager);
                 await handler.chunkPostProcess();
             }
@@ -150,15 +150,15 @@ export class CrawlerService
         return true;
     }
     
-    protected async fetchNextNewBlock (blockNumber : number)
+    protected async _fetchNextNewBlock (blockNumber : number)
     {
-        const blockHash : string = (await this.api.rpc.chain.getBlockHash(blockNumber)).toString();
+        const blockHash : string = (await this._api.rpc.chain.getBlockHash(blockNumber)).toString();
         if (!blockHash) {
             throw new Exception('Block not found', 1613180182057);
         }
         
-        const blockTimestamp : number = <any>(await this.api.query.timestamp.now.at(blockHash)).toJSON();
-        const allEvents : any[] = <any>await this.api.query.system.events.at(blockHash);
+        const blockTimestamp : number = <any>(await this._api.query.timestamp.now.at(blockHash)).toJSON();
+        const allEvents : any[] = <any>await this._api.query.system.events.at(blockHash);
         
         for (const { event: onChainEvent } of allEvents) {
             const event = Trans.plainToInstance(Event, {
@@ -169,27 +169,27 @@ export class CrawlerService
                 data: onChainEvent.data.toJSON(),
             });
             
-            await this.handleEvent(event);
+            await this._handleEvent(event);
         }
         
-        this.appState.value.lastFetchedBlock = blockNumber;
-        this.txEntityManager.persist(this.appState);
+        this._appState.value.lastFetchedBlock = blockNumber;
+        this._txEntityManager.persist(this._appState);
     }
     
-    protected async handleEvent (event : Event)
+    protected async _handleEvent (event : Event)
     {
-        let canHandle = Object.values(this.handlers)
+        let canHandle = Object.values(this._handlers)
             .find(handler => handler.canHandle(event));
         if (!canHandle) {
             return;
         }
         
-        for (const handler of Object.values(this.handlers)) {
-            handler.beforeHandle(this.txEntityManager);
+        for (const handler of Object.values(this._handlers)) {
+            handler.beforeHandle(this._txEntityManager);
             
             const handled = await handler.tryHandle(event);
             if (handled) {
-                this.logger.log('Event', colors.brightCyan(event.type), 'handled');
+                this._logger.log('Event', colors.brightCyan(event.type), 'handled');
             }
         }
     }

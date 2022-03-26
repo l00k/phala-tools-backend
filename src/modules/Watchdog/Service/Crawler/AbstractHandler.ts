@@ -20,32 +20,32 @@ export abstract class AbstractHandler
 
 
     @Inject()
-    protected apiProvider : ApiProvider;
+    protected _apiProvider : ApiProvider;
 
     @Inject()
-    protected messagingProvider : MessagingProvider;
+    protected _messagingProvider : MessagingProvider;
 
 
-    protected logger : Logger;
+    protected _logger : Logger;
 
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
 
-    protected api : ApiPromise;
+    protected _api : ApiPromise;
 
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
 
 
     public [InitializeSymbol] ()
     {
         const Constructor : typeof AbstractHandler = <any>this.constructor;
 
-        this.logger = ObjectManager.getSingleton()
+        this._logger = ObjectManager.getSingleton()
             .getInstance(Logger, [ Constructor.name ]);
     }
 
     public async init ()
     {
-        this.api = await this.apiProvider.getApi();
+        this._api = await this._apiProvider.getApi();
     }
 
     public canHandle (event : Event) : boolean
@@ -62,7 +62,7 @@ export abstract class AbstractHandler
 
     public beforeHandle (entityManaer : EntityManager)
     {
-        this.entityManager = entityManaer;
+        this._entityManager = entityManaer;
     }
 
     public async tryHandle (event : Event) : Promise<boolean>
@@ -85,7 +85,7 @@ export abstract class AbstractHandler
             }
         }
         catch (e) {
-            this.logger.error(e);
+            this._logger.error(e);
             return false;
         }
 
@@ -94,8 +94,8 @@ export abstract class AbstractHandler
 
     public async chunkPostProcess ()
     {
-        if (this.notificationAggregator) {
-            await this.notificationAggregator.send();
+        if (this._notificationAggregator) {
+            await this._notificationAggregator.send();
         }
     }
 

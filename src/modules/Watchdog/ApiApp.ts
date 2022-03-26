@@ -9,7 +9,7 @@ export class ApiApp
     extends AbstractApp
 {
     
-    protected async main ()
+    protected async _main ()
     {
         const configuration = Configuration.getSingleton();
         const expressFactory = ObjectManager.getSingleton().getInstance(ExpressFactory);

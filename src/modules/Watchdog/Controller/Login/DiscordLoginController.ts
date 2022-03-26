@@ -17,16 +17,16 @@ export class DiscordLoginController
 {
     
     @Inject({ ctorArgs: [ DiscordLoginController.name ] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected jwtSigner : JwtSigner;
+    protected _jwtSigner : JwtSigner;
     
     @Inject()
-    protected discordIdentityProvider : DiscordIdentityProvider;
+    protected _discordIdentityProvider : DiscordIdentityProvider;
     
     
     @Endpoint.POST('/login/discord', {
@@ -41,11 +41,11 @@ export class DiscordLoginController
     )
     {
         try {
-            const discordAccessToken = await this.discordIdentityProvider.getAccessTokenViaCode(body.code);
-            const identity = await this.discordIdentityProvider.getIdentity(discordAccessToken.access_token);
-            const user = await this.getOrCreateUser(identity);
+            const discordAccessToken = await this._discordIdentityProvider.getAccessTokenViaCode(body.code);
+            const identity = await this._discordIdentityProvider.getIdentity(discordAccessToken.access_token);
+            const user = await this._getOrCreateUser(identity);
             
-            return this.jwtSigner.createTokens({
+            return this._jwtSigner.createTokens({
                 userId: user.id,
             });
         }
@@ -55,9 +55,9 @@ export class DiscordLoginController
         }
     }
     
-    protected async getOrCreateUser (apiUser : APIUser) : Promise<User>
+    protected async _getOrCreateUser (apiUser : APIUser) : Promise<User>
     {
-        const entityManager = this.entityManagerWrapper.getDirectEntityManager();
+        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
         const userRepository = entityManager.getRepository(User);
         
         let user = await userRepository.findOne({

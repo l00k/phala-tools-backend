@@ -20,23 +20,23 @@ export class NodeIssuesHandler
     
     
     @Inject({ ctorArgs: [ '🚨 Node has a problem' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     @Inject()
-    protected nodeStateVerficator : NodeStateVerificator;
+    protected _nodeStateVerficator : NodeStateVerificator;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
     
-    protected nodeStateRepository : SqlEntityRepository<NodeState>;
+    protected _nodeStateRepository : SqlEntityRepository<NodeState>;
     
     
     public async init ()
     {
-        this.entityManager = this.entityManagerWrapper.getDirectEntityManager();
-        this.nodeStateRepository = this.entityManager.getRepository(NodeState);
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._nodeStateRepository = this._entityManager.getRepository(NodeState);
     }
     
     @Task({
@@ -44,18 +44,18 @@ export class NodeIssuesHandler
     })
     public async handle () : Promise<boolean>
     {
-        const nodeStates : NodeState[] = await this.nodeStateRepository.find({
+        const nodeStates : NodeState[] = await this._nodeStateRepository.find({
             owner: { $ne: null }
         });
         
         for (const nodeState of nodeStates) {
-            const verification = await this.nodeStateVerficator.verify(nodeState);
+            const verification = await this._nodeStateVerficator.verify(nodeState);
             
             if (!verification.valid) {
                 const text = '*' + nodeState.name + '*\n'
                     + verification.issues.join('\n');
                 
-                this.notificationAggregator.aggregate(
+                this._notificationAggregator.aggregate(
                     nodeState.owner.msgChannel,
                     nodeState.owner.msgUserId,
                     text
@@ -68,7 +68,7 @@ export class NodeIssuesHandler
     
     public async postProcess ()
     {
-        await this.notificationAggregator.send();
+        await this._notificationAggregator.send();
     }
     
 }

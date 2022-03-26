@@ -1,7 +1,6 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { AbstractHandler } from '#/BackendCore/Service/Tasker/AbstractHandler';
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
-import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
@@ -26,32 +25,32 @@ export class ClaimableRewardsHandler
     
     
     @Inject({ ctorArgs: [ '💰 Pending rewards' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected apiProvider : ApiProvider;
+    protected _apiProvider : ApiProvider;
     
     @Inject()
-    protected runtimeCache : RuntimeCache;
+    protected _runtimeCache : RuntimeCache;
     
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
     
-    protected api : ApiPromise;
+    protected _api : ApiPromise;
     
     
     public async init ()
     {
-        this.entityManager = this.entityManagerWrapper.getDirectEntityManager();
-        this.api = await this.apiProvider.getApi();
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._api = await this._apiProvider.getApi();
     }
     
     public async postProcess ()
     {
-        await this.entityManager.flush();
-        await this.notificationAggregator.send();
+        await this._entityManager.flush();
+        await this._notificationAggregator.send();
     }
     
     @Task({
@@ -59,15 +58,15 @@ export class ClaimableRewardsHandler
     })
     public async handle ()
     {
-        const stakePoolRepository = this.entityManager.getRepository(StakePool);
-        const observationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const observationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const observations = await observationRepository.findAll();
         const observationGroups = _.groupBy(observations, ob => ob.stakePool.onChainId);
         
         await PromiseAggregator.allSettled(Object.entries(observationGroups), async([ onChainId, observations ]) => {
             const onChainStakePool : typeof KhalaTypes.PoolInfo =
-                <any>(await this.api.query.phalaStakePool.stakePools(onChainId)).toJSON();
+                <any>(await this._api.query.phalaStakePool.stakePools(onChainId)).toJSON();
             
             for (const observation of observations) {
                 // notify only if previous notification delay exceeded
@@ -79,7 +78,7 @@ export class ClaimableRewardsHandler
                 let availableRewardsRaw : number = onChainStakePool.owner === observation.account.address ? onChainStakePool.ownerReward : 0;
                 
                 const onChainStaker : typeof KhalaTypes.UserStakeInfo =
-                    <any>(await this.api.query.phalaStakePool.poolStakers([ onChainStakePool.pid, observation.account.address ])).toJSON();
+                    <any>(await this._api.query.phalaStakePool.poolStakers([ onChainStakePool.pid, observation.account.address ])).toJSON();
                 if (onChainStaker) {
                     availableRewardsRaw += onChainStaker.availableRewards
                         + (onChainStaker.shares * PhalaUtility.decodeBigNumber(onChainStakePool.rewardAcc) - onChainStaker.rewardDebt);
@@ -95,7 +94,7 @@ export class ClaimableRewardsHandler
                         + 'Amount: `' + Utility.formatCoin(availableRewards, true) + '`\n'
                     ;
                     
-                    this.notificationAggregator.aggregate(
+                    this._notificationAggregator.aggregate(
                         observation.user.msgChannel,
                         observation.user.msgUserId,
                         text

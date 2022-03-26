@@ -16,16 +16,16 @@ export class MinerEnterUnresponsiveHandler
 {
     
     @Inject({ ctorArgs: [ '🚨 Worker enter unresponsive state' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     
-    protected unresponsiveWorkersCounter : { [onChainId : number] : number } = {};
+    protected _unresponsiveWorkersCounter : { [onChainId : number] : number } = {};
     
     
     @Listen([
         EventType.MinerEnterUnresponsive
     ])
-    protected async handle (event : Event) : Promise<boolean>
+    protected async _handle (event : Event) : Promise<boolean>
     {
         const workerAccount : string = event.data[0];
         
@@ -40,25 +40,25 @@ export class MinerEnterUnresponsiveHandler
         //     return false;
         // }
         
-        const workerPubKey = (await this.api.query.phalaMining.minerBindings(workerAccount)).toString();
-        const onChainId : number = <number>(await this.api.query.phalaStakePool.workerAssignments(workerPubKey)).toJSON();
+        const workerPubKey = (await this._api.query.phalaMining.minerBindings(workerAccount)).toString();
+        const onChainId : number = <number>(await this._api.query.phalaStakePool.workerAssignments(workerPubKey)).toJSON();
         
         // load pool
-        const stakePoolRepository = this.entityManager.getRepository(StakePool);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
         const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: Number(onChainId) });
         if (!stakePool) {
             // skip - no observation for it
             return false;
         }
         
-        if (!this.unresponsiveWorkersCounter[onChainId]) {
-            this.unresponsiveWorkersCounter[onChainId] = 0;
+        if (!this._unresponsiveWorkersCounter[onChainId]) {
+            this._unresponsiveWorkersCounter[onChainId] = 0;
         }
         
-        ++this.unresponsiveWorkersCounter[onChainId];
+        ++this._unresponsiveWorkersCounter[onChainId];
         
         // create issue if it doesn't exists yet
-        const issueRepository = this.entityManager.getRepository(UnresponsiveWorker);
+        const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
         
         const issueAlreadyExists = await issueRepository.findOne({
             stakePool,
@@ -72,9 +72,9 @@ export class MinerEnterUnresponsiveHandler
                 workerAccount,
                 workerPubKey,
                 occurrenceDate: event.blockDate,
-            }, this.entityManager);
+            }, this._entityManager);
             
-            this.entityManager.persist(issue);
+            this._entityManager.persist(issue);
         }
         
         return true;
@@ -82,20 +82,20 @@ export class MinerEnterUnresponsiveHandler
     
     public async chunkPostProcess ()
     {
-        await this.prepareMessages();
+        await this._prepareMessages();
         
         // clear counters
-        this.unresponsiveWorkersCounter = {};
+        this._unresponsiveWorkersCounter = {};
         
         await super.chunkPostProcess();
     }
     
-    protected async prepareMessages ()
+    protected async _prepareMessages ()
     {
-        const stakePoolRepository = this.entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
         
-        for (const [ onChainId, unresponsiveCount ] of Object.entries(this.unresponsiveWorkersCounter)) {
+        for (const [ onChainId, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
             if (unresponsiveCount == 0) {
                 continue;
             }
@@ -128,7 +128,7 @@ export class MinerEnterUnresponsiveHandler
                     ? `1 worker is in unresponsive state`
                     : `${unresponsiveCount} workers are in unresponsive state`;
                 
-                this.notificationAggregator.aggregate(
+                this._notificationAggregator.aggregate(
                     observation.user.msgChannel,
                     observation.user.msgUserId,
                     text

@@ -13,12 +13,12 @@ export class MinerExitUnresponsiveHandler
     @Listen([
         EventType.MinerExitUnresponsive
     ])
-    protected async handle (event : Event) : Promise<boolean>
+    protected async _handle (event : Event) : Promise<boolean>
     {
-        const issueRepository = this.entityManager.getRepository(UnresponsiveWorker);
+        const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
         
         const workerAccount : string = event.data[0];
-        const workerPubKey = (await this.api.query.phalaMining.minerBindings(workerAccount)).toString();
+        const workerPubKey = (await this._api.query.phalaMining.minerBindings(workerAccount)).toString();
         
         // delete worker entry
         const count = await issueRepository.nativeDelete({

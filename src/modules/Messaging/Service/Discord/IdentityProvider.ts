@@ -10,30 +10,30 @@ export class IdentityProvider
 {
     
     @Config('module.messaging.discord')
-    protected config : DiscordConfig;
+    protected _config : DiscordConfig;
     
     
-    protected botRest : REST;
+    protected _botRest : REST;
     
     
     public [InitializeSymbol] ()
     {
-        this.botRest = new REST({ version: '10' });
-        this.botRest.setToken(this.config.botToken);
+        this._botRest = new REST({ version: '10' });
+        this._botRest.setToken(this._config.botToken);
     }
     
     
     public async getAccessTokenViaCode (code : string) : Promise<RESTPostOAuth2AccessTokenResult>
     {
-        return <any>await this.botRest.post(
+        return <any>await this._botRest.post(
             Routes.oauth2TokenExchange(),
             {
                 passThroughBody: true,
                 body: new URLSearchParams({
-                    client_id: this.config.clientId,
-                    client_secret: this.config.clientSecret,
+                    client_id: this._config.clientId,
+                    client_secret: this._config.clientSecret,
                     code,
-                    redirect_uri: this.config.redirectUri,
+                    redirect_uri: this._config.redirectUri,
                     grant_type: 'authorization_code',
                     scope: 'identify',
                 }),

@@ -16,17 +16,17 @@ export class ApiProvider
     
     
     @Config('module.phala.api.wsUrl')
-    protected apiWsUrl : string = null;
+    protected _apiWsUrl : string = null;
     
     
     @Inject({ ctorArgs: [ ApiProvider.SERVICE_NAME ] })
-    protected logger : Logger = null;
+    protected _logger : Logger = null;
     
     
-    protected createApi () : Promise<ApiPromise>
+    protected _createApi () : Promise<ApiPromise>
     {
         return ApiPromise.create({
-            provider: this.wsProvider,
+            provider: this._wsProvider,
             types: Khala,
         });
     }

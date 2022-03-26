@@ -14,23 +14,23 @@ export class MessagingProvider
 {
     
     @Config('module.messaging.discord')
-    protected discordConfig : DiscordConfig;
+    protected _discordConfig : DiscordConfig;
     
     @Config('module.messaging.telegram')
-    protected telegramConfig : TelegramConfig;
+    protected _telegramConfig : TelegramConfig;
     
     
-    protected discordRest : REST;
+    protected _discordRest : REST;
     
-    protected telegram : Telegram;
+    protected _telegram : Telegram;
     
     
     public [InitializeSymbol] ()
     {
-        this.discordRest = new REST({ version: '10' });
-        this.discordRest.setToken(this.discordConfig.botToken);
+        this._discordRest = new REST({ version: '10' });
+        this._discordRest.setToken(this._discordConfig.botToken);
         
-        this.telegram = new Telegram(this.telegramConfig.botToken);
+        this._telegram = new Telegram(this._telegramConfig.botToken);
     }
     
     
@@ -41,27 +41,27 @@ export class MessagingProvider
     ) : Promise<any>
     {
         if (channel == MessagingChannel.Discord) {
-            return this.sendMessageViaDiscord(chatId, text);
+            return this._sendMessageViaDiscord(chatId, text);
         }
         else if (channel == MessagingChannel.Telegram) {
-            return this.sendMessageViaTelegram(chatId, text);
+            return this._sendMessageViaTelegram(chatId, text);
         }
         
         return null;
     }
     
-    protected async sendMessageViaDiscord (
+    protected async _sendMessageViaDiscord (
         chatId : string,
         text : string
     ) : Promise<Message>
     {
-        if (this.discordConfig.redirectMsgTo) {
+        if (this._discordConfig.redirectMsgTo) {
             text = `## Redirected from ${chatId}\n` + text;
-            chatId = this.discordConfig.redirectMsgTo;
+            chatId = this._discordConfig.redirectMsgTo;
         }
         
         // open channel
-        const channel : PartialGroupDMChannel = <any>await this.discordRest.post(
+        const channel : PartialGroupDMChannel = <any>await this._discordRest.post(
             Routes.userChannels(),
             {
                 body: {
@@ -71,7 +71,7 @@ export class MessagingProvider
         );
         
         // send message
-        return <any>this.discordRest.post(
+        return <any>this._discordRest.post(
             Routes.channelMessages(channel.id),
             {
                 body: {
@@ -81,18 +81,18 @@ export class MessagingProvider
         );
     }
     
-    protected async sendMessageViaTelegram (
+    protected async _sendMessageViaTelegram (
         chatId : string,
         text : string
     ) : Promise<ExtraReplyMessage>
     {
-        if (this.telegramConfig.redirectMsgTo) {
+        if (this._telegramConfig.redirectMsgTo) {
             text = `## Redirected from ${chatId}\n` + text;
-            chatId = this.telegramConfig.redirectMsgTo;
+            chatId = this._telegramConfig.redirectMsgTo;
         }
         
         try {
-            return <any>this.telegram.sendMessage(
+            return <any>this._telegram.sendMessage(
                 chatId,
                 text,
                 { parse_mode: 'MarkdownV2' }

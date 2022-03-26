@@ -18,30 +18,30 @@ export class NodeStateVerificator
 {
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected runtimeCache : RuntimeCache;
+    protected _runtimeCache : RuntimeCache;
     
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
     
-    protected nodeStateRepository : SqlEntityRepository<NodeState>;
+    protected _nodeStateRepository : SqlEntityRepository<NodeState>;
     
     
     public [InitializeSymbol]()
     {
-        this.entityManager = this.entityManagerWrapper.getDirectEntityManager();
-        this.nodeStateRepository = this.entityManager.getRepository(NodeState);
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._nodeStateRepository = this._entityManager.getRepository(NodeState);
     }
     
     public getBest(): Promise<NodeState>
     {
-        return this.runtimeCache.get('bestNode', async() => {
+        return this._runtimeCache.get('bestNode', async() => {
             const dateThreshold : Date = moment().subtract(15, 'minute').toDate();
         
-            this.entityManager.clear();
+            this._entityManager.clear();
             
-            const activePrimaryNodes = await this.nodeStateRepository.find({
+            const activePrimaryNodes = await this._nodeStateRepository.find({
                 primary: true
             });
             
@@ -104,6 +104,5 @@ export class NodeStateVerificator
         
         return result;
     }
-    
     
 }

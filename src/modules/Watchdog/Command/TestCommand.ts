@@ -12,7 +12,7 @@ export class DumpCommand
 {
     
     @Config('module.messaging.telegram')
-    protected telegramConfig : TelegramConfig;
+    protected _telegramConfig : TelegramConfig;
     
     public async execute () : Promise<void>
     {

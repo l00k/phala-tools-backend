@@ -28,32 +28,32 @@ export class PoolPerformanceDropHandler
     
     
     @Inject({ ctorArgs: [ '🚨 Pool performance drop' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected apiProvider : ApiProvider;
+    protected _apiProvider : ApiProvider;
     
     @Inject()
-    protected runtimeCache : RuntimeCache;
+    protected _runtimeCache : RuntimeCache;
     
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
     
-    protected api : ApiPromise;
+    protected _api : ApiPromise;
     
     
     public async init ()
     {
-        this.entityManager = this.entityManagerWrapper.getDirectEntityManager();
-        this.api = await this.apiProvider.getApi();
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._api = await this._apiProvider.getApi();
     }
     
     public async postProcess ()
     {
-        await this.entityManager.flush();
-        await this.notificationAggregator.send();
+        await this._entityManager.flush();
+        await this._notificationAggregator.send();
     }
     
     @Task({
@@ -61,20 +61,20 @@ export class PoolPerformanceDropHandler
     })
     public async handle ()
     {
-        const stakePoolRepository = this.entityManager.getRepository(StakePool);
-        const observationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const observationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const observations = await observationRepository.findAll();
         const observationGroups = _.groupBy(observations, ob => ob.stakePool.onChainId);
         
         await PromiseAggregator.allSettled(Object.entries(observationGroups), async([ onChainId, observations ]) => {
             const onChainStakePool : typeof KhalaTypes.PoolInfo =
-                <any>(await this.api.query.phalaStakePool.stakePools(onChainId)).toJSON();
+                <any>(await this._api.query.phalaStakePool.stakePools(onChainId)).toJSON();
             
             const rewardsNow : number = 10 ** 12 * PhalaUtility.decodeBigNumber(onChainStakePool.rewardAcc);
             
-            const finalizedHead = await this.api.rpc.chain.getFinalizedHead();
-            const finalizedBlockHeader : Header = await this.api.rpc.chain.getHeader(finalizedHead);
+            const finalizedHead = await this._api.rpc.chain.getFinalizedHead();
+            const finalizedBlockHeader : Header = await this._api.rpc.chain.getHeader(finalizedHead);
             const finalizedBlockNumber = finalizedBlockHeader.number.toNumber();
             
             let lastChunkRewards : number;
@@ -82,14 +82,14 @@ export class PoolPerformanceDropHandler
             
             try {
                 {
-                    const rewardsPrevious = await this.findRewardsAtBlock(
+                    const rewardsPrevious = await this._findRewardsAtBlock(
                         Number(onChainId),
                         finalizedBlockNumber - PoolPerformanceDropHandler.BLOCKS_CHUNK
                     );
                     lastChunkRewards = rewardsNow - rewardsPrevious;
                 }
                 {
-                    const rewardsPrevious = await this.findRewardsAtBlock(
+                    const rewardsPrevious = await this._findRewardsAtBlock(
                         Number(onChainId),
                         finalizedBlockNumber - 5 * PoolPerformanceDropHandler.BLOCKS_CHUNK
                     );
@@ -109,7 +109,7 @@ export class PoolPerformanceDropHandler
                 if (exceedThreshold) {
                     const text = '`#' + onChainId + '` rewards performance drop of `' + dropPercent.toFixed(1) + '%`';
                     
-                    this.notificationAggregator.aggregate(
+                    this._notificationAggregator.aggregate(
                         observation.user.msgChannel,
                         observation.user.msgUserId,
                         text
@@ -119,12 +119,12 @@ export class PoolPerformanceDropHandler
         });
     }
     
-    protected async findRewardsAtBlock (onChainId : number, blockNumber : number) : Promise<number>
+    protected async _findRewardsAtBlock (onChainId : number, blockNumber : number) : Promise<number>
     {
-        const blockHash : string = (await this.api.rpc.chain.getBlockHash(blockNumber)).toString();
+        const blockHash : string = (await this._api.rpc.chain.getBlockHash(blockNumber)).toString();
         
         const historyStakePool : typeof KhalaTypes.PoolInfo =
-            <any>(await this.api.query.phalaStakePool.stakePools.at(blockHash, onChainId)).toJSON();
+            <any>(await this._api.query.phalaStakePool.stakePools.at(blockHash, onChainId)).toJSON();
         if (!historyStakePool) {
             throw new Exception('Unable to fetch history data', 1637407485035);
         }

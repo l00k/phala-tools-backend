@@ -16,16 +16,16 @@ export class NotificationAggregator
 {
     
     @Inject({ ctorArgs: [ NotificationAggregator.name ] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
     @Inject()
-    protected messagingProvider : MessagingProvider;
+    protected _messagingProvider : MessagingProvider;
     
     
-    protected aggregations : Aggregations = {};
+    protected _aggregations : Aggregations = {};
     
     public constructor (
-        protected title : string
+        protected _title : string
     )
     {}
     
@@ -37,40 +37,40 @@ export class NotificationAggregator
         key : string = 'main'
     )
     {
-        if (!this.aggregations[channel]) {
-            this.aggregations[channel] = {};
+        if (!this._aggregations[channel]) {
+            this._aggregations[channel] = {};
         }
-        if (!this.aggregations[channel][chatId]) {
-            this.aggregations[channel][chatId] = {};
+        if (!this._aggregations[channel][chatId]) {
+            this._aggregations[channel][chatId] = {};
         }
-        if (!this.aggregations[channel][chatId][key]) {
-            this.aggregations[channel][chatId][key] = [];
+        if (!this._aggregations[channel][chatId][key]) {
+            this._aggregations[channel][chatId][key] = [];
         }
         
-        this.aggregations[channel][chatId][key].push(text);
+        this._aggregations[channel][chatId][key].push(text);
     }
     
     public async send ()
     {
         const promises = [];
         
-        const aggregations = Object.values(this.aggregations);
+        const aggregations = Object.values(this._aggregations);
         if (!aggregations.length) {
             return;
         }
         
-        this.logger.log(`Sending aggregated notifications (${aggregations.length})`);
+        this._logger.log(`Sending aggregated notifications (${aggregations.length})`);
         
-        for (const [ channel, channelPartials ] of Object.entries(this.aggregations)) {
+        for (const [ channel, channelPartials ] of Object.entries(this._aggregations)) {
             for (const [ recipient, partials ] of Object.entries(channelPartials)) {
                 const keys = Object.keys(partials).sort();
                 const partialsText = keys.map(key => partials[key].join('\n'))
                     .join('\n');
                 
-                let text = `**${this.title}**\n${partialsText}`;
+                let text = `**${this._title}**\n${partialsText}`;
                 
                 const promise = new Promise((resolve, reject) => {
-                    this.messagingProvider
+                    this._messagingProvider
                         .sendMessage(<MessagingChannel>channel, recipient, text)
                         .then(resolve)
                         .catch(e => {
@@ -85,9 +85,9 @@ export class NotificationAggregator
         
         await Promise.allSettled(promises);
         
-        this.logger.log('Done');
+        this._logger.log('Done');
         
-        this.aggregations = {};
+        this._aggregations = {};
     }
     
 }

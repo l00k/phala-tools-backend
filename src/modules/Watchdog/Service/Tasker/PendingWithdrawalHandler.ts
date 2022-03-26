@@ -19,31 +19,31 @@ export class PendingWithdrawalHandler
 {
     
     @Inject({ ctorArgs: [ '🚨 Pending withdrawal(s) in queue' ] })
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected apiProvider : ApiProvider;
+    protected _apiProvider : ApiProvider;
     
     @Inject()
-    protected runtimeCache : RuntimeCache;
+    protected _runtimeCache : RuntimeCache;
     
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
     
-    protected api : ApiPromise;
+    protected _api : ApiPromise;
     
     
     public async init ()
     {
-        this.entityManager = this.entityManagerWrapper.getDirectEntityManager();
-        this.api = await this.apiProvider.getApi();
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._api = await this._apiProvider.getApi();
     }
     
     public async postProcess ()
     {
-        await this.notificationAggregator.send();
+        await this._notificationAggregator.send();
     }
     
     @Task({
@@ -51,13 +51,13 @@ export class PendingWithdrawalHandler
     })
     public async handle () : Promise<boolean>
     {
-        const observationRepository = this.entityManager.getRepository(StakePoolObservation);
+        const observationRepository = this._entityManager.getRepository(StakePoolObservation);
         const observations = await observationRepository.find({ mode: ObservationMode.Owner });
         const observationGroups = _.groupBy(observations, ob => ob.stakePool.onChainId);
         
         for (const [ onChainPoolId, observations ] of Object.entries(observationGroups)) {
             const stakePool : typeof KhalaTypes.PoolInfo =
-                <any>(await this.api.query.phalaStakePool.stakePools(onChainPoolId)).toJSON();
+                <any>(await this._api.query.phalaStakePool.stakePools(onChainPoolId)).toJSON();
             
             if (stakePool.withdrawQueue.length) {
                 const totalRaw = stakePool.withdrawQueue.reduce((acc, r) => acc + Number(r.shares), 0);
@@ -66,7 +66,7 @@ export class PendingWithdrawalHandler
                 for (const observation of observations) {
                     const text = '`#' + onChainPoolId + '` total `' + totalText + '`';
                     
-                    this.notificationAggregator.aggregate(
+                    this._notificationAggregator.aggregate(
                         observation.user.msgChannel,
                         observation.user.msgUserId,
                         text

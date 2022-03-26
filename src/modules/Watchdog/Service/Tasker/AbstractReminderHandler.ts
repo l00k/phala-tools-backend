@@ -19,22 +19,22 @@ export abstract class AbstractReminderHandler
     
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
-    protected apiProvider : ApiProvider;
+    protected _apiProvider : ApiProvider;
     
     @Inject()
-    protected messagingProvider : MessagingProvider;
+    protected _messagingProvider : MessagingProvider;
     
     
-    protected logger : Logger;
+    protected _logger : Logger;
     
-    protected notificationAggregator : NotificationAggregator;
+    protected _notificationAggregator : NotificationAggregator;
     
-    protected api : ApiPromise;
+    protected _api : ApiPromise;
     
-    protected entityManager : EntityManager;
+    protected _entityManager : EntityManager;
     
     
     
@@ -42,27 +42,27 @@ export abstract class AbstractReminderHandler
     {
         const Constructor : typeof AbstractReminderHandler = <any>this.constructor;
         
-        this.logger = ObjectManager.getSingleton()
+        this._logger = ObjectManager.getSingleton()
             .getInstance(Logger, [ Constructor.name ]);
     }
     
     public async init ()
     {
-        this.api = await this.apiProvider.getApi();
-        this.entityManager = this.entityManagerWrapper.getDirectEntityManager();
+        this._api = await this._apiProvider.getApi();
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
     }
     
     public async postProcess ()
     {
-        await this.notificationAggregator.send();
-        await this.entityManager.flush();
+        await this._notificationAggregator.send();
+        await this._entityManager.flush();
     }
     
-    protected async loadIssues<T extends AbstractIssue<T>> () : Promise<T[]>
+    protected async _loadIssues<T extends AbstractIssue<T>> () : Promise<T[]>
     {
         const Constructor : typeof AbstractReminderHandler = <any>this.constructor;
         
-        const issueRepository : EntityRepository<any> = <any>this.entityManager.getRepository(Constructor.ISSUE_CLASS);
+        const issueRepository : EntityRepository<any> = <any>this._entityManager.getRepository(Constructor.ISSUE_CLASS);
         return issueRepository.findAll();
     }
     

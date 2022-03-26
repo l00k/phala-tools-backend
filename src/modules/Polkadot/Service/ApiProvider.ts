@@ -12,38 +12,38 @@ export class ApiProvider
     
     
     @Config('module.polkadot.api.wsUrl')
-    protected apiWsUrl : string;
+    protected _apiWsUrl : string;
     
     
     @Inject({ ctorArgs: [ApiProvider.SERVICE_NAME] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
-    protected wsProvider : WsProvider;
+    protected _wsProvider : WsProvider;
     
-    protected apiPromise : Promise<ApiPromise>;
+    protected _apiPromise : Promise<ApiPromise>;
     
     #api : ApiPromise;
     
     
     public async getApi () : Promise<ApiPromise>
     {
-        await this.apiPromise;
+        await this._apiPromise;
         return this.#api;
     }
     
     public [InitializeSymbol] ()
     {
-        this.wsProvider = new WsProvider(this.apiWsUrl);
+        this._wsProvider = new WsProvider(this._apiWsUrl);
         
-        this.wsProvider.on('connected', () => {
-            this.logger.log('Connected to node.');
+        this._wsProvider.on('connected', () => {
+            this._logger.log('Connected to node.');
         });
-        this.wsProvider.on('disconnected', () => {
-            this.logger.log('Disconnected from node.');
+        this._wsProvider.on('disconnected', () => {
+            this._logger.log('Disconnected from node.');
         });
         
-        this.apiPromise = this.createApi();
-        this.apiPromise.then(api => this.#api = api);
+        this._apiPromise = this._createApi();
+        this._apiPromise.then(api => this.#api = api);
     }
     
     public async [ReleaseSymbol] ()
@@ -53,9 +53,9 @@ export class ApiProvider
         }
     }
     
-    protected createApi () : Promise<ApiPromise>
+    protected _createApi () : Promise<ApiPromise>
     {
-        return ApiPromise.create({ provider: this.wsProvider });
+        return ApiPromise.create({ provider: this._wsProvider });
     }
     
 }
