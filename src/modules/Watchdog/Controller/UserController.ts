@@ -13,10 +13,10 @@ export class UserController
 {
     
     @Inject({ ctorArgs: [ UserController.name ] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
     @Inject()
-    protected entityManagerWrapper : EntityManagerWrapper;
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     
     @Router.Endpoint.GET('/user/me', {
@@ -30,7 +30,7 @@ export class UserController
             authData : any
     )
     {
-        const entityManager = this.entityManagerWrapper.getDirectEntityManager();
+        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
         const userRepository = entityManager.getRepository(User);
         
         return await userRepository.findOne(
