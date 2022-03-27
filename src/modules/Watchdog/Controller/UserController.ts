@@ -35,7 +35,9 @@ export class UserController
         
         return await userRepository.findOne(
             { id: authData.userId },
-            [ 'stakePoolObservations' ]
+            {
+                populate: [ 'stakePoolObservations' ]
+            }
         );
     }
     

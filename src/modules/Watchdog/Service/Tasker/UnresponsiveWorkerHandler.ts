@@ -5,7 +5,7 @@ import { WorkerState } from '#/Phala/Api/Worker';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { AbstractReminderHandler } from '#/Watchdog/Service/Tasker/AbstractReminderHandler';
 import { Inject, Injectable } from '@inti5/object-manager';
 

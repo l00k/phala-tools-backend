@@ -1,10 +1,11 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { Account } from '#/Watchdog/Domain/Model/Account';
-import { Observation } from '#/Watchdog/Domain/Model/StakePool/Observation';
-import { Configuration } from '#/Watchdog/Domain/Model/User/Configuration';
+import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
+import { UserConfiguration } from '#/Watchdog/Domain/Model/User/UserConfiguration';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
+import { EntityData } from '@mikro-orm/core/typings';
 import { EntityManager } from '@mikro-orm/mysql';
 import * as Trans from 'class-transformer';
 
@@ -63,39 +64,39 @@ export class User
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => Configuration)
+    @API.Property(() => UserConfiguration)
     @API.Groups([
         'Watchdog/User',
     ])
-    public config : Configuration = new Configuration();
+    public config : UserConfiguration = new UserConfiguration();
     
     @ORM.ManyToMany(() => Account)
     public accounts : ORM.Collection<Account>;
     
-    @ORM.OneToMany(() => Observation, o => o.user)
-    @API.Property(() => Observation)
+    @ORM.OneToMany(() => StakePoolObservation, o => o.user)
+    @API.Property(() => StakePoolObservation)
     @API.Groups([
         'Watchdog/User',
     ])
-    public stakePoolObservations : ORM.Collection<Observation>;
+    public stakePoolObservations : ORM.Collection<StakePoolObservation>;
     
     
-    public constructor (data? : Partial<User>, entityManager? : EntityManager)
+    public constructor (data? : EntityData<User>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         
         this.accounts = new ORM.Collection<Account>(this, []);
-        this.stakePoolObservations = new ORM.Collection<Observation>(this, []);
+        this.stakePoolObservations = new ORM.Collection<StakePoolObservation>(this, []);
         
         if (data) {
             this.assign(data, { em: entityManager });
         }
     }
     
-    public getConfig<K extends keyof Configuration> (key : K) : Configuration[K]
+    public getConfig<K extends keyof UserConfiguration> (key : K) : UserConfiguration[K]
     {
         if (this.config[key] === undefined) {
-            this.config = Trans.plainToClassFromExist(new Configuration(), this.config);
+            this.config = Trans.plainToClassFromExist(new UserConfiguration(), this.config);
         }
         
         return this.config[key];

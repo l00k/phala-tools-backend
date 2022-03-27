@@ -1,11 +1,15 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account } from '#/Watchdog/Domain/Model/Account';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
-import { Configuration } from '#/Watchdog/Domain/Model/StakePool/Observation/Configuration';
-import { LastNotifications, NotificationType } from '#/Watchdog/Domain/Model/StakePool/Observation/LastNotifications';
+import { ObservationConfiguration } from '#/Watchdog/Domain/Model/StakePool/Observation/ObservationConfiguration';
+import {
+    NotificationType,
+    ObservationNotifications
+} from '#/Watchdog/Domain/Model/StakePool/Observation/ObservationNotifications';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
+import { EntityData } from '@mikro-orm/core/typings';
 import { EntityManager } from '@mikro-orm/mysql';
 import * as Trans from 'class-transformer';
 
@@ -22,8 +26,8 @@ export enum ObservationMode
     tableName: 'watchdog_stakepool_observation'
 })
 @API.Resource('Watchdog/StakePool/Observation')
-export class Observation
-    extends AbstractModel<Observation>
+export class StakePoolObservation
+    extends AbstractModel<StakePoolObservation>
 {
     
     
@@ -61,22 +65,22 @@ export class Observation
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => Configuration)
+    @API.Property(() => ObservationConfiguration)
     @API.Groups([
         'Watchdog/User',
     ])
-    public config : Configuration = new Configuration();
+    public config : ObservationConfiguration = new ObservationConfiguration();
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => LastNotifications)
+    @API.Property(() => ObservationNotifications)
     @API.Groups([
         'Watchdog/User',
     ])
-    public lastNotifications : LastNotifications = new LastNotifications();
+    public lastNotifications : ObservationNotifications = new ObservationNotifications();
     
     
-    public constructor (data? : Partial<Observation>, entityManager? : EntityManager)
+    public constructor (data? : EntityData<StakePoolObservation>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         if (data) {
@@ -84,10 +88,10 @@ export class Observation
         }
     }
     
-    public getConfig<K extends keyof Configuration> (key : K) : Configuration[K]
+    public getConfig<K extends keyof ObservationConfiguration> (key : K) : ObservationConfiguration[K]
     {
         if (this.config[key] === undefined) {
-            this.config = Trans.plainToClassFromExist(new Configuration(), this.config);
+            this.config = Trans.plainToClassFromExist(new ObservationConfiguration(), this.config);
         }
         
         return this.config[key];

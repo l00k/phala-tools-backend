@@ -1,7 +1,7 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';

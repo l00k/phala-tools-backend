@@ -8,14 +8,20 @@ export enum NotificationType
 }
 
 
-@API.Resource('Watchdog/StakePool/Observation/LastNotifications')
-export class LastNotifications
+@API.Resource('Watchdog/StakePool/Observation/Notifications')
+export class ObservationNotifications
 {
     
     @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     [NotificationType.ClaimableRewards] : number;
     
     @API.Property()
+    @API.Groups([
+        'Watchdog/User',
+    ])
     [NotificationType.RewardsDrop] : number;
     
 }

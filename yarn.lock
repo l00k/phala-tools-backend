@@ -51,7 +51,7 @@
     node-fetch "^2.6.5"
     tslib "^2.3.1"
 
-"@mikro-orm/cli@^4.5.9":
+"@mikro-orm/cli@^4.5.10":
   version "4.5.10"
   resolved "https://registry.yarnpkg.com/@mikro-orm/cli/-/cli-4.5.10.tgz#0d30ca8ca80794e78361080abdb8afb1a548217d"
   integrity sha512-buPCyaTLKed5Mm2Z0x/feZ06XsPpb84e/FvoWdGfVtZ9JmhqE/SuY+6gp2p/VRH4cp4jLMqc50Ky29FKdG0aWw==
@@ -79,7 +79,7 @@
     mikro-orm "^5.1.0"
     reflect-metadata "0.1.13"
 
-"@mikro-orm/core@^4.5.10", "@mikro-orm/core@^4.5.9":
+"@mikro-orm/core@^4.5.10":
   version "4.5.10"
   resolved "https://registry.yarnpkg.com/@mikro-orm/core/-/core-4.5.10.tgz#195222654bd1e25648bffd282d13f1c2ad7982b3"
   integrity sha512-vnSSFGSR/JoGINJlci5fafGSqvLgHx+3Nt3XjnCTNLOjQ0WL7LsdUVwM9FE/W5FipcJRaQfWmY/iLXBqnaarGQ==
@@ -110,7 +110,7 @@
     knex "0.21.19"
     sqlstring "2.3.2"
 
-"@mikro-orm/migrations@^4.5.10", "@mikro-orm/migrations@^4.5.9":
+"@mikro-orm/migrations@^4.5.10":
   version "4.5.10"
   resolved "https://registry.yarnpkg.com/@mikro-orm/migrations/-/migrations-4.5.10.tgz#4f2aa203f9b69483a86d4f9a3b9ea55248ec5d4a"
   integrity sha512-dnXDIHrOlIZL/ImXLtbxHiNlAHKvxDmXWtL9ejM0kzx7NDDcxIR5aEqabT3DlawaoupyqOVuI30j3trZxiJdeg==
@@ -128,7 +128,7 @@
   dependencies:
     "@mikro-orm/knex" "^4.5.10"
 
-"@mikro-orm/mysql@^4.5.9":
+"@mikro-orm/mysql@^4.5.10":
   version "4.5.10"
   resolved "https://registry.yarnpkg.com/@mikro-orm/mysql/-/mysql-4.5.10.tgz#6c4aad2407fe97d18eb7a507e1a2b76a82aca574"
   integrity sha512-UQkg3XlwJFXj4P5AnDiH/14b5wsJPVxALPtCX+Yi+qqyG6o3A/QtpO7ZJLXYhyZaBMAz1N8mKUyAvQBprMCVtg==
@@ -136,7 +136,7 @@
     "@mikro-orm/mysql-base" "^4.5.10"
     mysql2 "2.3.2"
 
-"@mikro-orm/reflection@^4.5.9":
+"@mikro-orm/reflection@^4.5.10":
   version "4.5.10"
   resolved "https://registry.yarnpkg.com/@mikro-orm/reflection/-/reflection-4.5.10.tgz#5f2bb047d9bcfaf57fa01ddeec7e8bebed2e1f65"
   integrity sha512-Kj/mSrQQxNnCx0ffScEHiFkL7UlR98prlwieyWp/jufn57FMQ0TZ/DKNtgSlRY+7Ly+IS5rPRiwImKfISQrJ1A==
@@ -700,7 +700,12 @@
     "@types/mongodb" "*"
     "@types/sequelize" "*"
 
-"@types/validator@*", "@types/validator@^13.1.2":
+"@types/validator@*":
+  version "13.7.2"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.7.2.tgz#a2114225d9be743fb154b06c29b8257aaca42922"
+  integrity sha512-KFcchQ3h0OPQgFirBRPZr5F/sVjxZsOrQHedj3zi8AH3Zv/hOLx2OLR4hxR5HcfoU+33n69ZuOfzthKVdMoTiw==
+
+"@types/validator@^13.1.2":
   version "13.7.1"
   resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.7.1.tgz#cdab1b4779f6b1718a08de89d92d2603b71950cb"
   integrity sha512-I6OUIZ5cYRk5lp14xSOAiXjWrfVoMZVjDuevBYgQDYzZIjsf2CAISpEcXOkFAtpAHbmWIDLcZObejqny/9xq5Q==
@@ -969,9 +974,9 @@ braces@^3.0.1, braces@~3.0.2:
     fill-range "^7.0.1"
 
 bson@^4.6.1:
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/bson/-/bson-4.6.1.tgz#2b5da517539bb0f7f3ffb54ac70a384ca899641c"
-  integrity sha512-I1LQ7Hz5zgwR4QquilLNZwbhPw0Apx7i7X9kGMBTsqPdml/03Q9NBtD9nt/19ahjlphktQImrnderxqpzeVDjw==
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/bson/-/bson-4.6.2.tgz#3241c79d23d225b86ab6d2bc268b803d8a5fd444"
+  integrity sha512-VeJKHShcu1b/ugl0QiujlVuBepab714X9nNyBdA1kfekuDGecxgpTA2Z6nYbagrWFeiIyzSWIOzju3lhj+RNyQ==
   dependencies:
     buffer "^5.6.0"
 
