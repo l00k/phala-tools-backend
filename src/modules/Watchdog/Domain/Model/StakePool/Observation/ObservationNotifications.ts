@@ -1,4 +1,4 @@
-import { Annotation as API } from 'core/api-backend';
+import { Annotation as API } from '@inti5/api-backend';
 
 
 export enum NotificationType
