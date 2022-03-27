@@ -28,7 +28,7 @@ export class UserController
     public async getUserMe (
         @Router.AuthData()
             authData : any
-    )
+    ) : Promise<User>
     {
         const entityManager = this._entityManagerWrapper.getDirectEntityManager();
         const userRepository = entityManager.getRepository(User);

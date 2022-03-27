@@ -1,18 +1,15 @@
+import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account } from '#/Watchdog/Domain/Model/Account';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
-import { StakePoolObservationConfiguration } from '#/Watchdog/Domain/Model/StakePoolObservationConfiguration';
+import { Configuration } from '#/Watchdog/Domain/Model/StakePool/Observation/Configuration';
+import { LastNotifications, NotificationType } from '#/Watchdog/Domain/Model/StakePool/Observation/LastNotifications';
 import { User } from '#/Watchdog/Domain/Model/User';
-import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
+import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
-import { Annotation as API } from '@inti5/api-backend';
+import * as Trans from 'class-transformer';
 
 
-export enum NotificationType
-{
-    ClaimableRewards = 'claimableRewards',
-    RewardsDrop = 'rewardsDrop',
-}
 
 export enum ObservationMode
 {
@@ -21,17 +18,12 @@ export enum ObservationMode
 }
 
 
-type LastNotifications = {
-    [notificationType : string] : number
-};
-
-
 @ORM.Entity({
     tableName: 'watchdog_stakepool_observation'
 })
-@API.Resource('Watchdog/StakePoolObservation')
-export class StakePoolObservation
-    extends AbstractModel<StakePoolObservation>
+@API.Resource('Watchdog/StakePool/Observation')
+export class Observation
+    extends AbstractModel<Observation>
 {
     
     
@@ -69,27 +61,36 @@ export class StakePoolObservation
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => StakePoolObservationConfiguration)
+    @API.Property(() => Configuration)
     @API.Groups([
         'Watchdog/User',
     ])
-    public config : StakePoolObservationConfiguration = new StakePoolObservationConfiguration();
+    public config : Configuration = new Configuration();
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => Object)
+    @API.Property(() => LastNotifications)
     @API.Groups([
         'Watchdog/User',
     ])
-    public lastNotifications : LastNotifications = {};
+    public lastNotifications : LastNotifications = new LastNotifications();
     
     
-    public constructor (data? : Partial<StakePoolObservation>, entityManager? : EntityManager)
+    public constructor (data? : Partial<Observation>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         if (data) {
             this.assign(data, { em: entityManager });
         }
+    }
+    
+    public getConfig<K extends keyof Configuration> (key : K) : Configuration[K]
+    {
+        if (this.config[key] === undefined) {
+            this.config = Trans.plainToClassFromExist(new Configuration(), this.config);
+        }
+        
+        return this.config[key];
     }
     
     public getLastNotification (notificationType : NotificationType) : number

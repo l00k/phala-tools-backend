@@ -3,7 +3,7 @@ import { Assert } from '@inti5/validator/Object';
 
 
 @API.Resource('Watchdog/User/Configuration')
-export class UserConfiguration
+export class Configuration
 {
     
     @API.Property()

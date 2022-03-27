@@ -1,8 +1,8 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { Account } from '#/Watchdog/Domain/Model/Account';
-import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
-import { UserConfiguration } from '#/Watchdog/Domain/Model/UserConfiguration';
+import { Observation } from '#/Watchdog/Domain/Model/StakePool/Observation';
+import { Configuration } from '#/Watchdog/Domain/Model/User/Configuration';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
@@ -63,21 +63,21 @@ export class User
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => UserConfiguration)
+    @API.Property(() => Configuration)
     @API.Groups([
         'Watchdog/User',
     ])
-    public config : UserConfiguration = new UserConfiguration();
+    public config : Configuration = new Configuration();
     
     @ORM.ManyToMany(() => Account)
     public accounts : ORM.Collection<Account>;
     
-    @ORM.OneToMany(() => StakePoolObservation, o => o.user)
-    @API.Property(() => StakePoolObservation)
+    @ORM.OneToMany(() => Observation, o => o.user)
+    @API.Property(() => Observation)
     @API.Groups([
         'Watchdog/User',
     ])
-    public stakePoolObservations : ORM.Collection<StakePoolObservation>;
+    public stakePoolObservations : ORM.Collection<Observation>;
     
     
     public constructor (data? : Partial<User>, entityManager? : EntityManager)
@@ -85,17 +85,17 @@ export class User
         super(data, entityManager);
         
         this.accounts = new ORM.Collection<Account>(this, []);
-        this.stakePoolObservations = new ORM.Collection<StakePoolObservation>(this, []);
+        this.stakePoolObservations = new ORM.Collection<Observation>(this, []);
         
         if (data) {
             this.assign(data, { em: entityManager });
         }
     }
     
-    public getConfig<K extends keyof UserConfiguration> (key : K) : UserConfiguration[K]
+    public getConfig<K extends keyof Configuration> (key : K) : Configuration[K]
     {
         if (this.config[key] === undefined) {
-            this.config = Trans.plainToClassFromExist(new UserConfiguration(), this.config);
+            this.config = Trans.plainToClassFromExist(new Configuration(), this.config);
         }
         
         return this.config[key];

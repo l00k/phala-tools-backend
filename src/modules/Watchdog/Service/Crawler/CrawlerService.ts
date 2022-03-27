@@ -1,10 +1,10 @@
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
+import { Exception } from '#/BackendCore/Exception';
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { CrawlerState } from '#/Watchdog/Domain/Model/AppState/CrawlerState';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Event } from '#/Watchdog/Service/Crawler/Event';
-import { Exception } from '#/BackendCore/Exception';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { EntityManager } from '@mikro-orm/mysql';
