@@ -31,6 +31,14 @@ export class Account
     ])
     public address : string;
     
+    @ORM.Property()
+    @API.Property()
+    @API.Groups([
+        'Watchdog/StakePool',
+        'Watchdog/User',
+    ])
+    public identity : string;
+    
     
     public constructor (data? : Partial<Account>, entityManager? : EntityManager)
     {
