@@ -18,6 +18,7 @@ export class StakePool
     @ORM.PrimaryKey()
     @API.Id()
     @API.Groups([
+        'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
@@ -27,17 +28,21 @@ export class StakePool
     @ORM.Property()
     @API.Property()
     @API.Groups([
+        'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
+    @API.Filterable()
     public onChainId : number;
 
     @ORM.ManyToOne(() => Account)
     @API.Property(() => Account)
     @API.Groups([
+        'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
+    @API.Filterable()
     public owner : Account;
 
 

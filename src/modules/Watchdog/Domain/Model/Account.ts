@@ -17,6 +17,7 @@ export class Account
     @ORM.PrimaryKey()
     @API.Id()
     @API.Groups([
+        'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
@@ -26,17 +27,21 @@ export class Account
     @ORM.Property({ unique: true })
     @API.Property()
     @API.Groups([
+        'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
+    @API.Filterable()
     public address : string;
     
-    @ORM.Property()
+    @ORM.Property({ nullable: true })
     @API.Property()
     @API.Groups([
+        'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
+    @API.Filterable()
     public identity : string;
     
     

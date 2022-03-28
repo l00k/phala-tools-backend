@@ -2,42 +2,39 @@ import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
-import * as ORM from '@mikro-orm/core';
 
 
 export class StakePoolController
     extends CrudController<StakePool>
 {
     
+    protected static readonly ENTITY = StakePool;
+    
+    
     @API.CRUD.GetCollection(() => StakePool)
     public async getStakePoolCollection (
         @API.Filters(() => StakePool)
-            filters : ORM.FilterQuery<StakePool>,
+            filters : Api.Domain.Filters<StakePool>,
         @API.Sorting(() => StakePool)
-            sorting : ORM.QueryOrderMap,
+            sorting : Api.Domain.Sorting<StakePool>,
         @API.Pagination()
             pagination : Api.Domain.Pagination,
     ) : Promise<Api.Domain.Collection<StakePool>>
     {
-        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
-        const stakePoolRepository = entityManager.getRepository(StakePool);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
         
-        // build query and fetch collection
-        const collection : Api.Domain.Collection<StakePool> = {
-            items: [],
-            total: 0,
-        };
-        
-        collection.items = await stakePoolRepository.find(
-            filters,
+        const items = await stakePoolRepository.find(
+            filters.toQueryFilters(),
             {
-                orderBy: sorting,
+                populate: [ 'owner' ],
+                orderBy: sorting.toOrderByMap(),
                 limit: pagination.itemsPerPage,
                 offset: pagination.offset,
             }
         );
+        const total = await stakePoolRepository.count(filters.toQueryFilters());
         
-        return collection;
+        return { items, total };
     }
     
 }
