@@ -4,6 +4,7 @@ import { Inject, Singleton } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { khala as Khala } from '@phala/typedefs';
 import { ApiPromise } from '@polkadot/api';
+import { ProviderInterface } from '@polkadot/rpc-provider/types';
 
 
 
@@ -15,18 +16,17 @@ export class ApiProvider
     protected static readonly SERVICE_NAME : string = 'PhalaApiProvider';
     
     
-    @Config('module.phala.api.wsUrl')
-    protected _apiWsUrl : string = null;
-    
+    @Config('module.phala.api.urls')
+    protected _apiUrls : Polkadot.ApiModeMap<string> = {};
     
     @Inject({ ctorArgs: [ ApiProvider.SERVICE_NAME ] })
     protected _logger : Logger = null;
     
     
-    protected _createApi () : Promise<ApiPromise>
+    protected _createApi (provider : ProviderInterface) : Promise<ApiPromise>
     {
         return ApiPromise.create({
-            provider: this._wsProvider,
+            provider,
             types: Khala,
         });
     }
