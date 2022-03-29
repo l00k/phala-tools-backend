@@ -12,6 +12,7 @@ import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
 import { EntityManager } from '@mikro-orm/mysql';
 import * as Trans from 'class-transformer';
+import { Assert } from 'core/validator/Object';
 
 
 
@@ -61,6 +62,7 @@ export class StakePoolObservation
     @API.Groups([
         'Watchdog/User',
     ])
+    @Assert()
     public mode : ObservationMode;
     
     
