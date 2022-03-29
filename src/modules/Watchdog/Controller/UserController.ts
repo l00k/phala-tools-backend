@@ -2,7 +2,7 @@ import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
-import { Assert } from 'core/validator/Method';
+import { Assert } from '@inti5/validator/Method';
 import rateLimit from 'express-rate-limit';
 
 

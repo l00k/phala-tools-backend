@@ -3,10 +3,12 @@ import { ApiProvider } from '#/Phala';
 import * as Polkadot from '#/Polkadot';
 import { Account } from '#/Watchdog/Domain/Model/Account';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
+import { PhalaEntityFetcher } from '#/Watchdog/Service/PhalaEntityFetcher';
 import { Annotation as API } from '@inti5/api-backend';
-import { Inject } from 'core/object-manager';
-import { Assert } from 'core/validator/Method';
+import { Inject } from '@inti5/object-manager';
+import { Assert } from '@inti5/validator/Method';
 import * as PolkadotUtils from '@polkadot/util';
+import * as Router from 'core/express-ext';
 
 
 export class AccountController
@@ -16,38 +18,17 @@ export class AccountController
     protected static readonly ENTITY = Account;
     
     @Inject()
-    protected _apiProvider : ApiProvider;
+    protected _phalaEntityFetcher : PhalaEntityFetcher;
     
     
     @API.CRUD.GetItem(() => Account, { path: '#PATH#/by_address/:address' })
     public async getOrCreateAccount (
+        @Router.Param('address')
         @Assert({ custom: Polkadot.Utility.isAddress })
-        @API.Param('address')
             address : string
     ) : Promise<Account>
     {
-        const accountRepository = this._entityManager.getRepository(Account);
-        
-        let account = await accountRepository.findOne({
-            address : { $eq: address }
-        });
-        if (!account) {
-            account = new Account({ address }, this._entityManager);
-            
-            const api = await this._apiProvider.getApi(Polkadot.ApiMode.HTTP);
-            
-            const onChainIdentity : any =
-                (await api.query.identity.identityOf(account.address)).toHuman();
-            if (onChainIdentity) {
-                account.identity = PolkadotUtils.isHex(onChainIdentity.info.display.Raw)
-                    ? PolkadotUtils.hexToString(onChainIdentity.info.display.Raw)
-                    : onChainIdentity.info.display.Raw;
-            }
-            
-            await accountRepository.persistAndFlush(account);
-        }
-        
-        return account;
+        return this._phalaEntityFetcher.getOrCreateAccount(address);
     }
     
 }

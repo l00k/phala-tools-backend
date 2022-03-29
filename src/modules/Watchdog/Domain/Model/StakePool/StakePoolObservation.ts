@@ -12,7 +12,7 @@ import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
 import { EntityManager } from '@mikro-orm/mysql';
 import * as Trans from 'class-transformer';
-import { Assert } from 'core/validator/Object';
+import { Assert } from '@inti5/validator/Object';
 
 
 
