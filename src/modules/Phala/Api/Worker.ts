@@ -6,3 +6,8 @@ export enum WorkerState {
     MiningUnresponsive = 'MiningUnresponsive',
     MiningCoolingDown = 'MiningCoolingDown',
 }
+
+export const MiningStates : string[] = [
+    WorkerState.MiningIdle,
+    WorkerState.MiningActive,
+];

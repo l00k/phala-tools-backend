@@ -17,6 +17,14 @@ export class Utility
         prefix? : number
     ) : boolean
     {
+        if (typeof address != 'string') {
+            return false;
+        }
+        
+        if (!address.match(/^[a-zA-Z0-9]{48}$/)) {
+            return false;
+        }
+    
         try {
             const encoded = encodeAddress(
                 isHex(address)

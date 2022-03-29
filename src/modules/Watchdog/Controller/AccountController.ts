@@ -21,11 +21,7 @@ export class AccountController
     
     @API.CRUD.GetItem(() => Account, { path: '#PATH#/by_address/:address' })
     public async getOrCreateAccount (
-        @Assert({
-            type: 'string',
-            format: /^[a-zA-Z0-9]{48}$/,
-            custom: Polkadot.Utility.isAddress,
-        })
+        @Assert({ custom: Polkadot.Utility.isAddress })
         @API.Param('address')
             address : string
     ) : Promise<Account>
