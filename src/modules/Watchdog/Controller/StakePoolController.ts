@@ -9,7 +9,7 @@ import { Inject } from '@inti5/object-manager';
 import { Assert } from '@inti5/validator/Method';
 import * as ORM from '@mikro-orm/core';
 import * as PolkadotUtils from '@polkadot/util';
-import * as Router from 'core/express-ext';
+import * as Router from '@inti5/express-ext';
 import * as Api from '@inti5/api-backend';
 import { addedDiff } from 'deep-object-diff';
 import isNumeric from 'lodash';

@@ -3,7 +3,7 @@ import { Inject, ReleaseSymbol, Singleton } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { ApiPromise, HttpProvider, WsProvider } from '@polkadot/api';
 import { ProviderInterface } from '@polkadot/rpc-provider/types';
-import { Timeout } from 'core/utils/Timeout';
+import { Timeout } from '@inti5/utils/Timeout';
 
 
 export enum ApiMode

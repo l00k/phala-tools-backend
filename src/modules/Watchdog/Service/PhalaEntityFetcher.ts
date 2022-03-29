@@ -5,8 +5,8 @@ import { Account } from '#/Watchdog/Domain/Model/Account';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
 import { EntityManager } from '@mikro-orm/mysql';
 import * as PolkadotUtils from '@polkadot/util';
-import { Inject } from 'core/object-manager';
-import { Logger } from 'core/utils/Logger';
+import { Inject } from '@inti5/object-manager';
+import { Logger } from '@inti5/utils/Logger';
 
 
 

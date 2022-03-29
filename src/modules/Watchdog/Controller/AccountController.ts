@@ -8,7 +8,7 @@ import { Annotation as API } from '@inti5/api-backend';
 import { Inject } from '@inti5/object-manager';
 import { Assert } from '@inti5/validator/Method';
 import * as PolkadotUtils from '@polkadot/util';
-import * as Router from 'core/express-ext';
+import * as Router from '@inti5/express-ext';
 
 
 export class AccountController
