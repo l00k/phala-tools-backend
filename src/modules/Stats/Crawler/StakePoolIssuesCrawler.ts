@@ -34,17 +34,23 @@ export class StakePoolIssuesCrawler
     @Timeout(5 * 60 * 1000)
     public async run ()
     {
-        await this.init();
+        return super.run();
+    }
+    
+    protected async _process ()
+    {
         await this.findBadBahaviours();
-        //await this.findSlashes();
+        
+        // todo ld 2022-03-07 22:34:26
+        // await this.findSlashes();
     }
     
     protected async findBadBahaviours ()
     {
-        this.entityManagerDirect = this.entityManagerWrapper.getDirectEntityManager();
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
         
-        const issueRepository = this.entityManagerDirect.getRepository(Issue);
-        const eventRepository = this.entityManagerDirect.getRepository(Event);
+        const issueRepository = this._entityManager.getRepository(Issue);
+        const eventRepository = this._entityManager.getRepository(Event);
         
         // get bad behavour issue
         const badBehaviorIssue = await issueRepository.findOne(Issue.BAD_BEHAVIOR_ID);
@@ -118,9 +124,9 @@ export class StakePoolIssuesCrawler
                     blockDate: commissionEvent.blockDate,
                     type: EventType.BadBehavior,
                     additionalData: {}
-                }, this.entityManagerDirect);
+                }, this._entityManager);
                 
-                this.entityManagerDirect.persist(badBehaviorEvent);
+                this._entityManager.persist(badBehaviorEvent);
                 
                 // mark stakepool
                 await stakePool.issues.loadItems();
@@ -130,22 +136,18 @@ export class StakePoolIssuesCrawler
             }
             
             this.appState.value.badBehaviorLastBlock = commissionEvent.blockNumber;
-            this.entityManagerDirect.persist(this.appState);
+            this._entityManager.persist(this.appState);
         }
         
-        await this.entityManagerDirect.flush();
+        await this._entityManager.flush();
     }
     
     protected async findSlashes ()
     {
-        // todo ld 2022-03-07 22:34:26
-        // curently it gives false positives
-        return;
-    
-        this.entityManagerDirect = this.entityManagerWrapper.getDirectEntityManager();
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
         
-        const issueRepository = this.entityManagerDirect.getRepository(Issue);
-        const eventRepository = this.entityManagerDirect.getRepository(Event);
+        const issueRepository = this._entityManager.getRepository(Issue);
+        const eventRepository = this._entityManager.getRepository(Event);
         
         // get slash issue
         const slashedIssue = await issueRepository.findOne(Issue.SLASHED_ID);
@@ -172,10 +174,10 @@ export class StakePoolIssuesCrawler
             }
             
             this.appState.value.slashesLastBlock = slashEvent.blockNumber;
-            this.entityManagerDirect.persist(this.appState);
+            this._entityManager.persist(this.appState);
         }
         
-        await this.entityManagerDirect.flush();
+        await this._entityManager.flush();
     }
     
 }

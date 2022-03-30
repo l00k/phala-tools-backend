@@ -2,6 +2,7 @@ import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Event } from '#/Stats/Domain/Model/Event';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-ext';
 
 
 export class StakePoolHistoryEntryController
@@ -12,10 +13,10 @@ export class StakePoolHistoryEntryController
     
     @API.CRUD.GetCollection(
         () => Event,
-        'stake_pool/:id/events'
+        { path: 'stake_pool/:id/events' }
     )
     public async getStakePoolHistoryCollection (
-        @API.Param.Id()
+        @Router.Param.Id()
             id : number,
         @API.Filters(() => Event)
             filters : Api.Domain.Filters<Event<any>>,
@@ -23,15 +24,14 @@ export class StakePoolHistoryEntryController
             pagination : Api.Domain.Pagination
     ) : Promise<Api.Domain.Collection<Event<any>>>
     {
-        const finalFilters : Api.Domain.Filters<Event<any>> = {
+        const finalFilters : any = {
             $and: [
                 {
                     $or: [
                         { stakePool: { id: { $eq: id } } },
-                        { stakePool: null },
                     ]
                 },
-                filters,
+                filters.toQueryFilters(),
             ]
         };
         

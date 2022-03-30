@@ -1,6 +1,6 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
-import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
+import { WatchdogStakePool } from '#/Watchdog/Domain/Model/WatchdogStakePool';
 import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
@@ -22,14 +22,14 @@ export class PoolCommissionSetHandler
     ])
     protected async _handle (event : Event) : Promise<boolean>
     {
-        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const stakePoolRepository = this._entityManager.getRepository(WatchdogStakePool);
         const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const onChainId : number = Number(event.data[0]);
         const newCommissionPercent : number = Number(event.data[1]) / 10000;
         
         // fetch stake pool
-        const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: onChainId });
+        const stakePool : WatchdogStakePool = await stakePoolRepository.findOne({ onChainId: onChainId });
         if (!stakePool) {
             // no stake pool entry
             return false;

@@ -1,7 +1,7 @@
 import { ColumnType } from '#/App/Domain/DbConfig';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
-import { Account } from '#/Stats/Domain/Model/Account';
+import { Account } from '#/Phala/Domain/Model';
 import { StakePool } from '#/Stats/Domain/Model/StakePool';
 import { EventRepository } from '#/Stats/Domain/Repository/EventRepository';
 import { Annotation as API } from '@inti5/api-backend';

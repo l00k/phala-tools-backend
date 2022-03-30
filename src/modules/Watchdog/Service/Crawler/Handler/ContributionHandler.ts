@@ -1,6 +1,6 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
-import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
+import { WatchdogStakePool } from '#/Watchdog/Domain/Model/WatchdogStakePool';
 import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
@@ -23,7 +23,7 @@ export class ContributionHandler
     ])
     protected async _handle (event : Event) : Promise<boolean>
     {
-        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const stakePoolRepository = this._entityManager.getRepository(WatchdogStakePool);
         const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const onChainStakePoolId : number = Number(event.data[0]);
@@ -31,7 +31,7 @@ export class ContributionHandler
         const stakedAmount : number = PhalaUtility.parseRawAmount(Number(event.data[2]));
         
         // fetch stake pool
-        const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: onChainStakePoolId });
+        const stakePool : WatchdogStakePool = await stakePoolRepository.findOne({ onChainId: onChainStakePoolId });
         if (!stakePool) {
             // no stake pool entry
             return false;

@@ -1,9 +1,9 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
-import { StakePool } from '#/Stats/Domain/Model/StakePool';
 import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
 import * as Api from '@inti5/api-backend';
-import * as ORM from '@mikro-orm/core';
 import { Annotation as API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-ext';
+import * as ORM from '@mikro-orm/core';
 
 
 export class StakePoolHistoryEntryController
@@ -14,10 +14,10 @@ export class StakePoolHistoryEntryController
     
     @API.CRUD.GetCollection(
         () => HistoryEntry,
-        'stake_pool/:id/history'
+        { path: 'stake_pool/:id/history' }
     )
     public async getStakePoolHistoryCollection (
-        @API.Param.Id()
+        @Router.Param.Id()
             id : number,
         @API.Pagination([ 200 ])
             pagination : Api.Domain.Pagination

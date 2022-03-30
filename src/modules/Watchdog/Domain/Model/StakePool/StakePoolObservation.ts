@@ -1,6 +1,6 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
-import { Account } from '#/Watchdog/Domain/Model/Account';
-import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
+import { WatchdogAccount } from '#/Watchdog/Domain/Model/WatchdogAccount';
+import { WatchdogStakePool } from '#/Watchdog/Domain/Model/WatchdogStakePool';
 import { ObservationConfiguration } from '#/Watchdog/Domain/Model/StakePool/Observation/ObservationConfiguration';
 import {
     NotificationType,
@@ -43,19 +43,19 @@ export class StakePoolObservation
     @ORM.ManyToOne(() => User, { eager: true })
     public user : User;
     
-    @ORM.ManyToOne(() => StakePool, { eager: true })
-    @API.Property(() => StakePool)
+    @ORM.ManyToOne(() => WatchdogStakePool, { eager: true })
+    @API.Property(() => WatchdogStakePool)
     @API.Groups([
         'Watchdog/User',
     ])
-    public stakePool : StakePool;
+    public stakePool : WatchdogStakePool;
     
-    @ORM.ManyToOne(() => Account, { nullable: true, eager: true })
-    @API.Property(() => Account)
+    @ORM.ManyToOne(() => WatchdogAccount, { nullable: true, eager: true })
+    @API.Property(() => WatchdogAccount)
     @API.Groups([
         'Watchdog/User',
     ])
-    public account : Account;
+    public account : WatchdogAccount;
     
     @ORM.Enum({ items: () => ObservationMode, nullable: true })
     @API.Property()

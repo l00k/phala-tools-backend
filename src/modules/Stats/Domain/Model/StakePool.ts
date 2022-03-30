@@ -1,5 +1,6 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
-import { Account } from '#/Stats/Domain/Model/Account';
+import * as Phala from '#/Phala/Domain/Model';
+import { Account } from '#/Phala/Domain/Model';
 import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
 import { Issue } from '#/Stats/Domain/Model/StakePool/Issue';
 import { Worker } from '#/Stats/Domain/Model/Worker';
@@ -8,7 +9,9 @@ import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 
 
-@ORM.Entity()
+@ORM.Entity({
+    tableName: 'stats_stakepool'
+})
 @API.Resource('Stats/StakePool')
 export class StakePool
     extends AbstractModel<StakePool>
@@ -22,6 +25,10 @@ export class StakePool
     @ORM.PrimaryKey()
     @API.Id()
     public id : number;
+    
+    
+    @ORM.OneToOne(() => Phala.StakePool)
+    public stakePool : Phala.StakePool;
     
     
     @ORM.Property({ nullable: true })
@@ -72,6 +79,13 @@ export class StakePool
     ])
     @API.Filterable()
     public issues : ORM.Collection<Issue>;
+    
+    
+    @ORM.Property({ onCreate: () => new Date() })
+    public createdAt : Date = new Date();
+    
+    @ORM.Property({ onUpdate: () => new Date() })
+    public updatedAt : Date = new Date();
     
     
     // runtime values

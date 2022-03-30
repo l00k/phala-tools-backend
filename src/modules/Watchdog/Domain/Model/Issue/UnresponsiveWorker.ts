@@ -1,6 +1,6 @@
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
-import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
+import { WatchdogStakePool } from '#/Watchdog/Domain/Model/WatchdogStakePool';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 
 
@@ -21,8 +21,8 @@ export class UnresponsiveWorker
     @ORM.Property({ unique: true })
     public workerPubKey : string;
 
-    @ORM.ManyToOne(() => StakePool, { eager: true })
-    public stakePool : StakePool;
+    @ORM.ManyToOne(() => WatchdogStakePool, { eager: true })
+    public stakePool : WatchdogStakePool;
 
 
     public constructor (data? : Partial<UnresponsiveWorker>, entityManager? : EntityManager)

@@ -5,7 +5,7 @@ import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregat
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
-import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
+import { WatchdogStakePool } from '#/Watchdog/Domain/Model/WatchdogStakePool';
 import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { Exception } from '#/BackendCore/Exception';
 import { RuntimeCache } from '@inti5/cache/RuntimeCache';
@@ -61,7 +61,7 @@ export class PoolPerformanceDropHandler
     })
     public async handle ()
     {
-        const stakePoolRepository = this._entityManager.getRepository(StakePool);
+        const stakePoolRepository = this._entityManager.getRepository(WatchdogStakePool);
         const observationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const observations = await observationRepository.findAll();

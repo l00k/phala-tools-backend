@@ -4,6 +4,7 @@ import { Modifiers } from '#/Stats/Controller/StakePool/Modifiers';
 import { StakePool } from '#/Stats/Domain/Model/StakePool';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-ext';
 import * as ORM from '@mikro-orm/core';
 import * as Trans from 'class-transformer';
 
@@ -16,7 +17,7 @@ export class StakePoolController
     
     @API.CRUD.GetItem(() => StakePool)
     public async getStakePool (
-        @API.Param.Id()
+        @Router.Param.Id()
             id : number
     ) : Promise<StakePool>
     {
@@ -42,10 +43,10 @@ export class StakePoolController
             modifiers : Modifiers
     ) : Promise<Api.Domain.Collection<StakePool>>
     {
-        const finalFilters : Api.Domain.Filters<StakePool> = {
+        const finalFilters : any = {
             $and: [
                 { onChainId: { $ne: null } },
-                filters,
+                filters.toQueryFilters(),
             ]
         };
         
@@ -58,7 +59,7 @@ export class StakePoolController
         const queryFilters : ORM.FilterQuery<StakePool> = Trans.instanceToPlain(finalFilters);
         const querySorting : ORM.QueryOrderMap = Trans.instanceToPlain(sorting);
         
-        const qb = this.repository.createQueryBuilder('m');
+        const qb = this._repository.createQueryBuilder('m');
         qb.select('*');
         qb.leftJoin('owner', 'o');
         qb.leftJoin('o.tags', 't');
@@ -85,11 +86,11 @@ export class StakePoolController
         
         collection.items = await qb.getResult();
         
-        await this.entityManager.populate(collection.items, [
+        await this._entityManager.populate(collection.items, [
             'owner',
             'owner.tags',
             'issues',
-        ])
+        ]);
         
         return collection;
     }

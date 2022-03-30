@@ -1,22 +1,18 @@
-import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
-import { Account } from '#/Watchdog/Domain/Model/Account';
+import * as Phala from '#/Phala/Domain/Model';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 
 
-@ORM.Entity({
-    tableName: 'watchdog_stakepool'
-})
-@API.Resource('Watchdog/StakePool')
-export class StakePool
-    extends AbstractModel<StakePool>
+@ORM.Entity()
+@API.Resource('Watchdog/Account')
+export class WatchdogAccount
+    extends Phala.Account
 {
     
-    
-    @ORM.PrimaryKey()
     @API.Id()
     @API.Groups([
+        'Watchdog/Account',
         'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
@@ -24,28 +20,28 @@ export class StakePool
     public id : number;
     
     
-    @ORM.Property({ nullable: true })
     @API.Property()
     @API.Groups([
+        'Watchdog/Account',
         'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
     @API.Filterable()
-    public onChainId : number;
+    public address : string;
     
-    @ORM.ManyToOne(() => Account)
-    @API.Property(() => Account)
+    @API.Property()
     @API.Groups([
+        'Watchdog/Account',
         'Watchdog/StakePool/Collection',
         'Watchdog/StakePool',
         'Watchdog/User',
     ])
     @API.Filterable()
-    public owner : Account;
+    public identity : string;
     
     
-    public constructor (data? : Partial<StakePool>, entityManager? : EntityManager)
+    public constructor (data? : Partial<WatchdogAccount>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         if (data) {

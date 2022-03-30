@@ -1,6 +1,6 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
-import { Account } from '#/Watchdog/Domain/Model/Account';
+import { WatchdogAccount } from '#/Watchdog/Domain/Model/WatchdogAccount';
 import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { UserConfiguration } from '#/Watchdog/Domain/Model/User/UserConfiguration';
 import { Annotation as API } from '@inti5/api-backend';
@@ -70,8 +70,8 @@ export class User
     ])
     public config : UserConfiguration = new UserConfiguration();
     
-    @ORM.ManyToMany(() => Account)
-    public accounts : ORM.Collection<Account>;
+    @ORM.ManyToMany(() => WatchdogAccount)
+    public accounts : ORM.Collection<WatchdogAccount>;
     
     @ORM.OneToMany(() => StakePoolObservation, o => o.user)
     @API.Property(() => StakePoolObservation)
@@ -85,7 +85,7 @@ export class User
     {
         super(data, entityManager);
         
-        this.accounts = new ORM.Collection<Account>(this, []);
+        this.accounts = new ORM.Collection<WatchdogAccount>(this, []);
         this.stakePoolObservations = new ORM.Collection<StakePoolObservation>(this, []);
         
         if (data) {
