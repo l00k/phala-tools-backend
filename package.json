@@ -6,9 +6,6 @@
         "app": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts",
         "app:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts",
         "app:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts",
-        "cli": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts cli",
-        "cli:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts cli",
-        "cli:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts cli",
         "postinstall": "patch-package"
     },
     "workspaces": [

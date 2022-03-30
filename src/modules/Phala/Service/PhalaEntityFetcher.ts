@@ -1,12 +1,12 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { ApiProvider, KhalaTypes } from '#/Phala';
+import { Account } from '#/Phala/Domain/Model/Account';
+import { StakePool } from '#/Phala/Domain/Model/StakePool';
 import * as Polkadot from '#/Polkadot';
-import { Account } from '#/Watchdog/Domain/Model/Account';
-import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
-import { EntityManager } from '@mikro-orm/mysql';
-import * as PolkadotUtils from '@polkadot/util';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
+import { EntityManager } from '@mikro-orm/mysql';
+import * as PolkadotUtils from '@polkadot/util';
 
 
 
@@ -29,7 +29,7 @@ export class PhalaEntityFetcher
     }
     
     
-    public async getOrCreateStakePool(onChainId : number) : Promise<StakePool>
+    public async getOrCreateStakePool (onChainId : number) : Promise<StakePool>
     {
         const entityManager = this._getEntityManager();
         const stakePoolRepository = entityManager.getRepository(StakePool);
@@ -37,7 +37,7 @@ export class PhalaEntityFetcher
         let stakePool = await stakePoolRepository.findOne({ onChainId });
         if (!stakePool) {
             const api = await this._apiProvider.getApi(Polkadot.ApiMode.HTTP);
-        
+            
             const onChainStakePool : typeof KhalaTypes.PoolInfo =
                 <any>(await api.query.phalaStakePool.stakePools(onChainId)).toJSON();
             if (!onChainStakePool) {
@@ -56,7 +56,7 @@ export class PhalaEntityFetcher
         return stakePool;
     }
     
-    public async getOrCreateAccount(address : string) : Promise<Account>
+    public async getOrCreateAccount (address : string) : Promise<Account>
     {
         const entityManager = this._getEntityManager();
         const accountRepository = entityManager.getRepository(Account);

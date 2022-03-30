@@ -14,15 +14,15 @@ const component = process.argv[2];
     let app = null;
     
     if (component == 'cli') {
-        const { CliApp } = require('#/Watchdog/CliApp');
+        const { CliApp } = require('#/App/CliApp');
         app = objectManager.getInstance(CliApp);
     }
     else if (component == 'process') {
-        const { ProcessingApp } = require('#/Watchdog/ProcessingApp');
-        app = objectManager.getInstance(ProcessingApp);
+        const { WatchdogProcessingApp } = require('#/App/ProcessingApp');
+        app = objectManager.getInstance(WatchdogProcessingApp);
     }
     else if (component == 'api') {
-        const { ApiApp } = require('#/Watchdog/ApiApp');
+        const { ApiApp } = require('#/App/ApiApp');
         app = objectManager.getInstance(ApiApp);
     }
     

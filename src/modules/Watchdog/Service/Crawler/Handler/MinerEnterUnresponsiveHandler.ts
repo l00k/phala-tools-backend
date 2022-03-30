@@ -1,6 +1,6 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
-import { WorkerState } from '#/Phala/Api/Worker';
+import { WorkerState } from '#/Phala/Domain/Model';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
 import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
@@ -29,10 +29,10 @@ export class MinerEnterUnresponsiveHandler
     {
         const workerAccount : string = event.data[0];
         
-        // confirm unresponsivness
         // todo ld 2022-03-21 21:50:43
+        // confirm unresponsivness
         // const workerState : typeof KhalaTypes.MinerInfo =
-        //     <any>(await this.api.query.phalaMining.miners(workerAccount)).toJSON();
+        //     <any>(await this._api.query.phalaMining.miners(workerAccount)).toJSON();
         // if (
         //     !workerState
         //     || workerState.state != WorkerState.MiningUnresponsive
@@ -108,12 +108,10 @@ export class MinerEnterUnresponsiveHandler
             }
             
             // inform owners (only!)
-            const stakePoolObservations = await stakePoolObservationRepository.find(
-                {
-                    stakePool,
-                    mode: ObservationMode.Owner,
-                }
-            );
+            const stakePoolObservations = await stakePoolObservationRepository.find({
+                stakePool,
+                mode: ObservationMode.Owner,
+            });
             if (!stakePoolObservations.length) {
                 // no stake pool observations
                 return;

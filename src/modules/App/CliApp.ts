@@ -8,7 +8,7 @@ export class CliApp
     
     protected async _main ()
     {
-        this._moduleLoader.load(['Command']);
+        this._moduleLoader.load([ 'Command' ]);
         
         const argv = process.argv.splice(1);
         await CLI.execute(argv);

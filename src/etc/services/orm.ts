@@ -1,6 +1,7 @@
 import { Options, MetadataStorage } from '@mikro-orm/core';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 
+// load .env
 require('dotenv').config();
 
 export default {

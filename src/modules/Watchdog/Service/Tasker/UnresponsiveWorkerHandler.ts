@@ -1,7 +1,7 @@
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
-import { WorkerState } from '#/Phala/Api/Worker';
+import { WorkerState } from '#/Phala/Domain/Model';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { StakePool } from '#/Watchdog/Domain/Model/StakePool';
@@ -38,12 +38,13 @@ export class UnresponsiveWorkerHandler
                 <any>(await this._api.query.phalaMining.miners(issue.workerAccount)).toJSON();
             
             // todo ld 2022-03-21 22:02:41
+            // confirm unresponsivness
             // if (
             //     !workerState
             //     || workerState.state != WorkerState.MiningUnresponsive
             // ) {
             //     // issue already resolved
-            //     this.entityManager.remove(issue);
+            //     this._entityManager.remove(issue);
             //     continue;
             // }
             
