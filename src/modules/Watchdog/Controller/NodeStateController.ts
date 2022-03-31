@@ -26,11 +26,7 @@ export class NodeStateController
         this._nodeStateRepository = this._entityManager.getRepository(NodeState);
     }
     
-    @Endpoint.POST('/node-state', {
-        middlewares: [
-            rateLimit({ windowMs: 5 * 60 * 1000, max: 5 })
-        ]
-    })
+    @Endpoint.POST('/node-state')
     public async index (
         @Body()
         @Assert({ presence: true })

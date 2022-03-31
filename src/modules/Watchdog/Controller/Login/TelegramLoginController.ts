@@ -30,11 +30,7 @@ export class TelegramLoginController
     protected _telegramConfig : TelegramConfig;
     
     
-    @Endpoint.POST('/login/telegram', {
-        middlewares: [
-            rateLimit({ windowMs: 15 * 1000, max: 1 })
-        ]
-    })
+    @Endpoint.POST('/login/telegram')
     public async index (
         @Body()
         @Assert({ presence: true })

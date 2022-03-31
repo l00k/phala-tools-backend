@@ -1,8 +1,10 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Event } from '#/Stats/Domain/Model/Event';
+import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
+import { Annotation as Srl } from 'core/serializer';
 
 
 export class EventController
@@ -15,14 +17,18 @@ export class EventController
         () => Event,
         { path: '#PATH#/by_stakepool/:id' }
     )
+    @Srl.Serialize<Api.Domain.Collection<Event>>({
+        items: '**',
+        total: true,
+    })
     public async getStakePoolHistoryCollection (
         @Router.Param.Id()
             id : number,
         @API.Filters(() => Event)
-            filters : Api.Domain.Filters<Event<any>>,
+            filters : Api.Domain.Filters<Event>,
         @API.Pagination([ 200 ])
             pagination : Api.Domain.Pagination
-    ) : Promise<Api.Domain.Collection<Event<any>>>
+    ) : Promise<Api.Domain.Collection<Event>>
     {
         const finalFilters : any = {
             $and: [

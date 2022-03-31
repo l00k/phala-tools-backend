@@ -13,8 +13,8 @@ import { EntityManager } from '@mikro-orm/mysql';
     tableName: 'stats_stakepool'
 })
 @API.Resource('Stats/StakePool')
-export class StakePool
-    extends AbstractModel<StakePool>
+export class StatsStakePool
+    extends AbstractModel<StatsStakePool>
 {
     
     public static readonly SPECIAL_NETWORK_AVG_ID = 1;
@@ -33,34 +33,22 @@ export class StakePool
     
     @ORM.Property({ type: 'string', nullable: true })
     @API.Property()
-    @API.Groups([
-        'Stats/StakePool'
-    ])
     public special : string;
     
     @ORM.Property({ nullable: true })
     @API.Property()
-    @API.Groups([
-        'Stats/StakePool'
-    ])
     @API.Filterable()
     @API.Sortable()
     public onChainId : number;
     
     @ORM.ManyToOne(() => Account)
     @API.Property(() => Account)
-    @API.Groups([
-        'Stats/StakePool'
-    ])
     @API.Filterable()
     @API.Sortable()
     public owner : Account;
     
     @ORM.OneToOne(() => HistoryEntry, null, { nullable: true, eager: true })
     @API.Property(() => HistoryEntry)
-    @API.Groups([
-        'Stats/StakePool'
-    ])
     @API.Filterable()
     @API.Sortable()
     public lastHistoryEntry : HistoryEntry = null;
@@ -74,9 +62,6 @@ export class StakePool
     
     @ORM.ManyToMany(() => Issue, null, { lazy: true })
     @API.Property(() => Issue)
-    @API.Groups([
-        'Stats/StakePool'
-    ])
     @API.Filterable()
     public issues : ORM.Collection<Issue>;
     
@@ -92,7 +77,7 @@ export class StakePool
     public snapshotWorkers : Worker[] = [];
     
     
-    public constructor (data? : Partial<StakePool>, entityManager? : EntityManager)
+    public constructor (data? : Partial<StatsStakePool>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         

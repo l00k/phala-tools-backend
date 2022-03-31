@@ -29,11 +29,7 @@ export class DiscordLoginController
     protected _discordIdentityProvider : DiscordIdentityProvider;
     
     
-    @Endpoint.POST('/login/discord', {
-        middlewares: [
-            rateLimit({ windowMs: 15 * 1000, max: 1 })
-        ]
-    })
+    @Endpoint.POST('/login/discord')
     public async index (
         @Body()
         @Assert({ presence: true })

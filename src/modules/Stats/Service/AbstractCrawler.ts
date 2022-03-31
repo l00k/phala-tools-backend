@@ -3,7 +3,7 @@ import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
-import { StakePool } from '#/Stats/Domain/Model/StakePool';
+import { StatsStakePool } from '#/Stats/Domain/Model/StatsStakePool';
 import { Worker } from '#/Stats/Domain/Model/Worker';
 import { Inject } from '@inti5/object-manager';
 import { ApiPromise } from '@polkadot/api';
@@ -32,7 +32,7 @@ export abstract class AbstractCrawler
     protected finalizedBlockHeader : Header;
     protected finalizedBlockNumber : number;
     
-    protected stakePools : Mapped<StakePool> = {};
+    protected stakePools : Mapped<StatsStakePool> = {};
     protected accounts : Mapped<Account> = {};
     protected workers : Mapped<Worker> = {};
     
@@ -75,14 +75,14 @@ export abstract class AbstractCrawler
     }
     
     
-    protected async getOrCreateStakePool (onChainId : number) : Promise<StakePool>
+    protected async getOrCreateStakePool (onChainId : number) : Promise<StatsStakePool>
     {
         if (!this.stakePools[onChainId]) {
-            const stakePoolRepository = this._entityManager.getRepository(StakePool);
+            const stakePoolRepository = this._entityManager.getRepository(StatsStakePool);
             
-            let stakePool : StakePool = await stakePoolRepository.findOne({ onChainId });
+            let stakePool : StatsStakePool = await stakePoolRepository.findOne({ onChainId });
             if (!stakePool) {
-                stakePool = new StakePool({ onChainId }, this._entityManager);
+                stakePool = new StatsStakePool({ onChainId }, this._entityManager);
                 stakePool.stakePool = await this._phalaEntityFetcher.getOrCreateStakePool(onChainId);
                 
                 const onChainStakePool : typeof Phala.KhalaTypes.PoolInfo =
@@ -118,7 +118,7 @@ export abstract class AbstractCrawler
         return this.accounts[address];
     }
     
-    protected async getOrCreateWorker (publicKey : string, stakePool : StakePool) : Promise<Worker>
+    protected async getOrCreateWorker (publicKey : string, stakePool : StatsStakePool) : Promise<Worker>
     {
         if (!this.workers[publicKey]) {
             const workerRepository = this._entityManager.getRepository(Worker);

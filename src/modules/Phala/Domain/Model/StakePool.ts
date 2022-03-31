@@ -7,8 +7,7 @@ import { Annotation as API } from 'core/api-backend';
 
 
 @ORM.Entity({
-    tableName: 'phala_stakepool',
-    discriminatorColumn: 'discr'
+    tableName: 'phala_stakepool'
 })
 @API.Resource('StakePool')
 export class StakePool
@@ -23,16 +22,10 @@ export class StakePool
     
     @ORM.Property({ unique: true, nullable: true })
     @API.Property()
-    @API.Groups([
-        'StakePool',
-    ])
     public onChainId : number;
     
     @ORM.ManyToOne(() => Account)
     @API.Property(() => Account)
-    @API.Groups([
-        'StakePool',
-    ])
     public owner : Account;
     
     

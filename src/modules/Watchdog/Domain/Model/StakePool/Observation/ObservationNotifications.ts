@@ -20,46 +20,25 @@ export class ObservationNotifications
 {
     
     @API.Property()
-    @API.Groups([
-        'Watchdog/User:*:get',
-    ])
     public [NotificationType.ClaimableRewards] : number;
     
     @API.Property()
-    @API.Groups([
-        'Watchdog/User:*:get',
-    ])
     public [NotificationType.RewardsDrop] : number;
     
     @API.Property()
-    @API.Groups([
-        'Watchdog/User:*:get',
-    ])
     public [NotificationType.PoolCommissionChange] : number;
     
     
     @API.Property()
-    @API.Groups([
-        'Watchdog/User:*:get',
-    ])
     public [NotificationType.UnresponsiveWorker] : number;
     
     @API.Property()
-    @API.Groups([
-        'Watchdog/User:*:get',
-    ])
     public [NotificationType.NodeStuck] : number;
     
     @API.Property()
-    @API.Groups([
-        'Watchdog/User:*:get',
-    ])
     public [NotificationType.FreePoolFunds] : number;
     
     @API.Property()
-    @API.Groups([
-        'Watchdog/User:*:get',
-    ])
     public [NotificationType.PendingWithdrawals] : number;
     
     

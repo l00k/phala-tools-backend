@@ -3,9 +3,9 @@ import { AbstractHandler } from '#/BackendCore/Service/Tasker/AbstractHandler';
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
+import { StakePool } from '#/Phala/Domain/Model';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
-import { WatchdogStakePool } from '#/Watchdog/Domain/Model/WatchdogStakePool';
 import { NotificationType } from '#/Watchdog/Domain/Model/StakePool/Observation/ObservationNotifications';
 import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { Utility } from '#/Watchdog/Utility/Utility';
@@ -59,7 +59,6 @@ export class ClaimableRewardsHandler
     })
     public async handle ()
     {
-        const stakePoolRepository = this._entityManager.getRepository(WatchdogStakePool);
         const observationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         const observations = await observationRepository.findAll();

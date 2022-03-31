@@ -7,7 +7,6 @@ export class UserConfiguration
 {
     
     @API.Property()
-    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -18,7 +17,6 @@ export class UserConfiguration
     public claimRewardsThreshold : number = 100;
     
     @API.Property()
-    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -29,7 +27,6 @@ export class UserConfiguration
     public changeCommissionThreshold : number = 1;
     
     @API.Property()
-    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -39,7 +36,6 @@ export class UserConfiguration
     public contributionThreshold : number = 1000;
     
     @API.Property()
-    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -49,7 +45,6 @@ export class UserConfiguration
     public withdrawalThreshold : number = 10000;
     
     @API.Property()
-    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {
@@ -59,7 +54,6 @@ export class UserConfiguration
     public poolPerformanceDropThreshold : number = 25;
     
     @API.Property()
-    @API.Groups([ '*' ])
     @Assert({
         presence: true,
         numericality: {

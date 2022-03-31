@@ -1,25 +1,34 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Filters } from '#/Stats/Controller/StakePoolDto/Filters';
 import { Modifiers } from '#/Stats/Controller/StakePoolDto/Modifiers';
-import { StakePool } from '#/Stats/Domain/Model/StakePool';
+import { StatsStakePool } from '#/Stats/Domain/Model/StatsStakePool';
+import { Issue } from '#/Stats/Domain/Model/StakePool/Issue';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import * as ORM from '@mikro-orm/core';
 import * as Trans from 'class-transformer';
+import { Annotation as Srl } from 'core/serializer';
 
 
 export class StakePoolController
-    extends CrudController<StakePool>
+    extends CrudController<StatsStakePool>
 {
     
-    protected static readonly ENTITY = StakePool;
+    protected static readonly ENTITY = StatsStakePool;
     
-    @API.CRUD.GetItem(() => StakePool)
+    @API.CRUD.GetItem(() => StatsStakePool)
+    @Srl.Serialize<StatsStakePool>({
+        special: true,
+        onChainId: true,
+        owner: '*',
+        lastHistoryEntry: '*',
+        issues: '*',
+    })
     public async getStakePool (
         @Router.Param.Id()
             id : number
-    ) : Promise<StakePool>
+    ) : Promise<StatsStakePool>
     {
         return super.getItem(
             id,
@@ -31,17 +40,27 @@ export class StakePoolController
         );
     }
     
-    @API.CRUD.GetCollection(() => StakePool)
+    @API.CRUD.GetCollection(() => StatsStakePool)
+    @Srl.Serialize<Api.Domain.Collection<StatsStakePool>>({
+        items: {
+            special: true,
+            onChainId: true,
+            owner: '*',
+            lastHistoryEntry: '*',
+            issues: '*',
+        },
+        total: true,
+    })
     public async getStakePoolsCollection (
-        @API.Filters(() => StakePool, Filters)
-            filters : Api.Domain.Filters<StakePool>,
-        @API.Sorting(() => StakePool)
-            sorting : Api.Domain.Sorting<StakePool>,
+        @API.Filters(() => StatsStakePool, Filters)
+            filters : Api.Domain.Filters<StatsStakePool>,
+        @API.Sorting(() => StatsStakePool)
+            sorting : Api.Domain.Sorting<StatsStakePool>,
         @API.Pagination()
             pagination : Api.Domain.Pagination,
         @API.Modifiers(Modifiers)
             modifiers : Modifiers
-    ) : Promise<Api.Domain.Collection<StakePool>>
+    ) : Promise<Api.Domain.Collection<StatsStakePool>>
     {
         const finalFilters : any = {
             $and: [
@@ -51,12 +70,12 @@ export class StakePoolController
         };
         
         // build query and fetch collection
-        const collection : Api.Domain.Collection<StakePool> = {
+        const collection : Api.Domain.Collection<StatsStakePool> = {
             items: [],
             total: 0,
         };
         
-        const queryFilters : ORM.FilterQuery<StakePool> = Trans.instanceToPlain(finalFilters);
+        const queryFilters : ORM.FilterQuery<StatsStakePool> = Trans.instanceToPlain(finalFilters);
         const querySorting : ORM.QueryOrderMap = Trans.instanceToPlain(sorting);
         
         const qb = this._repository.createQueryBuilder('m');

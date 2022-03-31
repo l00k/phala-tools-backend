@@ -2,7 +2,7 @@ import { ColumnType } from '#/App/Domain/DbConfig';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
 import { Account } from '#/Phala/Domain/Model';
-import { StakePool } from '#/Stats/Domain/Model/StakePool';
+import { StatsStakePool } from '#/Stats/Domain/Model/StatsStakePool';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 
@@ -57,8 +57,8 @@ export class Worker
     @ORM.ManyToOne(() => Account)
     public operator : Account;
     
-    @ORM.ManyToOne(() => StakePool, { nullable: true })
-    public stakePool : StakePool;
+    @ORM.ManyToOne(() => StatsStakePool, { nullable: true })
+    public stakePool : StatsStakePool;
     
     @ORM.Property({ unsigned: true })
     public initialScore : number;

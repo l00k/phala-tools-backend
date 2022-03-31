@@ -2,7 +2,7 @@ import { ColumnType } from '#/App/Domain/DbConfig';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
 import { Account } from '#/Phala/Domain/Model';
-import { StakePool } from '#/Stats/Domain/Model/StakePool';
+import { StatsStakePool } from '#/Stats/Domain/Model/StatsStakePool';
 import { EventRepository } from '#/Stats/Domain/Repository/EventRepository';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
@@ -52,13 +52,15 @@ export class CommissionChange
     public delta : number;
 }
 
+
+@API.Resource()
 class EventAdditionalData
 {
     
-    @API.Trans.Expose()
+    @API.Property()
     public commission : number;
     
-    @API.Trans.Expose()
+    @API.Property()
     public delta : number;
     
 }
@@ -69,7 +71,7 @@ class EventAdditionalData
     customRepository: () => EventRepository
 })
 @API.Resource('Stats/Event')
-export class Event<T extends AbstractEventData>
+export class Event<T extends AbstractEventData = AbstractEventData>
     extends AbstractModel<Event<T>>
 {
     
@@ -81,31 +83,22 @@ export class Event<T extends AbstractEventData>
     
     @ORM.Property({ index: true })
     @API.Property()
-    @API.Groups([
-        'Stats/Event'
-    ])
     public blockNumber : number;
     
     @ORM.Property()
     @API.Property()
-    @API.Groups([
-        'Stats/Event'
-    ])
     public blockDate : Date;
     
     
     @ORM.Property({ index: true })
     @ORM.Enum({ items: () => EventType })
     @API.Property()
-    @API.Groups([
-        'Stats/Event'
-    ])
     @API.Filterable()
     public type : EventType = null;
     
     
-    @ORM.ManyToOne(() => StakePool, { nullable: true })
-    public stakePool : StakePool;
+    @ORM.ManyToOne(() => StatsStakePool, { nullable: true })
+    public stakePool : StatsStakePool;
     
     @ORM.ManyToOne(() => Account, { nullable: true })
     public sourceAccount : Account;
@@ -115,17 +108,11 @@ export class Event<T extends AbstractEventData>
     
     @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE, nullable: true })
     @API.Property()
-    @API.Groups([
-        'Stats/Event'
-    ])
     public amount : number = 0;
     
     
     @ORM.Property({ type: ORM.JsonType })
     @API.Property(() => EventAdditionalData)
-    @API.Groups([
-        'Stats/Event'
-    ])
     public additionalData : T = <any>{};
     
     

@@ -23,23 +23,14 @@ export class Issue
     
     @ORM.Property()
     @API.Property()
-    @API.Groups([
-        'Stats/StakePool/Issue',
-    ])
     public name : string;
     
     @ORM.Property()
     @API.Property()
-    @API.Groups([
-        'Stats/StakePool/Issue'
-    ])
     public description : string;
     
     @ORM.Property()
     @API.Property()
-    @API.Groups([
-        'Stats/StakePool/Issue'
-    ])
     public color : string;
     
     

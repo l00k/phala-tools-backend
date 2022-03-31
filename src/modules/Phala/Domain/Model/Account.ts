@@ -6,8 +6,7 @@ import { Annotation as API } from 'core/api-backend';
 
 
 @ORM.Entity({
-    tableName: 'phala_account',
-    discriminatorColumn: 'discr'
+    tableName: 'phala_account'
 })
 @API.Resource('Account')
 export class Account
@@ -22,26 +21,14 @@ export class Account
     
     @ORM.Property({ unique: true })
     @API.Property()
-    @API.Groups([
-        'Account',
-        'StakePool',
-    ])
     public address : string;
     
     @ORM.Property({ nullable: true })
     @API.Property()
-    @API.Groups([
-        'Account',
-        'StakePool',
-    ])
     public identity : string;
     
     @ORM.Property()
     @API.Property()
-    @API.Groups([
-        'Account',
-        'StakePool',
-    ])
     public identityVerified : boolean = false;
     
     

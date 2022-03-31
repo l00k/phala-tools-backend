@@ -1,10 +1,10 @@
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
+import { StakePool } from '#/Phala/Domain/Model';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
-import { WatchdogStakePool } from '#/Watchdog/Domain/Model/WatchdogStakePool';
 import { AbstractReminderHandler } from '#/Watchdog/Service/Tasker/AbstractReminderHandler';
 import { Inject, Injectable } from '@inti5/object-manager';
 
@@ -69,7 +69,7 @@ export class UnresponsiveWorkerHandler
     
     protected async _prepareMessages ()
     {
-        const stakePoolRepository = this._entityManager.getRepository(WatchdogStakePool);
+        const stakePoolRepository = this._entityManager.getRepository(StakePool);
         const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
         
         for (const [ onChainId, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
@@ -78,7 +78,7 @@ export class UnresponsiveWorkerHandler
             }
             
             // fetch stake pool
-            const stakePool : WatchdogStakePool = await stakePoolRepository.findOne({ onChainId: Number(onChainId) });
+            const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: Number(onChainId) });
             if (!stakePool) {
                 // no stake pool entry
                 continue;

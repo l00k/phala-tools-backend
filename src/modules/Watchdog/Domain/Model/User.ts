@@ -1,6 +1,5 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
-import { WatchdogAccount } from '#/Watchdog/Domain/Model/WatchdogAccount';
 import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
 import { UserConfiguration } from '#/Watchdog/Domain/Model/User/UserConfiguration';
 import { Annotation as API } from '@inti5/api-backend';
@@ -29,9 +28,6 @@ export class User
     
     @ORM.Enum({ items: Object.values(MessagingChannel) })
     @API.Property()
-    @API.Groups([
-        'Watchdog/User',
-    ])
     public msgChannel : MessagingChannel;
     
     @ORM.Property({ index: true })
@@ -42,9 +38,6 @@ export class User
     
     @ORM.Property()
     @API.Property()
-    @API.Groups([
-        'Watchdog/User',
-    ])
     public username : string;
     
     
@@ -57,19 +50,10 @@ export class User
     
     @ORM.Property({ type: ORM.JsonType })
     @API.Property(() => UserConfiguration)
-    @API.Groups([
-        'Watchdog/User',
-    ])
     public config : UserConfiguration = new UserConfiguration();
     
-    @ORM.ManyToMany(() => WatchdogAccount)
-    public accounts : ORM.Collection<WatchdogAccount>;
-    
     @ORM.OneToMany(() => StakePoolObservation, o => o.user)
-    @API.Property(() => StakePoolObservation)
-    @API.Groups([
-        'Watchdog/User',
-    ])
+    @API.Property(() => [ StakePoolObservation ])
     public stakePoolObservations : ORM.Collection<StakePoolObservation>;
     
     
@@ -77,7 +61,6 @@ export class User
     {
         super(data, entityManager);
         
-        this.accounts = new ORM.Collection<WatchdogAccount>(this, []);
         this.stakePoolObservations = new ORM.Collection<StakePoolObservation>(this, []);
         
         if (data) {

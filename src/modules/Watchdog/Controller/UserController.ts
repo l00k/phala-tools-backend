@@ -3,7 +3,7 @@ import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import { Assert } from '@inti5/validator/Method';
-import rateLimit from 'express-rate-limit';
+import { Annotation as Srl } from 'core/serializer';
 
 
 @Router.AuthOnly()
@@ -14,12 +14,23 @@ export class UserController
     protected static readonly ENTITY = User;
     
     
-    @Router.Endpoint.GET('/user/me', {
-        middlewares: [
-            rateLimit({ windowMs: 15 * 1000, max: 1 })
-        ]
-    })
+    @Router.Endpoint.GET('/user/me')
     @API.Endpoint(() => User)
+    @Srl.Serialize<User>({
+        msgChannel: true,
+        username: true,
+        config: '*',
+        stakePoolObservations: {
+            stakePool: {
+                onChainId: true,
+                owner: '*',
+            },
+            account: '*',
+            mode: true,
+            config: '*',
+            lastNotifications: '*',
+        }
+    }, () => User)
     public async getUserMe (
         @Router.AuthData()
             authData : any
@@ -29,27 +40,23 @@ export class UserController
     }
     
     
-    @Router.Endpoint.POST('/user/me', {
-        middlewares: [
-            rateLimit({ windowMs: 15 * 1000, max: 1 })
-        ]
-    })
-    @API.Endpoint(() => User)
-    public async postUserMe (
-        @Router.AuthData()
-            authData : any,
-        @Router.Body()
-        @Assert()
-            user : User
-    ) : Promise<User>
-    {
-        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
-        const userRepository = entityManager.getRepository(User);
-        
-        
-        console.log(user);
-        
-        return user;
-    }
+    // @Router.Endpoint.POST('/user/me')
+    // @API.Endpoint(() => User)
+    // public async postUserMe (
+    //     @Router.AuthData()
+    //         authData : any,
+    //     @Router.Body()
+    //     @Assert()
+    //         user : User
+    // ) : Promise<User>
+    // {
+    //     const entityManager = this._entityManagerWrapper.getDirectEntityManager();
+    //     const userRepository = entityManager.getRepository(User);
+    //
+    //
+    //     console.log(user);
+    //
+    //     return user;
+    // }
     
 }
