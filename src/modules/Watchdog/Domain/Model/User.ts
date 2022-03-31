@@ -49,17 +49,9 @@ export class User
     
     
     @ORM.Property({ onCreate: () => new Date() })
-    @API.Property()
-    @API.Groups([
-        'Watchdog/User',
-    ])
     public createdAt : Date = new Date();
     
     @ORM.Property({ onUpdate: () => new Date() })
-    @API.Property()
-    @API.Groups([
-        'Watchdog/User',
-    ])
     public updatedAt : Date = new Date();
     
     

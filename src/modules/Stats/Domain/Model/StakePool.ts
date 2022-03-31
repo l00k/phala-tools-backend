@@ -31,7 +31,7 @@ export class StakePool
     public stakePool : Phala.StakePool;
     
     
-    @ORM.Property({ nullable: true })
+    @ORM.Property({ type: 'string', nullable: true })
     @API.Property()
     @API.Groups([
         'Stats/StakePool'

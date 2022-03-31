@@ -5,7 +5,7 @@ import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 
 
-export class StakePoolHistoryEntryController
+export class EventController
     extends CrudController<Event<any>>
 {
     
@@ -13,7 +13,7 @@ export class StakePoolHistoryEntryController
     
     @API.CRUD.GetCollection(
         () => Event,
-        { path: 'stake_pool/:id/events' }
+        { path: '#PATH#/by_stakepool/:id' }
     )
     public async getStakePoolHistoryCollection (
         @Router.Param.Id()

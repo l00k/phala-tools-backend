@@ -1,6 +1,6 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
-import { Filters } from '#/Stats/Controller/StakePool/Filters';
-import { Modifiers } from '#/Stats/Controller/StakePool/Modifiers';
+import { Filters } from '#/Stats/Controller/StakePoolDto/Filters';
+import { Modifiers } from '#/Stats/Controller/StakePoolDto/Modifiers';
 import { StakePool } from '#/Stats/Domain/Model/StakePool';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';

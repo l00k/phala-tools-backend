@@ -6,7 +6,7 @@ import * as Router from '@inti5/express-ext';
 import * as ORM from '@mikro-orm/core';
 
 
-export class StakePoolHistoryEntryController
+export class HistoryEntryController
     extends CrudController<HistoryEntry>
 {
     
@@ -14,8 +14,14 @@ export class StakePoolHistoryEntryController
     
     @API.CRUD.GetCollection(
         () => HistoryEntry,
-        { path: 'stake_pool/:id/history' }
+        { path: '#PATH#/by_stakepool/:id' }
     )
+    @API.Serialize({
+        items: [
+        
+        ],
+        total: true,
+    })
     public async getStakePoolHistoryCollection (
         @Router.Param.Id()
             id : number,
