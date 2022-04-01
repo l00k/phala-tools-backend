@@ -36,7 +36,7 @@ export class UserController
             authData : any
     ) : Promise<User>
     {
-        return this.getItem(authData.userId, [ 'stakePoolObservations' ]);
+        return this.getItem(authData.userId, [ 'stakePoolObservations', 'stakePoolObservations.stakePool.owner' ]);
     }
     
     
