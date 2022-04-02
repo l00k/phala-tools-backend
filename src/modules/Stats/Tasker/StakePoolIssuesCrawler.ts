@@ -22,10 +22,10 @@ export class StakePoolIssuesCrawler
     
     
     @Inject({ ctorArgs: [ StakePoolIssuesCrawler.name ] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
-    protected appStateClass : any = StakePoolIssueCrawlerState;
-    protected appState : AppState<StakePoolIssueCrawlerState>;
+    protected _appStateClass : any = StakePoolIssueCrawlerState;
+    protected _appState : AppState<StakePoolIssueCrawlerState>;
     
     
     @Task({
@@ -39,13 +39,13 @@ export class StakePoolIssuesCrawler
     
     protected async _process ()
     {
-        await this.findBadBahaviours();
+        await this._findBadBahaviours();
         
         // todo ld 2022-03-07 22:34:26
         // await this.findSlashes();
     }
     
-    protected async findBadBahaviours ()
+    protected async _findBadBahaviours ()
     {
         this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
         
@@ -59,7 +59,7 @@ export class StakePoolIssuesCrawler
         const commissionEvents : Event<CommissionChange>[] = await eventRepository.find(
             {
                 type: { $eq: EventType.CommissionChange },
-                blockNumber: { $gt: this.appState.value.badBehaviorLastBlock },
+                blockNumber: { $gt: this._appState.value.badBehaviorLastBlock },
                 additionalData: {
                     delta: { $gte: StakePoolIssuesCrawler.BAD_BEHAVIOR_PERCENT_THRESHOLD }
                 }
@@ -71,8 +71,8 @@ export class StakePoolIssuesCrawler
         }
         
         // fetch contribution and change commission events
-        const blockHash : string = (await this.phalaApi.rpc.chain.getBlockHash(this.appState.value.badBehaviorLastBlock)).toString();
-        const blockDateUts : number = <any>(await this.phalaApi.query.timestamp.now.at(blockHash)).toJSON();
+        const blockHash : string = (await this._phalaApi.rpc.chain.getBlockHash(this._appState.value.badBehaviorLastBlock)).toString();
+        const blockDateUts : number = <any>(await this._phalaApi.query.timestamp.now.at(blockHash)).toJSON();
         
         const aboveDate = moment(blockDateUts).subtract(StakePoolIssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD).toDate();
         const contributionEvents : Event<Contribution>[] = await eventRepository.find(
@@ -135,14 +135,14 @@ export class StakePoolIssuesCrawler
                 }
             }
             
-            this.appState.value.badBehaviorLastBlock = commissionEvent.blockNumber;
-            this._entityManager.persist(this.appState);
+            this._appState.value.badBehaviorLastBlock = commissionEvent.blockNumber;
+            this._entityManager.persist(this._appState);
         }
         
         await this._entityManager.flush();
     }
     
-    protected async findSlashes ()
+    protected async _findSlashes ()
     {
         this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
         
@@ -156,7 +156,7 @@ export class StakePoolIssuesCrawler
         const slashEvents : Event<Slash>[] = await eventRepository.find(
             {
                 type: { $eq: EventType.Slash },
-                blockNumber: { $gt: this.appState.value.slashesLastBlock },
+                blockNumber: { $gt: this._appState.value.slashesLastBlock },
             },
             [ 'stakePool' ]
         );
@@ -173,8 +173,8 @@ export class StakePoolIssuesCrawler
                 stakePool.issues.add(slashedIssue);
             }
             
-            this.appState.value.slashesLastBlock = slashEvent.blockNumber;
-            this._entityManager.persist(this.appState);
+            this._appState.value.slashesLastBlock = slashEvent.blockNumber;
+            this._entityManager.persist(this._appState);
         }
         
         await this._entityManager.flush();

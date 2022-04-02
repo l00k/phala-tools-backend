@@ -22,13 +22,13 @@ export class OnChainEventsCrawler
     
     
     @Inject({ ctorArgs: [ OnChainEventsCrawler.name ] })
-    protected logger : Logger;
+    protected _logger : Logger;
     
     @Inject()
-    protected phalaSubscan : Phala.Subscan;
+    protected _phalaSubscan : Phala.Subscan;
     
-    protected appStateClass : any = OnChainEventsCrawlerState;
-    protected appState : AppState<OnChainEventsCrawlerState>;
+    protected _appStateClass : any = OnChainEventsCrawlerState;
+    protected _appState : AppState<OnChainEventsCrawlerState>;
     
     
     @Task({
@@ -44,15 +44,15 @@ export class OnChainEventsCrawler
     protected async _process ()
     {
         // pool creation
-        this.logger.info(`Pool creation`);
+        this._logger.info(`Pool creation`);
         
-        await this.processEvents(
+        await this._processEvents(
             EventType.PoolCreated,
             'phalastakepool', 'poolcreated',
             400000,
             async(event : Event<Events.PoolCreated>, params : any[]) => {
                 const onChainId = Number(params[1]);
-                event.stakePoolEntry = await this.getOrCreateStakePool(onChainId);
+                event.stakePoolEntry = await this._getOrCreateStakePool(onChainId);
                 
                 event.stakePoolEntry.createdAt = event.blockDate;
             }
@@ -61,9 +61,9 @@ export class OnChainEventsCrawler
         await this._entityManager.flush();
         
         // commission change
-        this.logger.info(`Commission change events`);
+        this._logger.info(`Commission change events`);
         
-        await this.processEvents(
+        await this._processEvents(
             EventType.CommissionChange,
             'phalastakepool', 'poolcommissionset',
             100000,
@@ -72,15 +72,15 @@ export class OnChainEventsCrawler
                 const newCommission = Polkadot.Utility.parseRawPercent(Number(params[1]));
                 
                 // calcualate delta
-                const previousBlockHash = await this.phalaApi.rpc.chain.getBlockHash(event.blockNumber - 1);
-                const onChainStakePoolRaw = await this.phalaApi.query
+                const previousBlockHash = await this._phalaApi.rpc.chain.getBlockHash(event.blockNumber - 1);
+                const onChainStakePoolRaw = await this._phalaApi.query
                     .phalaStakePool.stakePools
                     .at(previousBlockHash, onChainId);
                 const onChainStakePool : typeof KhalaTypes.PoolInfo = <any>onChainStakePoolRaw.toJSON();
                 
                 const commissionDelta = newCommission - Polkadot.Utility.parseRawPercent(onChainStakePool.payoutCommission);
                 
-                event.stakePoolEntry = await this.getOrCreateStakePool(onChainId);
+                event.stakePoolEntry = await this._getOrCreateStakePool(onChainId);
                 event.additionalData = {
                     commission: newCommission,
                     delta: commissionDelta,
@@ -89,59 +89,59 @@ export class OnChainEventsCrawler
         );
         
         // contributions
-        this.logger.info(`Contribution events`);
+        this._logger.info(`Contribution events`);
         
-        await this.processEvents(
+        await this._processEvents(
             EventType.Contribution,
             'phalastakepool', 'contribution',
             50000,
             async(event : Event<Events.Contribution>, params : any[]) => {
-                event.stakePoolEntry = await this.getOrCreateStakePool(Number(params[0]));
+                event.stakePoolEntry = await this._getOrCreateStakePool(Number(params[0]));
                 
                 const hexAddr = (params[1].substring(0, 2) == '0x' ? '' : '0x') + params[1];
                 const address = encodeAddress(hexAddr, OnChainEventsCrawler.PHALA_SS58FORMAT);
-                event.sourceAccount = await this.getOrCreateAccount(address);
+                event.sourceAccount = await this._getOrCreateAccount(address);
                 
                 event.amount = Phala.Utility.parseRawAmount(Number(params[2]));
             }
         );
         
         // withdrawals
-        this.logger.info(`Widthdrawals events`);
+        this._logger.info(`Widthdrawals events`);
         
-        await this.processEvents(
+        await this._processEvents(
             EventType.Withdrawal,
             'phalastakepool', 'withdrawal',
             50000,
             async(event : Event<Events.Withdrawal>, params : any[]) => {
-                event.stakePoolEntry = await this.getOrCreateStakePool(Number(params[0]));
+                event.stakePoolEntry = await this._getOrCreateStakePool(Number(params[0]));
                 
                 const hexAddr = (params[1].substring(0, 2) == '0x' ? '' : '0x') + params[1];
                 const address = encodeAddress(hexAddr, OnChainEventsCrawler.PHALA_SS58FORMAT);
-                event.sourceAccount = await this.getOrCreateAccount(address);
+                event.sourceAccount = await this._getOrCreateAccount(address);
                 
                 event.amount = Phala.Utility.parseRawAmount(Number(params[2]));
             }
         );
         
         // slashes
-        this.logger.info(`Slash events`);
+        this._logger.info(`Slash events`);
         
-        await this.processEvents(
+        await this._processEvents(
             EventType.Slash,
             'phalastakepool', 'poolslashed',
             50000,
             async(event : Event<Events.Slash>, params : any[]) => {
-                event.stakePoolEntry = await this.getOrCreateStakePool(Number(params[0]));
+                event.stakePoolEntry = await this._getOrCreateStakePool(Number(params[0]));
                 
                 event.amount = Phala.Utility.parseRawAmount(Number(params[1]));
             }
         );
         
         // slashes
-        this.logger.info(`Halving events`);
+        this._logger.info(`Halving events`);
         
-        await this.processEvents(
+        await this._processEvents(
             EventType.Halving,
             'phalamining', 'subsidybudgethalved',
             400000,
@@ -149,7 +149,7 @@ export class OnChainEventsCrawler
         );
     }
     
-    protected async processEvents<T> (
+    protected async _processEvents<T> (
         eventType : EventType,
         module : string,
         call : string,
@@ -157,31 +157,31 @@ export class OnChainEventsCrawler
         callback : (event : Event<T>, params : any[]) => Promise<void>
     )
     {
-        if (this.appState.value[eventType] === undefined) {
-            this.appState.value = {
+        if (this._appState.value[eventType] === undefined) {
+            this._appState.value = {
                 ...(new OnChainEventsCrawlerState()),
-                ...this.appState.value
+                ...this._appState.value
             };
         }
         
         while (true) {
-            if (this.appState.value[eventType] >= this.finalizedBlockNumber) {
+            if (this._appState.value[eventType] >= this._finalizedBlockNumber) {
                 break;
             }
             
-            const firstBlock : number = this.appState.value[eventType];
+            const firstBlock : number = this._appState.value[eventType];
             const lastBlock : number = Math.min(
                 firstBlock + chunkSize - 1,
-                this.finalizedBlockNumber
+                this._finalizedBlockNumber
             );
             
-            this.logger.log(`Next chunk`, firstBlock, lastBlock);
+            this._logger.log(`Next chunk`, firstBlock, lastBlock);
             
             try {
                 await this._entityManagerWrapper.transaction(async(entityManager) => {
                     this._txEntityManager = entityManager;
                     
-                    await this.processEventsChunk(
+                    await this._processEventsChunk(
                         eventType,
                         firstBlock, lastBlock,
                         module, call,
@@ -192,7 +192,7 @@ export class OnChainEventsCrawler
                 });
                 
                 // update app state
-                this.appState.value[eventType] = lastBlock + 1;
+                this._appState.value[eventType] = lastBlock + 1;
                 
                 await this._entityManager.flush();
             }
@@ -202,7 +202,7 @@ export class OnChainEventsCrawler
         }
     }
     
-    protected async processEventsChunk<T> (
+    protected async _processEventsChunk<T> (
         eventType : EventType,
         firstBlock : number,
         lastBlock : number,
@@ -211,7 +211,7 @@ export class OnChainEventsCrawler
         callback : (event : Event<T>, params : any[]) => Promise<void>
     )
     {
-        const eventsGen = this.phalaSubscan.getEvents({
+        const eventsGen = this._phalaSubscan.getEvents({
             block_range: `${firstBlock}-${lastBlock}`,
             module,
             call,

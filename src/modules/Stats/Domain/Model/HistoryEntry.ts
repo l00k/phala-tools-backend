@@ -24,7 +24,7 @@ export class HistoryEntry
     public id : number;
     
     @ORM.ManyToOne(() => StakePoolEntry, { lazy: true })
-    public stakePool : StakePoolEntry;
+    public stakePoolEntry : StakePoolEntry;
     
     @ORM.Property({ index: true })
     @API.Property()

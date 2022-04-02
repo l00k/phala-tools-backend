@@ -2,7 +2,7 @@ import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper
 import { ApiProvider, KhalaTypes } from '#/Phala';
 import { Account } from '#/Phala/Domain/Model/Account';
 import { StakePool } from '#/Phala/Domain/Model/StakePool';
-import * as Polkadot from '#/Polkadot';
+import { ApiMode } from '#/Polkadot';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { EntityManager } from '@mikro-orm/mysql';
@@ -22,21 +22,35 @@ export class PhalaEntityFetcher
     @Inject()
     protected _apiProvider : ApiProvider;
     
+    protected _apiMode : ApiMode;
     
-    protected _getEntityManager () : EntityManager
+    protected _stakePools : Record<number, StakePool> = {};
+    protected _accounts : Record<string, Account> = {};
+    
+    
+    public constructor (apiMode = ApiMode.HTTP)
     {
-        return this._entityManagerWrapper.getDirectEntityManager();
+        this._apiMode = apiMode;
     }
     
     
     public async getOrCreateStakePool (onChainId : number) : Promise<StakePool>
     {
-        const entityManager = this._getEntityManager();
+        if (!this._stakePools[onChainId]) {
+            this._stakePools[onChainId] = await this._createStakePool(onChainId);
+        }
+        
+        return this._stakePools[onChainId];
+    }
+    
+    protected async _createStakePool (onChainId : number) : Promise<StakePool>
+    {
+        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
         const stakePoolRepository = entityManager.getRepository(StakePool);
         
         let stakePool = await stakePoolRepository.findOne({ onChainId });
         if (!stakePool) {
-            const api = await this._apiProvider.getApi(Polkadot.ApiMode.HTTP);
+            const api = await this._apiProvider.getApi(this._apiMode);
             
             const onChainStakePool : typeof KhalaTypes.PoolInfo =
                 <any>(await api.query.phalaStakePool.stakePools(onChainId)).toJSON();
@@ -56,16 +70,24 @@ export class PhalaEntityFetcher
         return stakePool;
     }
     
+    
     public async getOrCreateAccount (address : string) : Promise<Account>
     {
-        const entityManager = this._getEntityManager();
+        if (!this._accounts[address]) {
+            this._accounts[address] = await this._createAccount(address);
+        }
+        
+        return this._accounts[address];
+    }
+    
+    protected async _createAccount (address : string) : Promise<Account>
+    {
+        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
         const accountRepository = entityManager.getRepository(Account);
         
-        let account = await accountRepository.findOne({
-            address: { $eq: address }
-        });
+        let account = await accountRepository.findOne({ address });
         if (!account) {
-            const api = await this._apiProvider.getApi(Polkadot.ApiMode.HTTP);
+            const api = await this._apiProvider.getApi(this._apiMode);
             
             account = new Account({ address }, entityManager);
             

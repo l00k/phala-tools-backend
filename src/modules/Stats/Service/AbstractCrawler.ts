@@ -3,6 +3,7 @@ import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
+import { ApiMode } from '#/Polkadot';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker } from '#/Stats/Domain/Model/Worker';
 import { Inject } from '@inti5/object-manager';
@@ -19,22 +20,22 @@ export abstract class AbstractCrawler
 {
     
     @Inject()
-    protected phalaApiProvider : Phala.ApiProvider;
+    protected _phalaApiProvider : Phala.ApiProvider;
     
-    @Inject()
+    @Inject({ ctorArgs: [ ApiMode.WS ] })
     protected _phalaEntityFetcher : PhalaEntityFetcher;
     
-    protected phalaApi : ApiPromise;
+    protected _phalaApi : ApiPromise;
     
-    protected appStateClass : any = null;
-    protected appState : AppState<any>;
+    protected _appStateClass : any = null;
+    protected _appState : AppState<any>;
     
-    protected finalizedBlockHeader : Header;
-    protected finalizedBlockNumber : number;
+    protected _finalizedBlockHeader : Header;
+    protected _finalizedBlockNumber : number;
     
-    protected stakePoolEntries : Mapped<StakePoolEntry> = {};
-    protected accounts : Mapped<Account> = {};
-    protected workers : Mapped<Worker> = {};
+    protected _stakePoolEntries : Mapped<StakePoolEntry> = {};
+    protected _accounts : Mapped<Account> = {};
+    protected _workers : Mapped<Worker> = {};
     
     
     
@@ -42,43 +43,44 @@ export abstract class AbstractCrawler
     {
         await super._init();
         
-        this.phalaApi = await this.phalaApiProvider.getApi();
+        this._phalaApi = await this._phalaApiProvider.getApi(ApiMode.WS);
         
         // find chain header
-        const finalizedHead = await this.phalaApi.rpc.chain.getFinalizedHead();
+        const finalizedHead = await this._phalaApi.rpc.chain.getFinalizedHead();
         
-        this.finalizedBlockHeader = await this.phalaApi.rpc.chain.getHeader(finalizedHead);
-        this.finalizedBlockNumber = this.finalizedBlockHeader.number.toNumber();
+        this._finalizedBlockHeader = await this._phalaApi.rpc.chain.getHeader(finalizedHead);
+        this._finalizedBlockNumber = this._finalizedBlockHeader.number.toNumber();
         
         // fetch app state
-        if (this.appStateClass) {
+        if (this._appStateClass) {
             const appStateRepository = this._entityManager.getRepository(AppState);
-            this.appState = await appStateRepository.findOne(this.appStateClass.ID);
+            this._appState = await appStateRepository.findOne(this._appStateClass.ID);
             
-            if (!this.appState) {
-                this.appState = new AppState({
-                    id: this.appStateClass.ID,
-                    value: new this.appStateClass(),
+            if (!this._appState) {
+                this._appState = new AppState({
+                    id: this._appStateClass.ID,
+                    value: new this._appStateClass(),
                 });
                 
-                appStateRepository.persist(this.appState);
+                appStateRepository.persist(this._appState);
                 appStateRepository.flush();
             }
         }
     }
     
-    protected async clearContext ()
+    protected async _clearContext ()
     {
-        this.stakePoolEntries = {};
-        this.accounts = {};
-        this.workers = {};
+        this._stakePoolEntries = {};
+        this._accounts = {};
+        this._workers = {};
     }
     
     
-    protected async getOrCreateStakePool (onChainId : number) : Promise<StakePoolEntry>
+    
+    protected async _getOrCreateStakePool (onChainId : number) : Promise<StakePoolEntry>
     {
-        if (!this.stakePoolEntries[onChainId]) {
-            const stakePoolEntryRepository = this._entityManager.getRepository(StakePoolEntry);
+        if (!this._stakePoolEntries[onChainId]) {
+            const stakePoolEntryRepository = this._txEntityManager.getRepository(StakePoolEntry);
             
             let stakePoolEntry : StakePoolEntry = await stakePoolEntryRepository.findOne({ stakePool: { onChainId } });
             if (!stakePoolEntry) {
@@ -86,37 +88,29 @@ export abstract class AbstractCrawler
                 
                 stakePoolEntry = new StakePoolEntry({
                     stakePool,
-                }, this._entityManager);
+                }, this._txEntityManager);
                 
-                this._entityManager.persist(stakePoolEntry);
+                this._txEntityManager.persist(stakePoolEntry);
             }
             
-            this.stakePoolEntries[onChainId] = stakePoolEntry;
+            this._stakePoolEntries[onChainId] = stakePoolEntry;
         }
         
-        return this.stakePoolEntries[onChainId];
+        return this._stakePoolEntries[onChainId];
     }
     
-    protected async getOrCreateAccount (address : string) : Promise<Account>
+    protected async _getOrCreateAccount (address : string) : Promise<Account>
     {
-        if (!this.accounts[address]) {
-            const accountRepository = this._entityManager.getRepository(Account);
-            
-            let account = await accountRepository.findOne({ address });
-            if (!account) {
-                account = new Account({ address }, this._entityManager);
-                this._entityManager.persist(account);
-            }
-            
-            this.accounts[address] = account;
+        if (!this._accounts[address]) {
+            this._accounts[address] = await this._phalaEntityFetcher.getOrCreateAccount(address);
         }
         
-        return this.accounts[address];
+        return this._accounts[address];
     }
     
-    protected async getOrCreateWorker (publicKey : string, stakePool : StakePoolEntry) : Promise<Worker>
+    protected async _getOrCreateWorker (publicKey : string, stakePool : StakePoolEntry) : Promise<Worker>
     {
-        if (!this.workers[publicKey]) {
+        if (!this._workers[publicKey]) {
             const workerRepository = this._entityManager.getRepository(Worker);
             
             let worker = await workerRepository.findOne({ publicKey });
@@ -127,19 +121,19 @@ export abstract class AbstractCrawler
                 }, this._entityManager);
                 
                 const workerOnChain : typeof Phala.KhalaTypes.WorkerInfo =
-                    <any>(await this.phalaApi.query.phalaRegistry.workers(publicKey)).toJSON();
+                    <any>(await this._phalaApi.query.phalaRegistry.workers(publicKey)).toJSON();
                 
-                worker.operator = await this.getOrCreateAccount(workerOnChain.operator);
+                worker.operator = await this._getOrCreateAccount(workerOnChain.operator);
                 worker.initialScore = workerOnChain.initialScore;
                 worker.confidenceLevel = workerOnChain.confidenceLevel;
                 
-                this._entityManager.persist(worker);
+                this._txEntityManager.persist(worker);
             }
             
-            this.workers[publicKey] = worker;
+            this._workers[publicKey] = worker;
         }
         
-        return this.workers[publicKey];
+        return this._workers[publicKey];
     }
     
 }

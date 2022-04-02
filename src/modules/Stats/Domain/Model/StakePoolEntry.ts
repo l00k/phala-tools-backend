@@ -43,7 +43,7 @@ export class StakePoolEntry
     @API.Sortable()
     public lastHistoryEntry : HistoryEntry = null;
     
-    @ORM.OneToMany(() => HistoryEntry, entry => entry.stakePool, { lazy: true })
+    @ORM.OneToMany(() => HistoryEntry, entry => entry.stakePoolEntry, { lazy: true })
     public historyEntries : ORM.Collection<HistoryEntry>;
     
     @ORM.OneToMany(() => Worker, worker => worker.stakePool, { lazy: true })

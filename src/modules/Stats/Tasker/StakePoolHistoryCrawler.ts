@@ -4,13 +4,12 @@ import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import * as Polkadot from '#/Polkadot';
 import { StakePoolHistoryCrawlerState } from '#/Stats/Domain/Model/AppState/StakePoolHistoryCrawlerState';
-import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
+import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker, WorkerState } from '#/Stats/Domain/Model/Worker';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
 import { Injectable } from '@inti5/object-manager';
 import { Timeout } from '@inti5/utils/Timeout';
-import chunk from 'lodash/chunk';
 import moment from 'moment';
 
 
@@ -30,25 +29,25 @@ export class StakePoolHistoryCrawler
     protected static readonly CONFIDENCE_SCORE_MAP = { 1: 1, 2: 1, 3: 1, 4: 0.8, 5: 0.7 };
     
     
-    protected appStateClass : any = StakePoolHistoryCrawlerState;
-    protected appState : AppState<StakePoolHistoryCrawlerState>;
+    protected _appStateClass : any = StakePoolHistoryCrawlerState;
+    protected _appState : AppState<StakePoolHistoryCrawlerState>;
     
-    protected tokenomicParameters : typeof Phala.KhalaTypes.TokenomicParameters;
+    protected _tokenomicParameters : typeof Phala.KhalaTypes.TokenomicParameters;
     
-    protected previousEntryBlockNumber : number;
+    protected _previousEntryBlockNumber : number;
     
-    protected nextEntryDate : Date;
-    protected nextEntryBlockNumber : number;
-    protected nextEntryBlockHash : string;
+    protected _nextEntryDate : Date;
+    protected _nextEntryBlockNumber : number;
+    protected _nextEntryBlockHash : string;
     
-    protected avgBlockTime : number;
+    protected _avgBlockTime : number;
     
-    protected miningEra : number;
+    protected _miningEra : number;
     
-    protected stakePoolsCount : number = 0;
-    protected processedStakePools : StakePoolEntry[] = [];
-    protected sortedStakePools : StakePoolEntry[] = [];
-    protected specialStakePools : { [id : number] : StakePoolEntry } = {};
+    protected _stakePoolsCount : number = 0;
+    protected _processedStakePools : StakePoolEntry[] = [];
+    protected _sortedStakePools : StakePoolEntry[] = [];
+    protected _specialStakePools : { [id : number] : StakePoolEntry } = {};
     
     
     @Task({
@@ -66,7 +65,7 @@ export class StakePoolHistoryCrawler
         
         // max 10 entries per execution
         for (let i = 0; i < 10; ++i) {
-            const nextEntryMoment = moment(this.appState.value.lastProcessedUts * 1000)
+            const nextEntryMoment = moment(this._appState.value.lastProcessedUts * 1000)
                 .minute(0)
                 .second(0)
                 .millisecond(0)
@@ -78,31 +77,31 @@ export class StakePoolHistoryCrawler
             }
             
             // find first block of next entry
-            this.previousEntryBlockNumber = this.appState.value.lastProcessedBlock;
+            this._previousEntryBlockNumber = this._appState.value.lastProcessedBlock;
             
-            this.nextEntryDate = nextEntryMoment.toDate();
-            this.nextEntryBlockNumber = await this.findFirstBlockOfEntry(this.nextEntryDate, this.appState.value.lastProcessedBlock);
-            if (!this.nextEntryBlockNumber || this.nextEntryBlockNumber <= this.previousEntryBlockNumber) {
+            this._nextEntryDate = nextEntryMoment.toDate();
+            this._nextEntryBlockNumber = await this._findFirstBlockOfEntry(this._nextEntryDate, this._appState.value.lastProcessedBlock);
+            if (!this._nextEntryBlockNumber || this._nextEntryBlockNumber <= this._previousEntryBlockNumber) {
                 this._logger.info('Unable to find next block! Stop.');
                 break;
             }
             
-            this.nextEntryBlockHash = (await this.phalaApi.rpc.chain.getBlockHash(this.nextEntryBlockNumber)).toString();
+            this._nextEntryBlockHash = (await this._phalaApi.rpc.chain.getBlockHash(this._nextEntryBlockNumber)).toString();
             
-            const nextEntryUts : number = Number(this.nextEntryDate) / 1000;
-            this.avgBlockTime = (nextEntryUts - this.appState.value.lastProcessedUts) / (this.nextEntryBlockNumber - this.previousEntryBlockNumber);
+            const nextEntryUts : number = Number(this._nextEntryDate) / 1000;
+            this._avgBlockTime = (nextEntryUts - this._appState.value.lastProcessedUts) / (this._nextEntryBlockNumber - this._previousEntryBlockNumber);
             
             // update block related data
-            this.tokenomicParameters =
-                <any>(await this.phalaApi.query.phalaMining.tokenomicParameters.at(this.nextEntryBlockHash)).toJSON();
+            this._tokenomicParameters =
+                <any>(await this._phalaApi.query.phalaMining.tokenomicParameters.at(this._nextEntryBlockHash)).toJSON();
             
-            this.miningEra = await this.calculateMiningEra(this.nextEntryBlockNumber);
+            this._miningEra = await this._calculateMiningEra(this._nextEntryBlockNumber);
             
             // log
             this._logger.info('Next entry block found');
-            this._logger.info('Prev', this.previousEntryBlockNumber);
-            this._logger.info(moment(this.appState.value.lastProcessedUts * 1000).toISOString());
-            this._logger.info('Next', this.nextEntryBlockNumber);
+            this._logger.info('Prev', this._previousEntryBlockNumber);
+            this._logger.info(moment(this._appState.value.lastProcessedUts * 1000).toISOString());
+            this._logger.info('Next', this._nextEntryBlockNumber);
             this._logger.info(moment(nextEntryUts * 1000).toISOString());
             
             try {
@@ -110,23 +109,23 @@ export class StakePoolHistoryCrawler
                 await this._entityManagerWrapper.transaction(async(entityManager) => {
                     this._txEntityManager = entityManager;
                     
-                    await this.clearContext();
-                    await this.processNextHistoryEntry();
+                    await this._clearContext();
+                    await this._processNextHistoryEntry();
                     
-                    await this.calculateApr();
+                    await this._calculateApr();
                     
                     await entityManager.flush();
                     
-                    await this.calculateAvgApr();
-                    await this.processAvgStakePools();
+                    await this._calculateAvgApr();
+                    await this._processAvgStakePools();
                     
                     await entityManager.flush();
                 });
                 
                 // update app state
-                this.appState.value.lastProcessedBlock = this.nextEntryBlockNumber;
-                this.appState.value.lastProcessedUts = nextEntryUts;
-                ++this.appState.value.lastProcessedNonce;
+                this._appState.value.lastProcessedBlock = this._nextEntryBlockNumber;
+                this._appState.value.lastProcessedUts = nextEntryUts;
+                ++this._appState.value.lastProcessedNonce;
                 
                 await this._entityManager.flush();
             }
@@ -136,19 +135,19 @@ export class StakePoolHistoryCrawler
         }
     }
     
-    protected async clearContext ()
+    protected async _clearContext ()
     {
         const stakePoolEntryRepository = this._txEntityManager.getRepository(StakePoolEntry);
         
         // load from cache
-        this.specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID] = await stakePoolEntryRepository.findOne(StakePoolEntry.SPECIAL_NETWORK_AVG_ID);
-        this.specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID] = await stakePoolEntryRepository.findOne(StakePoolEntry.SPECIAL_TOP_AVG_ID);
+        this._specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID] = await stakePoolEntryRepository.findOne(StakePoolEntry.SPECIAL_NETWORK_AVG_ID);
+        this._specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID] = await stakePoolEntryRepository.findOne(StakePoolEntry.SPECIAL_TOP_AVG_ID);
         
         // stake pools
         const stakePoolEntries = await stakePoolEntryRepository.findAll({
             populate: [ 'workers' ]
         });
-        this.stakePoolEntries = Object.fromEntries(
+        this._stakePoolEntries = Object.fromEntries(
             stakePoolEntries
                 .filter(stakePoolEntry => !!stakePoolEntry.stakePool)
                 .map(stakePoolEntry => [ stakePoolEntry.stakePool.onChainId, stakePoolEntry ])
@@ -157,15 +156,15 @@ export class StakePoolHistoryCrawler
         // accounts
         const accountRepository = this._txEntityManager.getRepository(Account);
         const accounts = await accountRepository.findAll();
-        this.accounts = Object.fromEntries(accounts.map(account => [ account.address, account ]));
+        this._accounts = Object.fromEntries(accounts.map(account => [ account.address, account ]));
         
         // workers
         const workerRepository = this._txEntityManager.getRepository(Worker);
         const workers = await workerRepository.findAll();
-        this.workers = Object.fromEntries(workers.map(worker => [ worker.publicKey, worker ]));
+        this._workers = Object.fromEntries(workers.map(worker => [ worker.publicKey, worker ]));
         
         // prepare initial data
-        this.processedStakePools = [];
+        this._processedStakePools = [];
         
         for (const stakePoolEntry of stakePoolEntries) {
             stakePoolEntry.snapshotWorkers = [];
@@ -179,7 +178,7 @@ export class StakePoolHistoryCrawler
     /**
      * Find first block of day
      */
-    protected async findFirstBlockOfEntry (targetDate : Date, previousEntryBlock : number) : Promise<number>
+    protected async _findFirstBlockOfEntry (targetDate : Date, previousEntryBlock : number) : Promise<number>
     {
         let blockInterval : number = StakePoolHistoryCrawler.BLOCK_INTERVAL;
         let targetBlockToCheck = previousEntryBlock;
@@ -189,7 +188,7 @@ export class StakePoolHistoryCrawler
             
             let blockHash : string = null;
             try {
-                blockHash = (await this.phalaApi.rpc.chain.getBlockHash(targetBlockToCheck)).toString();
+                blockHash = (await this._phalaApi.rpc.chain.getBlockHash(targetBlockToCheck)).toString();
             }
             catch (e) {}
             
@@ -200,7 +199,7 @@ export class StakePoolHistoryCrawler
                 continue;
             }
             
-            const blockDateUts : number = <any>(await this.phalaApi.query.timestamp.now.at(blockHash)).toJSON();
+            const blockDateUts : number = <any>(await this._phalaApi.query.timestamp.now.at(blockHash)).toJSON();
             const blockDate : Date = new Date(blockDateUts);
             
             const found = blockInterval > 0
@@ -222,12 +221,12 @@ export class StakePoolHistoryCrawler
         return targetBlockToCheck;
     }
     
-    protected async calculateMiningEra (
+    protected async _calculateMiningEra (
         blockNumber : number
     ) : Promise<number>
     {
-        const miningStartBlock : number = <any>(await this.phalaApi.query.phalaMining.miningStartBlock()).toJSON();
-        const miningHalvingInterval : number = <any>(await this.phalaApi.query.phalaMining.miningHalvingInterval()).toJSON();
+        const miningStartBlock : number = <any>(await this._phalaApi.query.phalaMining.miningStartBlock()).toJSON();
+        const miningHalvingInterval : number = <any>(await this._phalaApi.query.phalaMining.miningHalvingInterval()).toJSON();
         
         return Math.floor((blockNumber - miningStartBlock) / miningHalvingInterval);
     }
@@ -235,40 +234,29 @@ export class StakePoolHistoryCrawler
     /**
      * Process stake pools
      */
-    protected async processNextHistoryEntry () : Promise<void>
+    protected async _processNextHistoryEntry () : Promise<void>
     {
-        this.stakePoolsCount = <any>(await this.phalaApi.query.phalaStakePool.poolCount.at(this.nextEntryBlockHash)).toJSON();
-        this._logger.log('Stake pools num', this.stakePoolsCount);
+        this._stakePoolsCount = <any>(await this._phalaApi.query.phalaStakePool.poolCount.at(this._nextEntryBlockHash)).toJSON();
+        this._logger.log('Stake pools num', this._stakePoolsCount);
         
-        const stakePoolIds = [ ...Array(this.stakePoolsCount).keys() ];
-        const chunks = chunk(stakePoolIds, 5);
-        
-        for (const [ idx, chunk ] of chunks.entries()) {
-            const promises = [];
-            
-            for (const stakePoolId of chunk) {
-                console.log(stakePoolId);
-                
-                const promise = this.processStakePool(stakePoolId);
-                promises.push(promise);
-            }
-            
-            await Promise.all(promises);
+        for (let stakePoolId = 0; stakePoolId < this._stakePoolsCount; ++stakePoolId) {
+            await this._processStakePool(stakePoolId);
+            console.log(stakePoolId);
         }
     }
     
-    protected async processStakePool (onChainId : number) : Promise<void>
+    protected async _processStakePool (onChainId : number) : Promise<void>
     {
-        const stakePoolEntry : StakePoolEntry = await this.getOrCreateStakePool(onChainId);
+        const stakePoolEntry : StakePoolEntry = await this._getOrCreateStakePool(onChainId);
         
         const onChainStakePool : typeof Phala.KhalaTypes.PoolInfo =
-            <any>(await this.phalaApi.query.phalaStakePool.stakePools.at(this.nextEntryBlockHash, stakePoolEntry.stakePool.onChainId)).toJSON();
+            <any>(await this._phalaApi.query.phalaStakePool.stakePools.at(this._nextEntryBlockHash, stakePoolEntry.stakePool.onChainId)).toJSON();
         
         // fetch simple data
         const historyEntry : HistoryEntry = new HistoryEntry({
-            stakePool: stakePoolEntry,
-            entryNonce: this.appState.value.lastProcessedNonce + 1,
-            entryDate: this.nextEntryDate,
+            stakePoolEntry: stakePoolEntry,
+            entryNonce: this._appState.value.lastProcessedNonce + 1,
+            entryDate: this._nextEntryDate,
             
             commission: Polkadot.Utility.parseRawPercent(onChainStakePool.payoutCommission || 0),
             cap: Phala.Utility.parseRawAmount(onChainStakePool.cap),
@@ -292,23 +280,23 @@ export class StakePoolHistoryCrawler
         let rewardsPerBlock = 0;
         
         for (const workerPublicKey of onChainStakePool.workers) {
-            const worker = await this.getOrCreateWorker(workerPublicKey, stakePoolEntry);
+            const worker = await this._getOrCreateWorker(workerPublicKey, stakePoolEntry);
             worker.isDropped = false;
             
             stakePoolEntry.snapshotWorkers.push(worker);
             
             if (!worker.bindingAccount) {
-                worker.bindingAccount = (await this.phalaApi.query.phalaMining.workerBindings.at(this.nextEntryBlockHash, workerPublicKey)).toString();
+                worker.bindingAccount = (await this._phalaApi.query.phalaMining.workerBindings.at(this._nextEntryBlockHash, workerPublicKey)).toString();
             }
             
             const onChainMiner : typeof Phala.KhalaTypes.MinerInfo =
-                <any>(await this.phalaApi.query.phalaMining.miners.at(this.nextEntryBlockHash, worker.bindingAccount)).toJSON();
+                <any>(await this._phalaApi.query.phalaMining.miners.at(this._nextEntryBlockHash, worker.bindingAccount)).toJSON();
             if (!onChainMiner) {
                 continue;
             }
             
             const workerOnChain : typeof Phala.KhalaTypes.WorkerInfo =
-                <any>(await this.phalaApi.query.phalaRegistry.workers(workerPublicKey)).toJSON();
+                <any>(await this._phalaApi.query.phalaRegistry.workers(workerPublicKey)).toJSON();
             
             const workerState : WorkerState = <any>onChainMiner.state;
             if (Worker.MINING_STATES.includes(workerState)) {
@@ -342,20 +330,20 @@ export class StakePoolHistoryCrawler
         
         this._txEntityManager.persist(historyEntry);
         
-        this.processedStakePools.push(stakePoolEntry);
+        this._processedStakePools.push(stakePoolEntry);
     }
     
-    protected async calculateApr ()
+    protected async _calculateApr ()
     {
-        const budgetPerBlock = Phala.Utility.decodeBigNumber(this.tokenomicParameters.budgetPerBlock);
-        const treasuryRatio = Phala.Utility.decodeBigNumber(this.tokenomicParameters.treasuryRatio);
-        const rewardsFractionInEra = Math.pow(StakePoolHistoryCrawler.HALVING_FRACTION, this.miningEra);
+        const budgetPerBlock = Phala.Utility.decodeBigNumber(this._tokenomicParameters.budgetPerBlock);
+        const treasuryRatio = Phala.Utility.decodeBigNumber(this._tokenomicParameters.treasuryRatio);
+        const rewardsFractionInEra = Math.pow(StakePoolHistoryCrawler.HALVING_FRACTION, this._miningEra);
         
-        const totalShare = Object.values(this.workers)
+        const totalShare = Object.values(this._workers)
             .filter(worker => !worker.isDropped && worker.isMiningState)
             .reduce((acc, worker) => acc + worker.getShare(), 0);
         
-        for (const stakePool of this.processedStakePools) {
+        for (const stakePool of this._processedStakePools) {
             if (!stakePool.lastHistoryEntry.stakeTotal) {
                 continue;
             }
@@ -372,45 +360,45 @@ export class StakePoolHistoryCrawler
                 * rewardsFractionInEra
                 * (1 - treasuryRatio)
                 * (1 - stakePool.lastHistoryEntry.commission)
-                * (86400 / this.avgBlockTime);
+                * (86400 / this._avgBlockTime);
             
             stakePool.lastHistoryEntry.currentApr = rewardPerBlock
                 * rewardsFractionInEra
                 * (1 - treasuryRatio)
                 * (1 - stakePool.lastHistoryEntry.commission)
-                * (31536000 / this.avgBlockTime)
+                * (31536000 / this._avgBlockTime)
                 / stakePool.lastHistoryEntry.stakeTotal;
         }
     }
     
-    protected async processAvgStakePools () : Promise<void>
+    protected async _processAvgStakePools () : Promise<void>
     {
         // sort stake pools
-        this.sortedStakePools = this.processedStakePools
-            .slice(0, this.stakePoolsCount)
+        this._sortedStakePools = this._processedStakePools
+            .slice(0, this._stakePoolsCount)
             .filter(sp => sp.lastHistoryEntry.currentApr > 0)
             .sort((a, b) => a.lastHistoryEntry.currentApr > b.lastHistoryEntry.currentApr ? -1 : 1);
         
         // process avg entries
-        await this.processAvgStakePool(
-            this.specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID],
-            this.sortedStakePools
+        await this._processAvgStakePool(
+            this._specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID],
+            this._sortedStakePools
         );
         
-        await this.processAvgStakePool(
-            this.specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID],
-            this.sortedStakePools.slice(0, 100)
+        await this._processAvgStakePool(
+            this._specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID],
+            this._sortedStakePools.slice(0, 100)
         );
     }
     
-    protected async processAvgStakePool (
+    protected async _processAvgStakePool (
         stakePool : StakePoolEntry,
         limitedStakePools : StakePoolEntry[]
     ) : Promise<void>
     {
-        const oneOfHistoryEntries : HistoryEntry = this.processedStakePools[0].lastHistoryEntry;
+        const oneOfHistoryEntries : HistoryEntry = this._processedStakePools[0].lastHistoryEntry;
         const historyEntry : HistoryEntry = new HistoryEntry({
-            stakePool,
+            stakePoolEntry: stakePool,
             entryNonce: oneOfHistoryEntries.entryNonce,
             entryDate: oneOfHistoryEntries.entryDate,
         }, this._entityManager);
@@ -455,11 +443,11 @@ export class StakePoolHistoryCrawler
         }
     }
     
-    protected async calculateAvgApr ()
+    protected async _calculateAvgApr ()
     {
         const entriesNum = Math.ceil(30 / StakePoolHistoryCrawler.HISTORY_ENTRY_INTERVAL);
         
-        for (const stakePool of this.processedStakePools) {
+        for (const stakePool of this._processedStakePools) {
             // offset last entry (not updated yet)
             const chunk = await stakePool.historyEntries.matching({
                 orderBy: { entryNonce: 'DESC' },
