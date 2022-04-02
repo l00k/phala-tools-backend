@@ -2,7 +2,7 @@ import { Annotation as API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
 
 
-@API.Resource('Watchdog/User/Configuration')
+@API.Resource('Watchdog/UserConfiguration')
 export class UserConfiguration
 {
     

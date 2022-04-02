@@ -4,7 +4,7 @@ import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
+import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
 import { Utility } from '#/Watchdog/Utility/Utility';
 import { RuntimeCache } from '@inti5/cache/RuntimeCache';
 import { Inject, Injectable } from '@inti5/object-manager';

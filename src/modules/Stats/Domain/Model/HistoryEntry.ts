@@ -1,8 +1,8 @@
 import { ColumnType } from '#/App/Domain/DbConfig';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
-import { StatsStakePool } from '#/Stats/Domain/Model/StatsStakePool';
-import { HistoryEntryRepository } from '#/Stats/Domain/Repository/StakePool/HistoryEntryRepository';
+import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
+import { HistoryEntryRepository } from '#/Stats/Domain/Repository/HistoryEntryRepository';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
@@ -12,7 +12,7 @@ import { EntityManager } from '@mikro-orm/mysql';
     tableName: 'stats_stakepool_historyentry',
     customRepository: () => HistoryEntryRepository
 })
-@API.Resource('Stats/StakePool/HistoryEntry')
+@API.Resource('Stats/HistoryEntry')
 export class HistoryEntry
     extends AbstractModel<HistoryEntry>
 {
@@ -23,8 +23,8 @@ export class HistoryEntry
     @API.Id()
     public id : number;
     
-    @ORM.ManyToOne(() => StatsStakePool, { lazy: true })
-    public stakePool : StatsStakePool;
+    @ORM.ManyToOne(() => StakePoolEntry, { lazy: true })
+    public stakePool : StakePoolEntry;
     
     @ORM.Property({ index: true })
     @API.Property()

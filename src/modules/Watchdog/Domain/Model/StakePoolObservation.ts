@@ -1,10 +1,10 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account, StakePool } from '#/Phala/Domain/Model';
-import { ObservationConfiguration } from '#/Watchdog/Domain/Model/StakePool/Observation/ObservationConfiguration';
+import { ObservationConfiguration } from '#/Watchdog/Domain/Model/Observation/ObservationConfiguration';
 import {
     NotificationType,
     ObservationNotifications
-} from '#/Watchdog/Domain/Model/StakePool/Observation/ObservationNotifications';
+} from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
@@ -25,7 +25,7 @@ export enum ObservationMode
 @ORM.Entity({
     tableName: 'watchdog_stakepool_observation'
 })
-@API.Resource('Watchdog/StakePool/Observation')
+@API.Resource('Watchdog/StakePoolObservation')
 export class StakePoolObservation
     extends AbstractModel<StakePoolObservation>
 {

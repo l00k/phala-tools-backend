@@ -1,14 +1,14 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
+import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
 import { Inject, Injectable } from '@inti5/object-manager';
 
 
-@Injectable({ tag: 'pw.crawler.handler' })
+@Injectable({ tag: 'watchdog.crawler.handler' })
 export class PoolCommissionSetHandler
     extends AbstractHandler
 {

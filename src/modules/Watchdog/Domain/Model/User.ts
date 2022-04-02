@@ -1,7 +1,7 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
-import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePool/StakePoolObservation';
-import { UserConfiguration } from '#/Watchdog/Domain/Model/User/UserConfiguration';
+import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { UserConfiguration } from '#/Watchdog/Domain/Model/UserConfiguration';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';

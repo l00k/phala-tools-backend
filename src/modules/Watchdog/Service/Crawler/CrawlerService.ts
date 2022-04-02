@@ -35,7 +35,7 @@ export class CrawlerService
     @Inject()
     protected _apiProvider : ApiProvider;
     
-    @Inject({ tag: 'pw.crawler.handler' })
+    @Inject({ tag: 'watchdog.crawler.handler' })
     protected _handlers : { [key : string] : AbstractHandler };
     
     

@@ -2,7 +2,7 @@ import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { StakePoolIssueCrawlerState } from '#/Stats/Domain/Model/AppState/StakePoolIssueCrawlerState';
 import { CommissionChange, Contribution, Event, EventType, Slash } from '#/Stats/Domain/Model/Event';
-import { Issue } from '#/Stats/Domain/Model/StakePool/Issue';
+import { Issue } from '#/Stats/Domain/Model/Issue';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
 import { Inject, Injectable } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
@@ -83,20 +83,20 @@ export class StakePoolIssuesCrawler
         );
         
         for (const commissionEvent of commissionEvents) {
-            const stakePool = commissionEvent.stakePool;
+            const stakePoolEntry = commissionEvent.stakePoolEntry;
             
-            const createDeltaTime = moment(commissionEvent.blockDate).diff(stakePool.createdAt, 'day', true);
+            const createDeltaTime = moment(commissionEvent.blockDate).diff(stakePoolEntry.createdAt, 'day', true);
             if (createDeltaTime <= StakePoolIssuesCrawler.NEW_STAKEPOOL_THRESHOLD) {
                 // it is new pool - skip this case
                 continue;
             }
             
             const recentContribution = contributionEvents.find(contributionEvent => {
-                if (contributionEvent.stakePool.id != stakePool.id) {
+                if (contributionEvent.stakePoolEntry.id != stakePoolEntry.id) {
                     return false;
                 }
                 
-                if (contributionEvent.sourceAccount.id != stakePool.owner.id) {
+                if (contributionEvent.sourceAccount.id != stakePoolEntry.stakePool.owner.id) {
                     return false;
                 }
                 
@@ -109,7 +109,7 @@ export class StakePoolIssuesCrawler
                     return false;
                 }
                 
-                const ratio = contributionEvent.amount / stakePool.lastHistoryEntry.stakeTotal;
+                const ratio = contributionEvent.amount / stakePoolEntry.lastHistoryEntry.stakeTotal;
                 if (ratio < StakePoolIssuesCrawler.MEANINGFUL_STAKE_RATIO) {
                     return false;
                 }
@@ -119,7 +119,7 @@ export class StakePoolIssuesCrawler
             
             if (recentContribution) {
                 const badBehaviorEvent = new Event({
-                    stakePool,
+                    stakePoolEntry: stakePoolEntry,
                     blockNumber: commissionEvent.blockNumber,
                     blockDate: commissionEvent.blockDate,
                     type: EventType.BadBehavior,
@@ -129,9 +129,9 @@ export class StakePoolIssuesCrawler
                 this._entityManager.persist(badBehaviorEvent);
                 
                 // mark stakepool
-                await stakePool.issues.loadItems();
-                if (!stakePool.issues.contains(badBehaviorIssue)) {
-                    stakePool.issues.add(badBehaviorIssue);
+                await stakePoolEntry.issues.loadItems();
+                if (!stakePoolEntry.issues.contains(badBehaviorIssue)) {
+                    stakePoolEntry.issues.add(badBehaviorIssue);
                 }
             }
             
@@ -165,7 +165,7 @@ export class StakePoolIssuesCrawler
         }
         
         for (const slashEvent of slashEvents) {
-            const stakePool = slashEvent.stakePool;
+            const stakePool = slashEvent.stakePoolEntry;
             
             // mark stakepool
             await stakePool.issues.loadItems();

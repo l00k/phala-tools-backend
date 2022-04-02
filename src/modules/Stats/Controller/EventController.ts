@@ -1,6 +1,6 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Event } from '#/Stats/Domain/Model/Event';
-import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
+import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';

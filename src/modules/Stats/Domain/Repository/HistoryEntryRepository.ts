@@ -1,5 +1,5 @@
 import { EntityRepository } from '@mikro-orm/mysql';
-import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
+import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 
 
 export class HistoryEntryRepository

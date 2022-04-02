@@ -4,8 +4,8 @@ import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import * as Polkadot from '#/Polkadot';
 import { StakePoolHistoryCrawlerState } from '#/Stats/Domain/Model/AppState/StakePoolHistoryCrawlerState';
-import { StatsStakePool } from '#/Stats/Domain/Model/StatsStakePool';
-import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
+import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
+import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import { Worker, WorkerState } from '#/Stats/Domain/Model/Worker';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
 import { Injectable } from '@inti5/object-manager';
@@ -46,9 +46,9 @@ export class StakePoolHistoryCrawler
     protected miningEra : number;
     
     protected stakePoolsCount : number = 0;
-    protected processedStakePools : StatsStakePool[] = [];
-    protected sortedStakePools : StatsStakePool[] = [];
-    protected specialStakePools : { [id : number] : StatsStakePool } = {};
+    protected processedStakePools : StakePoolEntry[] = [];
+    protected sortedStakePools : StakePoolEntry[] = [];
+    protected specialStakePools : { [id : number] : StakePoolEntry } = {};
     
     
     @Task({
@@ -138,18 +138,20 @@ export class StakePoolHistoryCrawler
     
     protected async clearContext ()
     {
-        const stakePoolRepository = this._txEntityManager.getRepository(StatsStakePool);
+        const stakePoolEntryRepository = this._txEntityManager.getRepository(StakePoolEntry);
         
         // load from cache
-        this.specialStakePools[StatsStakePool.SPECIAL_NETWORK_AVG_ID] = await stakePoolRepository.findOne(StatsStakePool.SPECIAL_NETWORK_AVG_ID);
-        this.specialStakePools[StatsStakePool.SPECIAL_TOP_AVG_ID] = await stakePoolRepository.findOne(StatsStakePool.SPECIAL_TOP_AVG_ID);
+        this.specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID] = await stakePoolEntryRepository.findOne(StakePoolEntry.SPECIAL_NETWORK_AVG_ID);
+        this.specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID] = await stakePoolEntryRepository.findOne(StakePoolEntry.SPECIAL_TOP_AVG_ID);
         
         // stake pools
-        const stakePools = await stakePoolRepository.findAll({ populate: [ 'workers' ] });
-        this.stakePools = Object.fromEntries(
-            stakePools
-                .filter(stakePool => !!stakePool.onChainId)
-                .map(stakePool => [ stakePool.onChainId, stakePool ])
+        const stakePoolEntries = await stakePoolEntryRepository.findAll({
+            populate: [ 'workers' ]
+        });
+        this.stakePoolEntries = Object.fromEntries(
+            stakePoolEntries
+                .filter(stakePoolEntry => !!stakePoolEntry.stakePool)
+                .map(stakePoolEntry => [ stakePoolEntry.stakePool.onChainId, stakePoolEntry ])
         );
         
         // accounts
@@ -165,8 +167,8 @@ export class StakePoolHistoryCrawler
         // prepare initial data
         this.processedStakePools = [];
         
-        for (const stakePool of stakePools) {
-            stakePool.snapshotWorkers = [];
+        for (const stakePoolEntry of stakePoolEntries) {
+            stakePoolEntry.snapshotWorkers = [];
         }
         
         for (const worker of workers) {
@@ -257,14 +259,14 @@ export class StakePoolHistoryCrawler
     
     protected async processStakePool (onChainId : number) : Promise<void>
     {
-        const stakePool : StatsStakePool = await this.getOrCreateStakePool(onChainId);
+        const stakePoolEntry : StakePoolEntry = await this.getOrCreateStakePool(onChainId);
         
         const onChainStakePool : typeof Phala.KhalaTypes.PoolInfo =
-            <any>(await this.phalaApi.query.phalaStakePool.stakePools.at(this.nextEntryBlockHash, stakePool.onChainId)).toJSON();
+            <any>(await this.phalaApi.query.phalaStakePool.stakePools.at(this.nextEntryBlockHash, stakePoolEntry.stakePool.onChainId)).toJSON();
         
         // fetch simple data
         const historyEntry : HistoryEntry = new HistoryEntry({
-            stakePool,
+            stakePool: stakePoolEntry,
             entryNonce: this.appState.value.lastProcessedNonce + 1,
             entryDate: this.nextEntryDate,
             
@@ -284,16 +286,16 @@ export class StakePoolHistoryCrawler
             : 0;
         
         // process workers
-        stakePool.snapshotWorkers = [];
+        stakePoolEntry.snapshotWorkers = [];
         historyEntry.workersNum = onChainStakePool.workers.length;
         
         let rewardsPerBlock = 0;
         
         for (const workerPublicKey of onChainStakePool.workers) {
-            const worker = await this.getOrCreateWorker(workerPublicKey, stakePool);
+            const worker = await this.getOrCreateWorker(workerPublicKey, stakePoolEntry);
             worker.isDropped = false;
             
-            stakePool.snapshotWorkers.push(worker);
+            stakePoolEntry.snapshotWorkers.push(worker);
             
             if (!worker.bindingAccount) {
                 worker.bindingAccount = (await this.phalaApi.query.phalaMining.workerBindings.at(this.nextEntryBlockHash, workerPublicKey)).toString();
@@ -327,8 +329,8 @@ export class StakePoolHistoryCrawler
             
             worker.totalRewards = Phala.Utility.parseRawAmount(onChainMiner.stats.totalReward);
             
-            if (!stakePool.workers.contains(worker)) {
-                stakePool.workers.add(worker);
+            if (!stakePoolEntry.workers.contains(worker)) {
+                stakePoolEntry.workers.add(worker);
             }
         }
         
@@ -336,11 +338,11 @@ export class StakePoolHistoryCrawler
         historyEntry.rewardsTotal = historyEntry.stakeTotal * rewardsAcc;
         
         // update last history entry
-        stakePool.lastHistoryEntry = historyEntry;
+        stakePoolEntry.lastHistoryEntry = historyEntry;
         
         this._txEntityManager.persist(historyEntry);
         
-        this.processedStakePools.push(stakePool);
+        this.processedStakePools.push(stakePoolEntry);
     }
     
     protected async calculateApr ()
@@ -391,19 +393,19 @@ export class StakePoolHistoryCrawler
         
         // process avg entries
         await this.processAvgStakePool(
-            this.specialStakePools[StatsStakePool.SPECIAL_NETWORK_AVG_ID],
+            this.specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID],
             this.sortedStakePools
         );
         
         await this.processAvgStakePool(
-            this.specialStakePools[StatsStakePool.SPECIAL_TOP_AVG_ID],
+            this.specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID],
             this.sortedStakePools.slice(0, 100)
         );
     }
     
     protected async processAvgStakePool (
-        stakePool : StatsStakePool,
-        limitedStakePools : StatsStakePool[]
+        stakePool : StakePoolEntry,
+        limitedStakePools : StakePoolEntry[]
     ) : Promise<void>
     {
         const oneOfHistoryEntries : HistoryEntry = this.processedStakePools[0].lastHistoryEntry;

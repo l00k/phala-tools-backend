@@ -1,10 +1,10 @@
-import { NotificationType } from '#/Watchdog/Domain/Model/StakePool/Observation/ObservationNotifications';
+import { NotificationType } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Trans from 'class-transformer';
 import { Assert, AssertObject } from '@inti5/validator/Object';
 
 
-@API.Resource('Watchdog/StakePool/Observation/NotificationConfig')
+@API.Resource('Watchdog/Observation/NotificationConfig')
 export class NotificationConfig
 {
     

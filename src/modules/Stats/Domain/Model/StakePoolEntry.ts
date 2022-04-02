@@ -1,8 +1,7 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as Phala from '#/Phala/Domain/Model';
-import { Account } from '#/Phala/Domain/Model';
-import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
-import { Issue } from '#/Stats/Domain/Model/StakePool/Issue';
+import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
+import { Issue } from '#/Stats/Domain/Model/Issue';
 import { Worker } from '#/Stats/Domain/Model/Worker';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
@@ -12,9 +11,9 @@ import { EntityManager } from '@mikro-orm/mysql';
 @ORM.Entity({
     tableName: 'stats_stakepool'
 })
-@API.Resource('Stats/StakePool')
-export class StatsStakePool
-    extends AbstractModel<StatsStakePool>
+@API.Resource('Stats/StakePoolEntry')
+export class StakePoolEntry
+    extends AbstractModel<StakePoolEntry>
 {
     
     public static readonly SPECIAL_NETWORK_AVG_ID = 1;
@@ -27,25 +26,16 @@ export class StatsStakePool
     public id : number;
     
     
-    @ORM.OneToOne(() => Phala.StakePool)
+    @ORM.OneToOne(() => Phala.StakePool, null, { nullable: true, eager: true })
+    @API.Property()
+    @API.Filterable()
+    @API.Sortable()
     public stakePool : Phala.StakePool;
     
     
     @ORM.Property({ type: 'string', nullable: true })
     @API.Property()
     public special : string;
-    
-    @ORM.Property({ nullable: true })
-    @API.Property()
-    @API.Filterable()
-    @API.Sortable()
-    public onChainId : number;
-    
-    @ORM.ManyToOne(() => Account)
-    @API.Property(() => Account)
-    @API.Filterable()
-    @API.Sortable()
-    public owner : Account;
     
     @ORM.OneToOne(() => HistoryEntry, null, { nullable: true, eager: true })
     @API.Property(() => HistoryEntry)
@@ -77,7 +67,7 @@ export class StatsStakePool
     public snapshotWorkers : Worker[] = [];
     
     
-    public constructor (data? : Partial<StatsStakePool>, entityManager? : EntityManager)
+    public constructor (data? : Partial<StakePoolEntry>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         

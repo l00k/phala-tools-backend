@@ -52,9 +52,9 @@ export class OnChainEventsCrawler
             400000,
             async(event : Event<Events.PoolCreated>, params : any[]) => {
                 const onChainId = Number(params[1]);
-                event.stakePool = await this.getOrCreateStakePool(onChainId);
+                event.stakePoolEntry = await this.getOrCreateStakePool(onChainId);
                 
-                event.stakePool.createdAt = event.blockDate;
+                event.stakePoolEntry.createdAt = event.blockDate;
             }
         );
         
@@ -80,7 +80,7 @@ export class OnChainEventsCrawler
                 
                 const commissionDelta = newCommission - Polkadot.Utility.parseRawPercent(onChainStakePool.payoutCommission);
                 
-                event.stakePool = await this.getOrCreateStakePool(onChainId);
+                event.stakePoolEntry = await this.getOrCreateStakePool(onChainId);
                 event.additionalData = {
                     commission: newCommission,
                     delta: commissionDelta,
@@ -96,7 +96,7 @@ export class OnChainEventsCrawler
             'phalastakepool', 'contribution',
             50000,
             async(event : Event<Events.Contribution>, params : any[]) => {
-                event.stakePool = await this.getOrCreateStakePool(Number(params[0]));
+                event.stakePoolEntry = await this.getOrCreateStakePool(Number(params[0]));
                 
                 const hexAddr = (params[1].substring(0, 2) == '0x' ? '' : '0x') + params[1];
                 const address = encodeAddress(hexAddr, OnChainEventsCrawler.PHALA_SS58FORMAT);
@@ -114,7 +114,7 @@ export class OnChainEventsCrawler
             'phalastakepool', 'withdrawal',
             50000,
             async(event : Event<Events.Withdrawal>, params : any[]) => {
-                event.stakePool = await this.getOrCreateStakePool(Number(params[0]));
+                event.stakePoolEntry = await this.getOrCreateStakePool(Number(params[0]));
                 
                 const hexAddr = (params[1].substring(0, 2) == '0x' ? '' : '0x') + params[1];
                 const address = encodeAddress(hexAddr, OnChainEventsCrawler.PHALA_SS58FORMAT);
@@ -132,7 +132,7 @@ export class OnChainEventsCrawler
             'phalastakepool', 'poolslashed',
             50000,
             async(event : Event<Events.Slash>, params : any[]) => {
-                event.stakePool = await this.getOrCreateStakePool(Number(params[0]));
+                event.stakePoolEntry = await this.getOrCreateStakePool(Number(params[0]));
                 
                 event.amount = Phala.Utility.parseRawAmount(Number(params[1]));
             }

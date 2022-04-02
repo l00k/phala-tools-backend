@@ -3,7 +3,7 @@ import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
-import { StatsStakePool } from '#/Stats/Domain/Model/StatsStakePool';
+import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker } from '#/Stats/Domain/Model/Worker';
 import { Inject } from '@inti5/object-manager';
 import { ApiPromise } from '@polkadot/api';
@@ -32,7 +32,7 @@ export abstract class AbstractCrawler
     protected finalizedBlockHeader : Header;
     protected finalizedBlockNumber : number;
     
-    protected stakePools : Mapped<StatsStakePool> = {};
+    protected stakePoolEntries : Mapped<StakePoolEntry> = {};
     protected accounts : Mapped<Account> = {};
     protected workers : Mapped<Worker> = {};
     
@@ -69,36 +69,32 @@ export abstract class AbstractCrawler
     
     protected async clearContext ()
     {
-        this.stakePools = {};
+        this.stakePoolEntries = {};
         this.accounts = {};
         this.workers = {};
     }
     
     
-    protected async getOrCreateStakePool (onChainId : number) : Promise<StatsStakePool>
+    protected async getOrCreateStakePool (onChainId : number) : Promise<StakePoolEntry>
     {
-        if (!this.stakePools[onChainId]) {
-            const stakePoolRepository = this._entityManager.getRepository(StatsStakePool);
+        if (!this.stakePoolEntries[onChainId]) {
+            const stakePoolEntryRepository = this._entityManager.getRepository(StakePoolEntry);
             
-            let stakePool : StatsStakePool = await stakePoolRepository.findOne({ onChainId });
-            if (!stakePool) {
-                stakePool = new StatsStakePool({ onChainId }, this._entityManager);
-                stakePool.stakePool = await this._phalaEntityFetcher.getOrCreateStakePool(onChainId);
+            let stakePoolEntry : StakePoolEntry = await stakePoolEntryRepository.findOne({ stakePool: { onChainId } });
+            if (!stakePoolEntry) {
+                const stakePool = await this._phalaEntityFetcher.getOrCreateStakePool(onChainId);
                 
-                const onChainStakePool : typeof Phala.KhalaTypes.PoolInfo =
-                    <any>(await this.phalaApi.query.phalaStakePool.stakePools(stakePool.onChainId)).toJSON();
+                stakePoolEntry = new StakePoolEntry({
+                    stakePool,
+                }, this._entityManager);
                 
-                if (!stakePool.owner) {
-                    stakePool.owner = await this.getOrCreateAccount(onChainStakePool.owner);
-                }
-                
-                this._entityManager.persist(stakePool);
+                this._entityManager.persist(stakePoolEntry);
             }
             
-            this.stakePools[onChainId] = stakePool;
+            this.stakePoolEntries[onChainId] = stakePoolEntry;
         }
         
-        return this.stakePools[onChainId];
+        return this.stakePoolEntries[onChainId];
     }
     
     protected async getOrCreateAccount (address : string) : Promise<Account>
@@ -118,7 +114,7 @@ export abstract class AbstractCrawler
         return this.accounts[address];
     }
     
-    protected async getOrCreateWorker (publicKey : string, stakePool : StatsStakePool) : Promise<Worker>
+    protected async getOrCreateWorker (publicKey : string, stakePool : StakePoolEntry) : Promise<Worker>
     {
         if (!this.workers[publicKey]) {
             const workerRepository = this._entityManager.getRepository(Worker);

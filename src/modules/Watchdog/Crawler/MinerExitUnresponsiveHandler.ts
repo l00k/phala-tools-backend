@@ -5,7 +5,7 @@ import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
 import { Injectable } from '@inti5/object-manager';
 
 
-@Injectable({ tag: 'pw.crawler.handler' })
+@Injectable({ tag: 'watchdog.crawler.handler' })
 export class MinerExitUnresponsiveHandler
     extends AbstractHandler
 {
