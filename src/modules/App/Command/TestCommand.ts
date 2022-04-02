@@ -1,3 +1,4 @@
+import { IssueController } from '#/Stats/Controller/IssueController';
 import { UserController } from '#/Watchdog/Controller/UserController';
 import { DependencyInjection, ObjectManager } from '@inti5/object-manager';
 import * as CLI from 'classy-commander';
@@ -16,10 +17,10 @@ export class TestCommand
             .getInstance(Api.Service);
         apiService.bootstrap();
     
-        const userController = ObjectManager.getSingleton()
-            .getInstance(UserController);
+        const controller = ObjectManager.getSingleton()
+            .getInstance(IssueController);
         
-        const result = await userController.getUserMe({
+        const result = await (<any>controller.getCollection)({
             authData: {
                 userId: 1,
             }
