@@ -1,7 +1,7 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { StakePool } from '#/Phala/Domain/Model';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
@@ -91,7 +91,7 @@ export class MinerEnterUnresponsiveHandler
     protected async _prepareMessages ()
     {
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
+        const stakePoolObservationRepository = this._entityManager.getRepository(Observation);
         
         for (const [ onChainId, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
             if (unresponsiveCount == 0) {

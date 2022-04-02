@@ -7,7 +7,7 @@ import { StakePool } from '#/Phala/Domain/Model';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
 import { NotificationType } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
-import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { Utility } from '#/Watchdog/Utility/Utility';
 import { RuntimeCache } from '@inti5/cache/RuntimeCache';
 import { Inject, Injectable } from '@inti5/object-manager';
@@ -59,7 +59,7 @@ export class ClaimableRewardsHandler
     })
     public async handle ()
     {
-        const observationRepository = this._entityManager.getRepository(StakePoolObservation);
+        const observationRepository = this._entityManager.getRepository(Observation);
         
         const observations = await observationRepository.findAll();
         const observationGroups = _.groupBy(observations, ob => ob.stakePool.onChainId);

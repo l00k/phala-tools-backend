@@ -23,11 +23,11 @@ export enum ObservationMode
 
 
 @ORM.Entity({
-    tableName: 'watchdog_stakepool_observation'
+    tableName: 'watchdog_observation'
 })
-@API.Resource('Watchdog/StakePoolObservation')
-export class StakePoolObservation
-    extends AbstractModel<StakePoolObservation>
+@API.Resource('Watchdog/Observation')
+export class Observation
+    extends AbstractModel<Observation>
 {
     
     
@@ -63,7 +63,7 @@ export class StakePoolObservation
     public lastNotifications : ObservationNotifications = new ObservationNotifications();
     
     
-    public constructor (data? : EntityData<StakePoolObservation>, entityManager? : EntityManager)
+    public constructor (data? : EntityData<Observation>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         if (data) {

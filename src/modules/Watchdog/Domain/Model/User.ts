@@ -1,6 +1,6 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
-import { StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { UserConfiguration } from '#/Watchdog/Domain/Model/UserConfiguration';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
@@ -52,16 +52,16 @@ export class User
     @API.Property(() => UserConfiguration)
     public config : UserConfiguration = new UserConfiguration();
     
-    @ORM.OneToMany(() => StakePoolObservation, o => o.user)
-    @API.Property(() => [ StakePoolObservation ])
-    public stakePoolObservations : ORM.Collection<StakePoolObservation>;
+    @ORM.OneToMany(() => Observation, o => o.user)
+    @API.Property(() => [ Observation ])
+    public stakePoolObservations : ORM.Collection<Observation>;
     
     
     public constructor (data? : EntityData<User>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         
-        this.stakePoolObservations = new ORM.Collection<StakePoolObservation>(this, []);
+        this.stakePoolObservations = new ORM.Collection<Observation>(this, []);
         
         if (data) {
             this.assign(data, { em: entityManager });

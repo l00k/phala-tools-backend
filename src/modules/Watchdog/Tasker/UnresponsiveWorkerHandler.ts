@@ -4,7 +4,7 @@ import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
 import { AbstractReminderHandler } from '#/Watchdog/Tasker/AbstractReminderHandler';
 import { Inject, Injectable } from '@inti5/object-manager';
 
@@ -30,7 +30,7 @@ export class UnresponsiveWorkerHandler
     public async handle () : Promise<boolean>
     {
         const issues : UnresponsiveWorker[] = await this._loadIssues();
-        const observationRepository = this._entityManager.getRepository(StakePoolObservation);
+        const observationRepository = this._entityManager.getRepository(Observation);
         
         for (const issue of issues) {
             const workerState : typeof KhalaTypes.MinerInfo =
@@ -70,7 +70,7 @@ export class UnresponsiveWorkerHandler
     protected async _prepareMessages ()
     {
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
+        const stakePoolObservationRepository = this._entityManager.getRepository(Observation);
         
         for (const [ onChainId, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
             if (unresponsiveCount == 0) {

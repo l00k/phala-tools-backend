@@ -224,3 +224,12 @@ task('db:push', function () {
     runLocally("rm .dep/dbdumps/$dumpname");
 });
 
+task('tmp:import', function() {
+    $localCwd = runLocally('pwd');
+    
+    runLocally("
+        cd $localCwd
+        set -o allexport; source $localCwd/.env; set +o allexport;
+        mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME < $localCwd/.local/toimport.sql;
+    ", ['tty' => true]);
+})->local();

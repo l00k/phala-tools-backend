@@ -5,7 +5,7 @@ import { Annotation as API } from '@inti5/api-backend';
 
 
 @ORM.Entity({
-    tableName: 'stats_stakepool_issue'
+    tableName: 'stats_issue'
 })
 @API.Resource('Stats/Issue')
 export class Issue

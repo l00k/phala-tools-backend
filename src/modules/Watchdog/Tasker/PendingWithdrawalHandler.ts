@@ -4,7 +4,7 @@ import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
 import { Utility } from '#/Watchdog/Utility/Utility';
 import { RuntimeCache } from '@inti5/cache/RuntimeCache';
 import { Inject, Injectable } from '@inti5/object-manager';
@@ -51,7 +51,7 @@ export class PendingWithdrawalHandler
     })
     public async handle () : Promise<boolean>
     {
-        const observationRepository = this._entityManager.getRepository(StakePoolObservation);
+        const observationRepository = this._entityManager.getRepository(Observation);
         const observations = await observationRepository.find({ mode: ObservationMode.Owner });
         const observationGroups = _.groupBy(observations, ob => ob.stakePool.onChainId);
         

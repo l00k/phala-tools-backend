@@ -1,7 +1,7 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { StakePool } from '#/Phala/Domain/Model';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
@@ -24,7 +24,7 @@ export class WithdrawalHandler
     protected async _handle (event : Event) : Promise<boolean>
     {
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
+        const stakePoolObservationRepository = this._entityManager.getRepository(Observation);
         
         const onChainStakePoolId : number = Number(event.data[0]);
         const delegator : string = String(event.data[1]);

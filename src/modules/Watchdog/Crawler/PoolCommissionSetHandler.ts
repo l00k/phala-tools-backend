@@ -1,7 +1,7 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
-import { ObservationMode, StakePoolObservation } from '#/Watchdog/Domain/Model/StakePoolObservation';
+import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
@@ -23,7 +23,7 @@ export class PoolCommissionSetHandler
     protected async _handle (event : Event) : Promise<boolean>
     {
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this._entityManager.getRepository(StakePoolObservation);
+        const stakePoolObservationRepository = this._entityManager.getRepository(Observation);
         
         const onChainId : number = Number(event.data[0]);
         const newCommissionPercent : number = Number(event.data[1]) / 10000;

@@ -9,7 +9,7 @@ import { EntityManager } from '@mikro-orm/mysql';
 
 
 @ORM.Entity({
-    tableName: 'stats_stakepool_historyentry',
+    tableName: 'stats_historyentry',
     customRepository: () => HistoryEntryRepository
 })
 @API.Resource('Stats/HistoryEntry')
