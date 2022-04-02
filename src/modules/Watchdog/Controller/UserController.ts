@@ -3,7 +3,7 @@ import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import { Assert } from '@inti5/validator/Method';
-import { Annotation as Srl } from 'core/serializer';
+import { Annotation as Srl } from '@inti5/serializer';
 
 
 @Router.AuthOnly()
@@ -36,7 +36,10 @@ export class UserController
             authData : any
     ) : Promise<User>
     {
-        return this.getItem(authData.userId, [ 'stakePoolObservations', 'stakePoolObservations.stakePool.owner' ]);
+        return this.getItem(
+            authData.userId,
+            [ 'stakePoolObservations', 'stakePoolObservations.stakePool.owner' ]
+        );
     }
     
     

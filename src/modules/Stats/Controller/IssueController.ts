@@ -3,7 +3,7 @@ import { Event } from '#/Stats/Domain/Model/Event';
 import { Issue } from '#/Stats/Domain/Model/StakePool/Issue';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
-import { Annotation as Srl } from 'core/serializer';
+import { Annotation as Srl } from '@inti5/serializer';
 
 
 export class IssueController

@@ -4,7 +4,7 @@ import { HistoryEntry } from '#/Stats/Domain/Model/StakePool/HistoryEntry';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
-import { Annotation as Srl } from 'core/serializer';
+import { Annotation as Srl } from '@inti5/serializer';
 
 
 export class EventController
