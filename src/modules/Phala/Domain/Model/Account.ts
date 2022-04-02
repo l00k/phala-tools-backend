@@ -21,14 +21,17 @@ export class Account
     
     @ORM.Property({ unique: true })
     @API.Property()
+    @API.Filterable()
     public address : string;
     
     @ORM.Property({ nullable: true })
     @API.Property()
+    @API.Filterable()
     public identity : string;
     
     @ORM.Property()
     @API.Property()
+    @API.Filterable()
     public identityVerified : boolean = false;
     
     

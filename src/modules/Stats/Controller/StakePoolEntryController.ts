@@ -33,8 +33,8 @@ export class StakePoolEntryController
         return super.getItem(
             id,
             [
-                'owner',
-                'owner.tags',
+                'stakePool.owner',
+                'stakePool.owner.tags',
                 'issues',
             ]
         );
@@ -64,7 +64,7 @@ export class StakePoolEntryController
     {
         const finalFilters : any = {
             $and: [
-                { onChainId: { $ne: null } },
+                { stakePool: { $ne: null } },
                 filters.toQueryFilters(),
             ]
         };
@@ -80,8 +80,7 @@ export class StakePoolEntryController
         
         const qb = this._repository.createQueryBuilder('m');
         qb.select('*');
-        qb.leftJoin('owner', 'o');
-        qb.leftJoin('o.tags', 't');
+        qb.leftJoin('m.stakePool.owner', 'o');
         qb.leftJoin('issues', 'i');
         qb.where(queryFilters);
         qb.orderBy(querySorting);
@@ -106,8 +105,7 @@ export class StakePoolEntryController
         collection.items = await qb.getResult();
         
         await this._entityManager.populate(collection.items, [
-            'owner',
-            'owner.tags',
+            'stakePool.owner',
             'issues',
         ]);
         

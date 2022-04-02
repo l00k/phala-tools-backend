@@ -22,10 +22,12 @@ export class StakePool
     
     @ORM.Property({ unique: true, nullable: true })
     @API.Property()
+    @API.Filterable()
     public onChainId : number;
     
     @ORM.ManyToOne(() => Account)
     @API.Property(() => Account)
+    @API.Filterable()
     public owner : Account;
     
     
