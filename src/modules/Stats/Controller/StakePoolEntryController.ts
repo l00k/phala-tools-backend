@@ -44,10 +44,12 @@ export class StakePoolEntryController
     @Srl.Serialize<Api.Domain.Collection<StakePoolEntry>>({
         items: {
             special: true,
-            onChainId: true,
-            owner: '*',
+            stakePool: {
+                $default: true,
+                owner: '*',
+            },
             lastHistoryEntry: '*',
-            issues: '*',
+            issues: true,
         },
         total: true,
     })
