@@ -91,42 +91,12 @@ export class HistoryEntry
     @API.Sortable()
     public withdrawals : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.ENC_BIG_DECIMAL })
-    @API.Property()
-    @API.Filterable()
-    @API.Sortable()
-    public vTotal : number = 0;
-    
-    @ORM.Property({ unsigned: true })
-    @API.Property()
-    @API.Filterable()
-    @API.Sortable()
-    public pTotal : number = 0;
-    
-    
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
-    @API.Property()
-    @API.Filterable()
-    @API.Sortable()
-    public rewardsTotal : number = 0;
-    
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
-    @API.Property()
-    @API.Filterable()
-    @API.Sortable()
-    public currentRewardsDaily : number = 0;
     
     @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.PERCENT })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public currentApr : number = 0;
-    
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
-    @API.Property()
-    @API.Filterable()
-    @API.Sortable()
-    public avgRewardsDaily : number = 0;
     
     @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.PERCENT, nullable: true })
     @API.Property()

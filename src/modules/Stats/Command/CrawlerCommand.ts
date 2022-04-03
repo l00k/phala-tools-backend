@@ -1,5 +1,6 @@
-import { IssueController } from '#/Stats/Controller/IssueController';
+import { OnChainEventsCrawler } from '#/Stats/Tasker/OnChainEventsCrawler';
 import { StakePoolHistoryCrawler } from '#/Stats/Tasker/StakePoolHistoryCrawler';
+import { StakePoolIssuesCrawler } from '#/Stats/Tasker/StakePoolIssuesCrawler';
 import { DependencyInjection, ObjectManager } from '@inti5/object-manager';
 import * as CLI from 'classy-commander';
 
@@ -12,10 +13,26 @@ export class CrawlerCommand
     
     public async execute () : Promise<void>
     {
-        const crawler = ObjectManager.getSingleton()
-            .getInstance(StakePoolHistoryCrawler);
+        // history entries
+        {
+            const crawler = ObjectManager.getSingleton()
+                .getInstance(StakePoolHistoryCrawler);
+            await crawler.run();
+        }
         
-        await crawler.run();
+        // events
+        {
+            const crawler = ObjectManager.getSingleton()
+                .getInstance(OnChainEventsCrawler);
+            await crawler.run();
+        }
+        
+        // issues
+        {
+            const crawler = ObjectManager.getSingleton()
+                .getInstance(StakePoolIssuesCrawler);
+            await crawler.run();
+        }
     }
     
 }

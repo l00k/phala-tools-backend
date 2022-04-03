@@ -5,6 +5,7 @@ import { Account } from '#/Phala/Domain/Model';
 import * as Polkadot from '#/Polkadot';
 import { StakePoolHistoryCrawlerState } from '#/Stats/Domain/Model/AppState/StakePoolHistoryCrawlerState';
 import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
+import { NetworkState } from '#/Stats/Domain/Model/NetworkState';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker, WorkerState } from '#/Stats/Domain/Model/Worker';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
@@ -118,6 +119,10 @@ export class StakePoolHistoryCrawler
                     
                     await this._calculateAvgApr();
                     await this._processAvgStakePools();
+                    
+                    await entityManager.flush();
+                    
+                    await this._processNetworkState();
                     
                     await entityManager.flush();
                 });
@@ -303,9 +308,6 @@ export class StakePoolHistoryCrawler
                 ++historyEntry.workersActiveNum;
             }
             
-            historyEntry.pTotal += onChainMiner.benchmark.pInstant;
-            historyEntry.vTotal += Phala.Utility.parseRawAmount(onChainMiner.v);
-            
             // update worker info
             worker.state = workerState;
             
@@ -321,9 +323,6 @@ export class StakePoolHistoryCrawler
                 stakePoolEntry.workers.add(worker);
             }
         }
-        
-        const rewardsAcc = Phala.Utility.decodeBigNumber(onChainStakePool.rewardAcc);
-        historyEntry.rewardsTotal = historyEntry.stakeTotal * rewardsAcc;
         
         // update last history entry
         stakePoolEntry.lastHistoryEntry = historyEntry;
@@ -355,12 +354,6 @@ export class StakePoolHistoryCrawler
                     const maxReward = (worker.v * 0.0002) / (3600 / 12);
                     return acc + Math.min(workerReward, maxReward);
                 }, 0);
-            
-            stakePool.lastHistoryEntry.currentRewardsDaily = rewardPerBlock
-                * rewardsFractionInEra
-                * (1 - treasuryRatio)
-                * (1 - stakePool.lastHistoryEntry.commission)
-                * (86400 / this._avgBlockTime);
             
             stakePool.lastHistoryEntry.currentApr = rewardPerBlock
                 * rewardsFractionInEra
@@ -417,12 +410,7 @@ export class StakePoolHistoryCrawler
             'stakeReleasing',
             'stakeRemaining',
             'withdrawals',
-            'vTotal',
-            'pTotal',
-            'rewardsTotal',
-            'currentRewardsDaily',
             'currentApr',
-            'avgRewardsDaily',
             'avgApr',
         ];
         
@@ -454,12 +442,23 @@ export class StakePoolHistoryCrawler
                 limit: entriesNum,
             });
             
-            stakePool.lastHistoryEntry.avgRewardsDaily = chunk.map(entry => entry.currentRewardsDaily)
-                .reduce((acc, curr) => acc + curr, 0) / chunk.length;
-            
             stakePool.lastHistoryEntry.avgApr = chunk.map(entry => entry.currentApr)
                 .reduce((acc, curr) => acc + curr, 0) / chunk.length;
         }
+    }
+    
+    protected async _processNetworkState ()
+    {
+        const networkState = new NetworkState({
+            entryNonce: this._appState.value.lastProcessedNonce + 1,
+            entryDate: this._nextEntryDate,
+        }, this._txEntityManager);
+        
+        networkState.totalShares = Object.values(this._workers)
+            .filter(worker => !worker.isDropped && worker.isMiningState)
+            .reduce((acc, worker) => acc + worker.getShare(), 0);
+        
+        this._txEntityManager.persist(networkState);
     }
     
 }
