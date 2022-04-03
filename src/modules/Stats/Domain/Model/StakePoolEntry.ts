@@ -1,5 +1,5 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
-import * as Phala from '#/Phala/Domain/Model';
+import { StakePool } from '#/Phala/Domain/Model';
 import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import { Issue } from '#/Stats/Domain/Model/Issue';
 import { Worker } from '#/Stats/Domain/Model/Worker';
@@ -26,11 +26,11 @@ export class StakePoolEntry
     public id : number;
     
     
-    @ORM.OneToOne(() => Phala.StakePool, null, { nullable: true, eager: true })
-    @API.Property()
+    @ORM.OneToOne(() => StakePool, null, { nullable: true, eager: true })
+    @API.Property(() => StakePool)
     @API.Filterable()
     @API.Sortable()
-    public stakePool : Phala.StakePool;
+    public stakePool : StakePool;
     
     
     @ORM.Property({ type: 'string', nullable: true })
@@ -51,7 +51,7 @@ export class StakePoolEntry
     
     
     @ORM.ManyToMany(() => Issue, null, { lazy: true })
-    @API.Property(() => Issue)
+    @API.Property(() => [ Issue ])
     @API.Filterable()
     public issues : ORM.Collection<Issue>;
     

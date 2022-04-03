@@ -24,7 +24,8 @@ export class TestCommand
             query: {}
         });
         
-        console.dir(result);
+        console.dir(result.items);
+        console.dir(result.items[0]);
     }
     
 }
