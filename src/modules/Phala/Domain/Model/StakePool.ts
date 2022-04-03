@@ -23,11 +23,13 @@ export class StakePool
     @ORM.Property({ unique: true, nullable: true })
     @API.Property()
     @API.Filterable()
+    @API.Sortable()
     public onChainId : number;
     
     @ORM.ManyToOne(() => Account)
     @API.Property(() => Account)
     @API.Filterable()
+    @API.Sortable()
     public owner : Account;
     
     

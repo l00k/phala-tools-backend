@@ -32,6 +32,7 @@ export class Account
     @ORM.Property()
     @API.Property()
     @API.Filterable()
+    @API.Sortable()
     public identityVerified : boolean = false;
     
     

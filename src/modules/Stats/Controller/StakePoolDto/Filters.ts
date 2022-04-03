@@ -13,7 +13,6 @@ export class Filters
         }
         
         this.$and[0].$or.push({ stakePool: { owner: { address: filter } } });
-        this.$and[0].$or.push({ stakePool: { owner: { alias: filter } } });
         this.$and[0].$or.push({ stakePool: { owner: { identity: filter } } });
     }
     
