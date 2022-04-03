@@ -5,7 +5,7 @@
     "scripts": {
         "app": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts",
         "app:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts",
-        "app:inspect": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --inspect --respawn -r tsconfig-paths/register src/bootstrap.ts",
+        "app:inspect": "NODE_ENV=development NODE_OPTIONS='--inspect --unhandled-rejections=strict' ts-node -r tsconfig-paths/register src/bootstrap.ts",
         "postinstall": "patch-package"
     },
     "workspaces": [

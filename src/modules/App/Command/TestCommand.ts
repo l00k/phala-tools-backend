@@ -1,8 +1,8 @@
 import { IssueController } from '#/Stats/Controller/IssueController';
-import { UserController } from '#/Watchdog/Controller/UserController';
+import { StakePoolEntryController } from '#/Stats/Controller/StakePoolEntryController';
+import * as Api from '@inti5/api-backend';
 import { DependencyInjection, ObjectManager } from '@inti5/object-manager';
 import * as CLI from 'classy-commander';
-import * as Api from '@inti5/api-backend';
 
 
 @CLI.command('test', Object, 'Test')
@@ -16,14 +16,12 @@ export class TestCommand
         const apiService = ObjectManager.getSingleton()
             .getInstance(Api.Service);
         apiService.bootstrap();
-    
-        const controller = ObjectManager.getSingleton()
-            .getInstance(IssueController);
         
-        const result = await (<any>controller.getCollection)({
-            authData: {
-                userId: 1,
-            }
+        const controller = ObjectManager.getSingleton()
+            .getInstance(StakePoolEntryController);
+        
+        const result = await (<any>controller.getStakePoolsCollection)({
+            query: {}
         });
         
         console.dir(result);
