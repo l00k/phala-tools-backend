@@ -20,8 +20,10 @@ export class StakePoolEntryController
     @API.CRUD.GetItem(() => StakePoolEntry)
     @Srl.Serialize<StakePoolEntry>({
         special: true,
-        onChainId: true,
-        owner: '*',
+        stakePool: {
+            $default: true,
+            owner: '*',
+        },
         lastHistoryEntry: '*',
         issues: '*',
     })
@@ -34,7 +36,6 @@ export class StakePoolEntryController
             id,
             [
                 'stakePool.owner',
-                'stakePool.owner.tags',
                 'issues',
             ]
         );

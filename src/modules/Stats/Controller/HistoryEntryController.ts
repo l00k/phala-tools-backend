@@ -30,7 +30,7 @@ export class HistoryEntryController
     {
         return super.getCollection(
             {
-                stakePoolEntry: { id: { $eq: id } }
+                stakePoolEntry: { id }
             },
             { entryNonce: ORM.QueryOrder.DESC },
             pagination

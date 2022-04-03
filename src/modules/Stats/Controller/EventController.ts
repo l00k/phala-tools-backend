@@ -21,7 +21,7 @@ export class EventController
         items: '**',
         total: true,
     })
-    public async getStakePoolHistoryCollection (
+    public async getEventsCollection (
         @Router.Param.Id()
             id : number,
         @API.Filters(() => Event)
@@ -34,7 +34,8 @@ export class EventController
             $and: [
                 {
                     $or: [
-                        { stakePool: { id: { $eq: id } } },
+                        { stakePoolEntry: { id } },
+                        { stakePoolEntry: null },
                     ]
                 },
                 filters.toQueryFilters(),
