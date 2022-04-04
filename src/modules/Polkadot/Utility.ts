@@ -17,7 +17,7 @@ export class Utility
         prefix? : number
     ) : boolean
     {
-        if (typeof address != 'string') {
+        if (typeof address !== 'string') {
             return false;
         }
         

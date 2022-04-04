@@ -6,6 +6,7 @@ import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import { Inject } from '@inti5/object-manager';
 import { Assert } from '@inti5/validator/Method';
+import validateJsExt from 'validate.js';
 
 
 export class AccountController
@@ -20,9 +21,11 @@ export class AccountController
     
     
     @API.CRUD.GetItem(() => Account, { path: '#PATH#/find/:address' })
-    public async getOrCreateAccount (
+    public async findAccountByAddress (
         @Router.Param('address')
-        @Assert({ custom: Polkadot.Utility.isAddress })
+        @Assert({
+            custom: { method: address => Polkadot.Utility.isAddress(address, 30) }
+        })
             address : string
     ) : Promise<Account>
     {
