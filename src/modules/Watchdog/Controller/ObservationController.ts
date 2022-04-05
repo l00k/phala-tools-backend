@@ -1,5 +1,7 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
+import { Account } from '#/Phala/Domain/Model';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import { Assert } from '@inti5/validator/Method';
@@ -32,9 +34,11 @@ export class ObservationController
             observation : Observation
     ) : Promise<Observation>
     {
-        console.log('CREATE', observation);
-        
-        return null;
+        // assign owner
+        observation.user = await this._entityManager.findOne(User, authData.userId);
+    
+        await this._entityManager.persistAndFlush(observation);
+        return observation;
     }
     
     @API.CRUD.Update(() => Observation)

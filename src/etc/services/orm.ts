@@ -25,6 +25,6 @@ export default {
         }
     },
     forceUtcTimezone: true,
-    //debug: true,
+    debug: true,
     //debug: env == 'development',
 } as Options;
