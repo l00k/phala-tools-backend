@@ -17,7 +17,7 @@ export class EventController
         () => Event,
         { path: '#PATH#/by_stakepool/:id' }
     )
-    @Srl.Serialize<Api.Domain.Collection<Event>>({
+    @API.Serialize<Api.Domain.Collection<Event>>({
         items: '**',
         total: true,
     })

@@ -18,14 +18,11 @@ export class TestCommand
         apiService.bootstrap();
         
         const controller = ObjectManager.getSingleton()
-            .getInstance(StakePoolEntryController);
+            .getInstance(IssueController);
         
-        const result = await (<any>controller.getStakePoolsCollection)({
+        const result = await (<any>controller.getCollection)({
             query: {}
         });
-        
-        console.dir(result.items);
-        console.dir(result.items[0]);
     }
     
 }

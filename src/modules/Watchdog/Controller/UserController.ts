@@ -14,9 +14,8 @@ export class UserController
     protected static readonly ENTITY = User;
     
     
-    @Router.Endpoint.GET('/user/me')
-    @API.Endpoint(() => User)
-    @Srl.Serialize<User>({
+    @API.CRUD.GetItem(() => User, { path: '#PATH#/me' })
+    @API.Serialize({
         msgChannel: true,
         username: true,
         config: '*',
@@ -41,25 +40,5 @@ export class UserController
             [ 'stakePoolObservations', 'stakePoolObservations.stakePool.owner' ]
         );
     }
-    
-    
-    // @Router.Endpoint.POST('/user/me')
-    // @API.Endpoint(() => User)
-    // public async postUserMe (
-    //     @Router.AuthData()
-    //         authData : any,
-    //     @Router.Body()
-    //     @Assert()
-    //         user : User
-    // ) : Promise<User>
-    // {
-    //     const entityManager = this._entityManagerWrapper.getDirectEntityManager();
-    //     const userRepository = entityManager.getRepository(User);
-    //
-    //
-    //     console.log(user);
-    //
-    //     return user;
-    // }
     
 }

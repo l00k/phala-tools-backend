@@ -3,7 +3,6 @@ import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
-import { Annotation as Srl } from '@inti5/serializer';
 import * as ORM from '@mikro-orm/core';
 
 
@@ -17,7 +16,7 @@ export class HistoryEntryController
         () => HistoryEntry,
         { path: '#PATH#/by_stakepool/:id' }
     )
-    @Srl.Serialize<Api.Domain.Collection<HistoryEntry>>({
+    @API.Serialize<Api.Domain.Collection<HistoryEntry>>({
         items: '*',
         total: true,
     })

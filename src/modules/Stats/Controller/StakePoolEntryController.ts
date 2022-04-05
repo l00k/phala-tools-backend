@@ -2,13 +2,11 @@ import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Filters } from '#/Stats/Controller/StakePoolDto/Filters';
 import { Modifiers } from '#/Stats/Controller/StakePoolDto/Modifiers';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
-import { Issue } from '#/Stats/Domain/Model/Issue';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import * as ORM from '@mikro-orm/core';
 import * as Trans from 'class-transformer';
-import { Annotation as Srl } from '@inti5/serializer';
 
 
 export class StakePoolEntryController
@@ -18,7 +16,7 @@ export class StakePoolEntryController
     protected static readonly ENTITY = StakePoolEntry;
     
     @API.CRUD.GetItem(() => StakePoolEntry)
-    @Srl.Serialize<StakePoolEntry>({
+    @API.Serialize<StakePoolEntry>({
         special: true,
         stakePool: {
             $default: true,
@@ -42,7 +40,7 @@ export class StakePoolEntryController
     }
     
     @API.CRUD.GetCollection(() => StakePoolEntry)
-    @Srl.Serialize<Api.Domain.Collection<StakePoolEntry>>({
+    @API.Serialize<Api.Domain.Collection<StakePoolEntry>>({
         items: {
             special: true,
             stakePool: {
