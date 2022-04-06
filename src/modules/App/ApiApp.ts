@@ -14,6 +14,12 @@ export class ApiApp
     {
         const objectManager = ObjectManager.getSingleton();
     
+        // load additional modules
+        this._loadModules([
+            'Controller'
+        ]);
+    
+        // setup express server
         const configuration = Configuration.getSingleton();
         const expressFactory = objectManager.getInstance(ExpressFactory);
         

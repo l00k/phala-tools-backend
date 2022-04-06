@@ -12,9 +12,16 @@ export class ProcessingApp
     {
         const objectManager = ObjectManager.getSingleton();
         
+        this._loadModules([
+            'Crawler',
+            'Tasker'
+        ]);
+        
+        // run crawlers
         const crawler = objectManager.getInstance(CrawlerService);
         await crawler.run();
         
+        // run taskers
         const tasker = objectManager.getInstance(TaskerService);
         await tasker.run();
     }
