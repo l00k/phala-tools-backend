@@ -6,7 +6,7 @@ import { TelegramLoginDto } from '#/Watchdog/Controller/Login/TelegramLoginDto';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Body, Controller, Endpoint } from '@inti5/express-ext';
 import { Inject } from '@inti5/object-manager';
-import { Assert } from '@inti5/validator/Method';
+import { Assert, Validate } from '@inti5/validator/Method';
 import { Config } from '@inti5/configuration';
 import { Logger } from '@inti5/utils/Logger';
 import crypto from 'crypto';
@@ -30,6 +30,7 @@ export class TelegramLoginController
     protected _telegramConfig : TelegramConfig;
     
     
+    @Validate()
     @Endpoint.POST('/login/telegram')
     public async index (
         @Body()

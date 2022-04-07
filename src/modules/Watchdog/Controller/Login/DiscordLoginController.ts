@@ -7,7 +7,7 @@ import { User } from '#/Watchdog/Domain/Model/User';
 import { Body, Controller, Endpoint } from '@inti5/express-ext';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
-import { Assert } from '@inti5/validator/Method';
+import { Assert, Validate } from '@inti5/validator/Method';
 import { APIUser } from 'discord-api-types';
 import rateLimit from 'express-rate-limit';
 
@@ -29,6 +29,7 @@ export class DiscordLoginController
     protected _discordIdentityProvider : DiscordIdentityProvider;
     
     
+    @Validate()
     @Endpoint.POST('/login/discord')
     public async index (
         @Body()

@@ -74,8 +74,7 @@ export class NotificationAggregator
                         .sendMessage(<MessagingChannel>channel, recipient, text)
                         .then(resolve)
                         .catch(e => {
-                            console.log(e);
-                            
+                            console.error(e);
                             reject(e);
                         });
                 });
