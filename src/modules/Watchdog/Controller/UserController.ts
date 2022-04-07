@@ -19,7 +19,7 @@ export class UserController
         msgChannel: true,
         username: true,
         config: '*',
-        stakePoolObservations: {
+        observations: {
             stakePool: {
                 onChainId: true,
                 owner: '*',
@@ -37,7 +37,7 @@ export class UserController
     {
         return this.getItem(
             authData.userId,
-            [ 'stakePoolObservations', 'stakePoolObservations.stakePool.owner' ]
+            [ 'observations', 'observations.stakePool.owner' ]
         );
     }
     

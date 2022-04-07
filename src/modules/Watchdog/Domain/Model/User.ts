@@ -54,14 +54,14 @@ export class User
     
     @ORM.OneToMany(() => Observation, o => o.user)
     @API.Property(() => [ Observation ])
-    public stakePoolObservations : ORM.Collection<Observation>;
+    public observations : ORM.Collection<Observation>;
     
     
     public constructor (data? : EntityData<User>, entityManager? : EntityManager)
     {
         super(data, entityManager);
         
-        this.stakePoolObservations = new ORM.Collection<Observation>(this, []);
+        this.observations = new ORM.Collection<Observation>(this, []);
         
         if (data) {
             this.assign(data, { em: entityManager });

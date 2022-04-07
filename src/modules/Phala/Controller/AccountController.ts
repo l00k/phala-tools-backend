@@ -21,6 +21,7 @@ export class AccountController
     
     
     @API.CRUD.GetItem(() => Account, { path: '#PATH#/find/:address' })
+    @API.Serialize('*')
     public async findAccountByAddress (
         @Router.Param('address')
         @Assert({
