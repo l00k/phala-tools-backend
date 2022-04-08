@@ -26,7 +26,7 @@ export class UserController
             },
             account: '*',
             mode: true,
-            config: '*',
+            config: '**',
             lastNotifications: '*',
         }
     }, () => User)
