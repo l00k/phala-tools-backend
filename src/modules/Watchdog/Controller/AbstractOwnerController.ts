@@ -23,7 +23,7 @@ export abstract class AbstractOwnerController<T>
         authData : any
     ) : Promise<void>
     {
-        if (!owner.id !== authData.userId) {
+        if (owner.id !== authData.userId) {
             throw new OwnershipException();
         }
     }

@@ -83,6 +83,7 @@ export class ObservationController
     }
     
     @API.CRUD.Delete(() => Observation)
+    @API.Serialize(true)
     @Router.AuthOnly()
     public async delete (
         @Router.AuthData()
