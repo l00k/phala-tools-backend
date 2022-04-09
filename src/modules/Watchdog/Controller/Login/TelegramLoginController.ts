@@ -2,7 +2,7 @@ import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper
 import { JwtSigner } from '#/BackendCore/Service/JwtSigner';
 import { TelegramConfig } from '#/Messaging/Domain/types';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
-import { TelegramLoginDto } from '#/Watchdog/Controller/Login/TelegramLoginDto';
+import { TelegramLoginDto } from '#/Watchdog/Controller/Login/Dto/TelegramLoginDto';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Body, Controller, Endpoint } from '@inti5/express-ext';
 import { Inject } from '@inti5/object-manager';
@@ -30,8 +30,8 @@ export class TelegramLoginController
     protected _telegramConfig : TelegramConfig;
     
     
-    @Validate()
     @Endpoint.POST('/login/telegram')
+    @Validate()
     public async index (
         @Body()
         @Assert({ presence: true })

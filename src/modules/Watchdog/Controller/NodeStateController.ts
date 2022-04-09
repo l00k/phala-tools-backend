@@ -26,8 +26,8 @@ export class NodeStateController
         this._nodeStateRepository = this._entityManager.getRepository(NodeState);
     }
     
-    @Validate()
     @Endpoint.POST('/node-state')
+    @Validate()
     public async index (
         @Body()
         @Assert({ presence: true })

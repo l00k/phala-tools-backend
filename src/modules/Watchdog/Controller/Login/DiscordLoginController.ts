@@ -2,14 +2,13 @@ import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper
 import { JwtSigner } from '#/BackendCore/Service/JwtSigner';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { IdentityProvider as DiscordIdentityProvider } from '#/Messaging/Service/Discord/IdentityProvider';
-import { DiscordLoginDto } from '#/Watchdog/Controller/Login/DiscordLoginDto';
+import { DiscordLoginDto } from '#/Watchdog/Controller/Login/Dto/DiscordLoginDto';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Body, Controller, Endpoint } from '@inti5/express-ext';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { Assert, Validate } from '@inti5/validator/Method';
 import { APIUser } from 'discord-api-types';
-import rateLimit from 'express-rate-limit';
 
 
 export class DiscordLoginController
@@ -29,8 +28,8 @@ export class DiscordLoginController
     protected _discordIdentityProvider : DiscordIdentityProvider;
     
     
-    @Validate()
     @Endpoint.POST('/login/discord')
+    @Validate()
     public async index (
         @Body()
         @Assert({ presence: true })

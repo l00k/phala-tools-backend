@@ -1,23 +1,33 @@
-import { CrudController } from '#/BackendCore/Controller/CrudController';
-import { Account } from '#/Phala/Domain/Model';
+import { AbstractOwnerController } from '#/Watchdog/Controller/AbstractOwnerController';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
-import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
+import { RuntimeException } from '@inti5/utils/Exception';
 import { Assert } from '@inti5/validator/Method';
+import { EntitySerializationGraph } from 'core/serializer';
+
+
+const observationSanitizationGraph : EntitySerializationGraph<Observation> = {
+    stakePool: {
+        onChainId: true,
+        owner: '*',
+    },
+    account: '*',
+    mode: true,
+    config: '**',
+    lastNotifications: '*',
+};
 
 
 export class ObservationController
-    extends CrudController<Observation>
+    extends AbstractOwnerController<Observation>
 {
     
     protected static readonly ENTITY = Observation;
     
     
     @API.CRUD.Create(() => Observation)
-    @API.Serialize({
-        $default: true
-    }, () => Observation)
+    @API.Serialize(observationSanitizationGraph, () => Observation)
     @Router.AuthOnly()
     public async create (
         @Router.AuthData()
@@ -35,16 +45,14 @@ export class ObservationController
     ) : Promise<Observation>
     {
         // assign owner
-        observation.user = await this._entityManager.findOne(User, authData.userId);
-    
+        observation.user = await this._userRepository.findOne(authData.userId);
+        
         await this._entityManager.persistAndFlush(observation);
         return observation;
     }
     
     @API.CRUD.Update(() => Observation)
-    @API.Serialize({
-        $default: true
-    }, () => Observation)
+    @API.Serialize(observationSanitizationGraph, () => Observation)
     @Router.AuthOnly()
     public async update (
         @Router.AuthData()
@@ -60,12 +68,18 @@ export class ObservationController
             lastNotifications: false,
         }, () => Observation)
         @Assert()
-            observation : Observation
+            observationUpdate : Observation
     ) : Promise<Observation>
     {
-        console.log('UPDATE', id, observation);
+        const observation = await this._repository.findOne(id);
         
-        return null;
+        // verify ownership
+        await this._verifyOwnership(observation.user, authData);
+        
+        observation.assign(observationUpdate);
+        
+        await this._entityManager.persistAndFlush(observation);
+        return observation;
     }
     
     @API.CRUD.Delete(() => Observation)
@@ -77,9 +91,24 @@ export class ObservationController
             id : number
     ) : Promise<boolean>
     {
-        console.log('DELETE', id);
+        // load
+        const observation = await this._repository.findOne(id);
+        if (!observation) {
+            throw new RuntimeException('Item not found', 1649519212197);
+        }
         
-        return null;
+        // verify ownership
+        await this._verifyOwnership(observation.user, authData);
+        
+        // delete
+        try {
+            await this._repository.removeAndFlush(observation);
+        }
+        catch (e) {
+            return false;
+        }
+        
+        return true;
     }
     
 }
