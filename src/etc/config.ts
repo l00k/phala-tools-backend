@@ -1,3 +1,6 @@
+import { ModuleAppConfig } from '#/App/Domain/Config';
+import { CoreConfig } from '#/BackendCore/Domain/Config';
+
 export default {
     core: {
         jwt: {
@@ -15,7 +18,7 @@ export default {
             },
         },
     },
-    service: {
+    services: {
         orm: require('./services/orm').default
     },
     module: {
@@ -47,4 +50,7 @@ export default {
             heartbeatUrl: null
         }
     }
-};
+} as (
+    CoreConfig
+    & ModuleAppConfig
+);
