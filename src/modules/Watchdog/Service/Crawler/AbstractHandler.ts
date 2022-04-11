@@ -1,3 +1,4 @@
+import { ApiMode } from '#/Polkadot';
 import { Event } from '#/Watchdog/Service/Crawler/Event';
 import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
@@ -45,7 +46,7 @@ export abstract class AbstractHandler
 
     public async init ()
     {
-        this._api = await this._apiProvider.getApi();
+        this._api = await this._apiProvider.getApi(ApiMode.WS);
     }
 
     public canHandle (event : Event) : boolean

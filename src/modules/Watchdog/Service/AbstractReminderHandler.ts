@@ -1,8 +1,9 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { AbstractHandler } from '#/BackendCore/Service/Tasker/AbstractHandler';
-import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { MessagingProvider } from '#/Messaging/Service/MessagingProvider';
+import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
+import { ApiMode } from '#/Polkadot';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
@@ -48,7 +49,7 @@ export abstract class AbstractReminderHandler
     
     public async init ()
     {
-        this._api = await this._apiProvider.getApi();
+        this._api = await this._apiProvider.getApi(ApiMode.WS);
         this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
     }
     

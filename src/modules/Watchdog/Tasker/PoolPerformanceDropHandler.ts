@@ -6,6 +6,7 @@ import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
+import { ApiMode } from '#/Polkadot';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { Exception } from '#/BackendCore/Exception';
 import { RuntimeCache } from '@inti5/cache/RuntimeCache';
@@ -47,7 +48,7 @@ export class PoolPerformanceDropHandler
     public async init ()
     {
         this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
-        this._api = await this._apiProvider.getApi();
+        this._api = await this._apiProvider.getApi(ApiMode.WS);
     }
     
     public async postProcess ()

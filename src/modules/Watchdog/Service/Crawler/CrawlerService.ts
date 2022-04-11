@@ -2,6 +2,7 @@ import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import { Exception } from '#/BackendCore/Exception';
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
+import { ApiMode } from '#/Polkadot';
 import { CrawlerState } from '#/Watchdog/Domain/Model/AppState/CrawlerState';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
 import { Event } from '#/Watchdog/Service/Crawler/Event';
@@ -93,7 +94,7 @@ export class CrawlerService
     
     protected async _init ()
     {
-        this._api = await this._apiProvider.getApi();
+        this._api = await this._apiProvider.getApi(ApiMode.WS);
         
         // fetch app state
         const entityManager = await this._entityManagerWrapper.getDirectEntityManager();
