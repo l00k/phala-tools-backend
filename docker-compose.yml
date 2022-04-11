@@ -27,6 +27,8 @@ services:
             context: .
             dockerfile: app.Dockerfile
         image: ${COMPOSE_PROJECT_NAME}-node
+        volumes:
+            - .:/usr/src/app/:rw
 
     app_process:
         depends_on:

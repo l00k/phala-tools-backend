@@ -88,8 +88,8 @@ task('server:up', function () {
 
         docker-compose up -d db
 
-        docker-compose run app_bot yarn install --only=production
-        docker-compose run app_bot yarn mikro-orm migration:up
+        docker-compose run node yarn install --only=production
+        docker-compose run node yarn mikro-orm migration:up
 
         docker-compose up -d
     ", [ 'tty' => true ]);
