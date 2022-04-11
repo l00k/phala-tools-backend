@@ -1,5 +1,7 @@
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
+import { KhalaTypes } from '#/Phala';
 import { StakePool } from '#/Phala/Domain/Model';
+import { WorkerState } from '#/Stats/Domain/Model/Worker';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
 import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
@@ -27,16 +29,15 @@ export class MinerEnterUnresponsiveHandler
     {
         const workerAccount : string = event.data[0];
         
-        // todo ld 2022-03-21 21:50:43
         // confirm unresponsivness
-        // const workerState : typeof KhalaTypes.MinerInfo =
-        //     <any>(await this._api.query.phalaMining.miners(workerAccount)).toJSON();
-        // if (
-        //     !workerState
-        //     || workerState.state != WorkerState.MiningUnresponsive
-        // ) {
-        //     return false;
-        // }
+        const workerState : typeof KhalaTypes.MinerInfo =
+            <any>(await this._api.query.phalaMining.miners(workerAccount)).toJSON();
+        if (
+            !workerState
+            || workerState.state != WorkerState.MiningUnresponsive
+        ) {
+            return false;
+        }
         
         const workerPubKey = (await this._api.query.phalaMining.minerBindings(workerAccount)).toString();
         const onChainId : number = <number>(await this._api.query.phalaStakePool.workerAssignments(workerPubKey)).toJSON();

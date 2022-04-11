@@ -18,8 +18,8 @@ const component = process.argv[2];
         app = objectManager.getInstance(CliApp);
     }
     else if (component == 'process') {
-        const { WatchdogProcessingApp } = require('#/App/ProcessingApp');
-        app = objectManager.getInstance(WatchdogProcessingApp);
+        const { ProcessingApp } = require('#/App/ProcessingApp');
+        app = objectManager.getInstance(ProcessingApp);
     }
     else if (component == 'api') {
         const { ApiApp } = require('#/App/ApiApp');

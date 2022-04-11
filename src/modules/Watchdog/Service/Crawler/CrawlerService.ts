@@ -70,15 +70,12 @@ export class CrawlerService
         const finalizedBlockHeader : Header = await this._api.rpc.chain.getHeader(finalizedHead);
         this._finalizedBlockNumber = finalizedBlockHeader.number.toNumber();
         
-        // todo ld 2022-03-21 20:18:30
-        this._appState.value.lastFetchedBlock = 758240;
-        // this.appState.value.lastFetchedBlock = Math.max(
-        //     this.appState.value.lastFetchedBlock,
-        //     this.finalizedBlockNumber - CrawlerService.BLOCK_HISTORY
-        // );
+        this._appState.value.lastFetchedBlock = Math.max(
+            this._appState.value.lastFetchedBlock,
+            this._finalizedBlockNumber - CrawlerService.BLOCK_HISTORY
+        );
         
         // process chunks
-        // todo ld 2022-03-21 19:54:48
         while (true) {
             const blockDelta = this._finalizedBlockNumber - this._appState.value.lastFetchedBlock;
             if (blockDelta <= 0) {

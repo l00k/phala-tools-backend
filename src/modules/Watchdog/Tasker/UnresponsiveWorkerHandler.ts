@@ -2,10 +2,11 @@ import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
+import { WorkerState } from '#/Stats/Domain/Model/Worker';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractReminderHandler } from '#/Watchdog/Tasker/AbstractReminderHandler';
+import { AbstractReminderHandler } from '#/Watchdog/Service/AbstractReminderHandler';
 import { Inject, Injectable } from '@inti5/object-manager';
 
 
@@ -36,16 +37,15 @@ export class UnresponsiveWorkerHandler
             const workerState : typeof KhalaTypes.MinerInfo =
                 <any>(await this._api.query.phalaMining.miners(issue.workerAccount)).toJSON();
             
-            // todo ld 2022-03-21 22:02:41
             // confirm unresponsivness
-            // if (
-            //     !workerState
-            //     || workerState.state != WorkerState.MiningUnresponsive
-            // ) {
-            //     // issue already resolved
-            //     this._entityManager.remove(issue);
-            //     continue;
-            // }
+            if (
+                !workerState
+                || workerState.state != WorkerState.MiningUnresponsive
+            ) {
+                // issue already resolved
+                this._entityManager.remove(issue);
+                continue;
+            }
             
             if (!this._unresponsiveWorkersCounter[issue.stakePool.onChainId]) {
                 this._unresponsiveWorkersCounter[issue.stakePool.onChainId] = 0;

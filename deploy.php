@@ -69,11 +69,6 @@ task('server:down', function () {
     if (!test('[[ -e {{deploy_path}}/current ]]')) {
         return;
     }
-
-    run("
-        cd {{deploy_path}}/current;
-        ps xo '%r %c %a' | grep 'monitor.sh' | grep -v 'grep' | awk '{{print -$1}}' | xargs -I {} bash -c 'kill -s 9 {}'
-    ", [ 'tty' => true ]);
     
     run("
         cd {{deploy_path}}/current;
@@ -138,11 +133,23 @@ task('db:backup', function () {
         ? 'shared/.env'
         : './.env';
 
+    writeln('Dumping...');
     run("
         cd {{deploy_path}}
         set -o allexport; source $envPath; set +o allexport
-        mysqldump -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME > .dep/dbdumps/$dumpname
+        mysqldump --column-statistics=0 -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME > .dep/dbdumps/$dumpname
     ", [ 'tty' => true ]);
+});
+
+task('db:restore', function () {
+    $localCwd = runLocally('pwd');
+
+    writeln('Restoring...');
+    runLocally("
+        cd $localCwd
+        set -o allexport; source $localCwd/.env; set +o allexport;
+        mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME < $localCwd/.dep/dbdumps/torestore.sql;
+    ", ['tty' => true]);
 });
 
 task('db:pull', function () {
@@ -154,6 +161,7 @@ task('db:pull', function () {
         [[ -e .dep/dbdumps ]] || mkdir -p .dep/dbdumps
     ");
 
+    writeln('Dumping...');
     run("
         cd {{deploy_path}}
         set -o allexport; source shared/.env; set +o allexport
@@ -165,25 +173,18 @@ task('db:pull', function () {
         [[ -e .dep/dbdumps ]] || mkdir -p .dep/dbdumps
     ");
 
+    writeln('Downloading...');
     download(
         "{{deploy_path}}/.dep/dbdumps/$dumpname",
         "$localCwd/.dep/dbdumps/$dumpname"
     );
 
+    writeln('Importing...');
     runLocally("
         cd $localCwd
         set -o allexport; source $localCwd/.env; set +o allexport;
         mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME < $localCwd/.dep/dbdumps/$dumpname;
     ", ['tty' => true]);
-
-    $confirm = askConfirmation('Clear user records?', true);
-    if ($confirm) {
-        runLocally("
-            cd $localCwd
-            set -o allexport; source $localCwd/.env; set +o allexport;
-            mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME < $localCwd/.dep/scripts/cleanup.sql;
-        ", ['tty' => true]);
-    }
 
     run("cd {{deploy_path}} && rm .dep/dbdumps/$dumpname");
 });
@@ -197,6 +198,7 @@ task('db:push', function () {
         [[ -e .dep/dbdumps ]] || mkdir -p .dep/dbdumps
     ");
 
+    writeln('Dumping...');
     runLocally("
         cd $localCwd
         set -o allexport; source $localCwd/.env; set +o allexport
@@ -208,11 +210,13 @@ task('db:push', function () {
         [[ -e .dep/dbdumps ]] || mkdir -p .dep/dbdumps
     ");
 
+    writeln('Uploading...');
     upload(
         "$localCwd/.dep/dbdumps/$dumpname",
         "{{deploy_path}}/.dep/dbdumps/$dumpname"
     );
 
+    writeln('Importing...');
     run("
         cd {{deploy_path}}
         set -o allexport; source shared/.env; set +o allexport
@@ -221,6 +225,7 @@ task('db:push', function () {
 
     runLocally("rm .dep/dbdumps/$dumpname");
 });
+
 
 task('tmp:import', function() {
     $localCwd = runLocally('pwd');
