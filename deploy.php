@@ -25,10 +25,17 @@ set('copy_dirs', [
 ]);
 
 
-host('main')
+host('phala')
     ->hostname('100k-dev-server')
     ->user('user')
-    ->set('deploy_path', '/srv/phala-watchdog');
+    ->set('app_variant', 'phala')
+    ->set('deploy_path', '/srv/phala-tools');
+
+host('khala')
+    ->hostname('100k-dev-server')
+    ->user('user')
+    ->set('app_variant', 'khala')
+    ->set('deploy_path', '/srv/khala-tools');
 
 localhost('local')
     ->user('l00k')
