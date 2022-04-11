@@ -88,7 +88,7 @@ export class Subscan
     protected static readonly SERVICE_NAME : string = 'PolkadotSubscan';
     
     
-    @Config('module.polkadot.subscan.baseUrl')
+    @Config('modules.polkadot.subscan.baseUrl')
     protected _subscanBaseUrl : string;
     
     @Inject({ ctorArgs: [Subscan.SERVICE_NAME] })

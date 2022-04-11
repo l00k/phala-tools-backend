@@ -6,9 +6,7 @@ export enum Network
 
 
 export type ModuleAppConfig = {
-    [namespace : string] : any,
-    modules? : {
-        [module : string] : any,
+    modules : {
         app : {
             network : Network,
         }

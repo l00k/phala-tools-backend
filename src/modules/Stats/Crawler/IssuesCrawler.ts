@@ -1,17 +1,14 @@
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
-import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { StakePoolIssueCrawlerState } from '#/Stats/Domain/Model/AppState/StakePoolIssueCrawlerState';
 import { CommissionChange, Contribution, Event, EventType, Slash } from '#/Stats/Domain/Model/Event';
 import { Issue } from '#/Stats/Domain/Model/Issue';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
-import { Inject, Injectable } from '@inti5/object-manager';
+import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
-import { Timeout } from '@inti5/utils/Timeout';
 import moment from 'moment';
 
 
-@Injectable({ tag: 'tasker.handler' })
-export class StakePoolIssuesCrawler
+export class IssuesCrawler
     extends AbstractCrawler
 {
     
@@ -21,17 +18,13 @@ export class StakePoolIssuesCrawler
     protected static readonly MEANINGFUL_STAKE_RATIO = 0.1;
     
     
-    @Inject({ ctorArgs: [ StakePoolIssuesCrawler.name ] })
+    @Inject({ ctorArgs: [ IssuesCrawler.name ] })
     protected _logger : Logger;
     
     protected _appStateClass : any = StakePoolIssueCrawlerState;
     protected _appState : AppState<StakePoolIssueCrawlerState>;
     
     
-    @Task({
-        cronExpr: '40 * * * *'
-    })
-    @Timeout(5 * 60 * 1000)
     public async run ()
     {
         return super.run();
@@ -61,7 +54,7 @@ export class StakePoolIssuesCrawler
                 type: { $eq: EventType.CommissionChange },
                 blockNumber: { $gt: this._appState.value.badBehaviorLastBlock },
                 additionalData: {
-                    delta: { $gte: StakePoolIssuesCrawler.BAD_BEHAVIOR_PERCENT_THRESHOLD }
+                    delta: { $gte: IssuesCrawler.BAD_BEHAVIOR_PERCENT_THRESHOLD }
                 }
             },
             [ 'stakePool' ]
@@ -74,7 +67,7 @@ export class StakePoolIssuesCrawler
         const blockHash : string = (await this._phalaApi.rpc.chain.getBlockHash(this._appState.value.badBehaviorLastBlock)).toString();
         const blockDateUts : number = <any>(await this._phalaApi.query.timestamp.now.at(blockHash)).toJSON();
         
-        const aboveDate = moment(blockDateUts).subtract(StakePoolIssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD).toDate();
+        const aboveDate = moment(blockDateUts).subtract(IssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD).toDate();
         const contributionEvents : Event<Contribution>[] = await eventRepository.find(
             {
                 type: { $eq: EventType.Contribution },
@@ -86,7 +79,7 @@ export class StakePoolIssuesCrawler
             const stakePoolEntry = commissionEvent.stakePoolEntry;
             
             const createDeltaTime = moment(commissionEvent.blockDate).diff(stakePoolEntry.createdAt, 'day', true);
-            if (createDeltaTime <= StakePoolIssuesCrawler.NEW_STAKEPOOL_THRESHOLD) {
+            if (createDeltaTime <= IssuesCrawler.NEW_STAKEPOOL_THRESHOLD) {
                 // it is new pool - skip this case
                 continue;
             }
@@ -105,12 +98,12 @@ export class StakePoolIssuesCrawler
                 }
                 
                 const deltaTime = moment(commissionEvent.blockDate).diff(contributionEvent.blockDate, 'day', true);
-                if (deltaTime > StakePoolIssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD) {
+                if (deltaTime > IssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD) {
                     return false;
                 }
                 
                 const ratio = contributionEvent.amount / stakePoolEntry.lastHistoryEntry.stakeTotal;
-                if (ratio < StakePoolIssuesCrawler.MEANINGFUL_STAKE_RATIO) {
+                if (ratio < IssuesCrawler.MEANINGFUL_STAKE_RATIO) {
                     return false;
                 }
                 

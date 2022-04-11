@@ -1,4 +1,4 @@
-import { ModuleAppConfig } from '#/App/Domain/Config';
+import { ModuleAppConfig, Network } from '#/App/Domain/Config';
 import { CoreConfig } from '#/BackendCore/Domain/Config';
 
 export default {
@@ -21,7 +21,7 @@ export default {
     services: {
         orm: require('./services/orm').default
     },
-    module: {
+    modules: {
         messaging: {
             discord: {
                 botToken: 'TOP.SECRET.VALUE',
@@ -36,11 +36,17 @@ export default {
         polkadot: {
             api: {
                 wsUrl: 'wss://rpc.polkadot.io'
+            },
+            subscan: {
+                baseUrl: 'https://polkadot.api.subscan.io/api/'
             }
         },
         phala: {
             api: {
                 wsUrl: 'wss://khala-api.phala.network/ws'
+            },
+            subscan: {
+                baseUrl: 'https://khala.api.subscan.io/api/'
             }
         },
         watchdog: {
@@ -52,5 +58,5 @@ export default {
     }
 } as (
     CoreConfig
-    & ModuleAppConfig
+    | ModuleAppConfig
 );

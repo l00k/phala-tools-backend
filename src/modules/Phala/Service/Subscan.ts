@@ -12,7 +12,7 @@ export class Subscan
     
     protected static readonly SERVICE_NAME : string = 'PhalaSubscan';
     
-    @Config('module.phala.subscan.baseUrl')
+    @Config('modules.phala.subscan.baseUrl')
     protected _subscanBaseUrl : string = null;
     
     @Inject({ ctorArgs: [ Subscan.SERVICE_NAME ] })

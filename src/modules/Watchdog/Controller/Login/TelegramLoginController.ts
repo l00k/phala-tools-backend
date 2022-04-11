@@ -26,7 +26,7 @@ export class TelegramLoginController
     @Inject()
     protected _jwtSigner : JwtSigner;
     
-    @Config('module.messaging.telegram')
+    @Config('modules.messaging.telegram')
     protected _telegramConfig : TelegramConfig;
     
     

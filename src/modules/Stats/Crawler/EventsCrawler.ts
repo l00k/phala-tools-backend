@@ -1,5 +1,4 @@
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
-import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import * as Phala from '#/Phala';
 import { KhalaTypes } from '#/Phala';
 import * as Polkadot from '#/Polkadot';
@@ -7,21 +6,19 @@ import { OnChainEventsCrawlerState } from '#/Stats/Domain/Model/AppState/OnChain
 import * as Events from '#/Stats/Domain/Model/Event';
 import { Event, EventType } from '#/Stats/Domain/Model/Event';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
-import { Inject, Injectable } from '@inti5/object-manager';
+import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
-import { Timeout } from '@inti5/utils/Timeout';
 import { encodeAddress } from '@polkadot/util-crypto';
 
 
-@Injectable({ tag: 'tasker.handler' })
-export class OnChainEventsCrawler
+export class EventsCrawler
     extends AbstractCrawler
 {
     
     protected static readonly PHALA_SS58FORMAT = 30;
     
     
-    @Inject({ ctorArgs: [ OnChainEventsCrawler.name ] })
+    @Inject({ ctorArgs: [ EventsCrawler.name ] })
     protected _logger : Logger;
     
     @Inject()
@@ -29,16 +26,6 @@ export class OnChainEventsCrawler
     
     protected _appStateClass : any = OnChainEventsCrawlerState;
     protected _appState : AppState<OnChainEventsCrawlerState>;
-    
-    
-    @Task({
-        cronExpr: '*/30 * * * *'
-    })
-    @Timeout(5 * 60 * 1000)
-    public async run ()
-    {
-        return super.run();
-    }
     
     
     protected async _process ()
@@ -99,7 +86,7 @@ export class OnChainEventsCrawler
                 event.stakePoolEntry = await this._getOrCreateStakePool(Number(params[0]));
                 
                 const hexAddr = (params[1].substring(0, 2) == '0x' ? '' : '0x') + params[1];
-                const address = encodeAddress(hexAddr, OnChainEventsCrawler.PHALA_SS58FORMAT);
+                const address = encodeAddress(hexAddr, EventsCrawler.PHALA_SS58FORMAT);
                 event.sourceAccount = await this._getOrCreateAccount(address);
                 
                 event.amount = Phala.Utility.parseRawAmount(Number(params[2]));
@@ -117,7 +104,7 @@ export class OnChainEventsCrawler
                 event.stakePoolEntry = await this._getOrCreateStakePool(Number(params[0]));
                 
                 const hexAddr = (params[1].substring(0, 2) == '0x' ? '' : '0x') + params[1];
-                const address = encodeAddress(hexAddr, OnChainEventsCrawler.PHALA_SS58FORMAT);
+                const address = encodeAddress(hexAddr, EventsCrawler.PHALA_SS58FORMAT);
                 event.sourceAccount = await this._getOrCreateAccount(address);
                 
                 event.amount = Phala.Utility.parseRawAmount(Number(params[2]));

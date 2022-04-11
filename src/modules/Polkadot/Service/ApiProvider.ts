@@ -24,7 +24,7 @@ export class ApiProvider
     protected static readonly SERVICE_NAME : string = 'PolkadotApiProvider';
     
     
-    @Config('module.polkadot.api.urls')
+    @Config('modules.polkadot.api.urls')
     protected _apiUrls : ApiModeMap<string>;
     
     @Inject({ ctorArgs: [ ApiProvider.SERVICE_NAME ] })

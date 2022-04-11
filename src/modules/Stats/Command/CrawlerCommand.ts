@@ -1,6 +1,6 @@
-import { OnChainEventsCrawler } from '#/Stats/Tasker/OnChainEventsCrawler';
-import { StakePoolHistoryCrawler } from '#/Stats/Tasker/StakePoolHistoryCrawler';
-import { StakePoolIssuesCrawler } from '#/Stats/Tasker/StakePoolIssuesCrawler';
+import { EventsCrawler } from '#/Stats/Crawler/EventsCrawler';
+import { HistoryCrawler } from '#/Stats/Crawler/HistoryCrawler';
+import { IssuesCrawler } from '#/Stats/Crawler/IssuesCrawler';
 import { DependencyInjection, ObjectManager } from '@inti5/object-manager';
 import * as CLI from 'classy-commander';
 
@@ -16,21 +16,21 @@ export class CrawlerCommand
         // history entries
         {
             const crawler = ObjectManager.getSingleton()
-                .getInstance(StakePoolHistoryCrawler);
+                .getInstance(HistoryCrawler);
             await crawler.run();
         }
         
         // events
         {
             const crawler = ObjectManager.getSingleton()
-                .getInstance(OnChainEventsCrawler);
+                .getInstance(EventsCrawler);
             await crawler.run();
         }
         
         // issues
         {
             const crawler = ObjectManager.getSingleton()
-                .getInstance(StakePoolIssuesCrawler);
+                .getInstance(IssuesCrawler);
             await crawler.run();
         }
     }

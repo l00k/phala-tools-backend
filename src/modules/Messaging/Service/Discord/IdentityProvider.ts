@@ -9,7 +9,7 @@ import { Routes } from 'discord-api-types/v9';
 export class IdentityProvider
 {
     
-    @Config('module.messaging.discord')
+    @Config('modules.messaging.discord')
     protected _config : DiscordConfig;
     
     

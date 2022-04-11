@@ -13,10 +13,10 @@ import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 export class MessagingProvider
 {
     
-    @Config('module.messaging.discord')
+    @Config('modules.messaging.discord')
     protected _discordConfig : DiscordConfig;
     
-    @Config('module.messaging.telegram')
+    @Config('modules.messaging.telegram')
     protected _telegramConfig : TelegramConfig;
     
     

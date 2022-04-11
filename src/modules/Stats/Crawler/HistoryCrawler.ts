@@ -1,5 +1,5 @@
+import { Network } from '#/App/Domain/Config';
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
-import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import * as Polkadot from '#/Polkadot';
@@ -9,8 +9,7 @@ import { NetworkState } from '#/Stats/Domain/Model/NetworkState';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker, WorkerState } from '#/Stats/Domain/Model/Worker';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
-import { Injectable } from '@inti5/object-manager';
-import { Timeout } from '@inti5/utils/Timeout';
+import { Config } from 'core/configuration';
 import moment from 'moment';
 
 
@@ -19,15 +18,27 @@ type ObjectMap<V> = {
 };
 
 
-@Injectable({ tag: 'tasker.handler' })
-export class StakePoolHistoryCrawler
+export class HistoryCrawler
     extends AbstractCrawler
 {
     
     protected static readonly HALVING_FRACTION = 0.75;
     protected static readonly HISTORY_ENTRY_INTERVAL = 0.25;
     protected static readonly BLOCK_INTERVAL = 2048;
-    protected static readonly CONFIDENCE_SCORE_MAP = { 1: 1, 2: 1, 3: 1, 4: 0.8, 5: 0.7 };
+    
+    protected static readonly TARGET_BLOCK_TIME = 12;
+    protected static readonly CONFIDENCE_SCORE_MAP = {
+        1: 1,
+        2: 1,
+        3: 1,
+        4: 0.8,
+        5: 0.7
+    };
+    protected static readonly GEMINI_UPGRADE_BLOCKHEIGHT = 1467000;
+    
+    
+    @Config('modules.app.network')
+    protected _network : Network;
     
     
     protected _appStateClass : any = StakePoolHistoryCrawlerState;
@@ -51,15 +62,6 @@ export class StakePoolHistoryCrawler
     protected _specialStakePools : { [id : number] : StakePoolEntry } = {};
     
     
-    @Task({
-        cronExpr: '*/15 * * * *'
-    })
-    @Timeout(30 * 60 * 1000)
-    public async run ()
-    {
-        return super.run();
-    }
-    
     protected async _process ()
     {
         this._logger.log('Processing history entries');
@@ -71,8 +73,9 @@ export class StakePoolHistoryCrawler
                 .second(0)
                 .millisecond(0)
                 .add(6, 'hour');
+            const dateThresholdMoment = moment().subtract(5, 'minutes');
             
-            if (nextEntryMoment.isAfter(moment().subtract(1, 'hour'))) {
+            if (nextEntryMoment.isAfter(dateThresholdMoment)) {
                 this._logger.info('Not processed yet! Stop.');
                 break;
             }
@@ -95,8 +98,6 @@ export class StakePoolHistoryCrawler
             // update block related data
             this._tokenomicParameters =
                 <any>(await this._phalaApi.query.phalaMining.tokenomicParameters.at(this._nextEntryBlockHash)).toJSON();
-            
-            this._miningEra = await this._calculateMiningEra(this._nextEntryBlockNumber);
             
             // log
             this._logger.info('Next entry block found');
@@ -185,8 +186,14 @@ export class StakePoolHistoryCrawler
      */
     protected async _findFirstBlockOfEntry (targetDate : Date, previousEntryBlock : number) : Promise<number>
     {
-        let blockInterval : number = StakePoolHistoryCrawler.BLOCK_INTERVAL;
+        let blockInterval : number = HistoryCrawler.BLOCK_INTERVAL;
         let targetBlockToCheck = previousEntryBlock;
+        
+        console.log('Finding block...');
+        console.log(
+            previousEntryBlock,
+            targetDate
+        );
         
         while (true) {
             targetBlockToCheck += blockInterval;
@@ -207,6 +214,8 @@ export class StakePoolHistoryCrawler
             const blockDateUts : number = <any>(await this._phalaApi.query.timestamp.now.at(blockHash)).toJSON();
             const blockDate : Date = new Date(blockDateUts);
             
+            console.log(targetBlockToCheck, blockDate);
+            
             const found = blockInterval > 0
                 ? blockDate >= targetDate
                 : blockDate < targetDate;
@@ -224,16 +233,6 @@ export class StakePoolHistoryCrawler
         }
         
         return targetBlockToCheck;
-    }
-    
-    protected async _calculateMiningEra (
-        blockNumber : number
-    ) : Promise<number>
-    {
-        const miningStartBlock : number = <any>(await this._phalaApi.query.phalaMining.miningStartBlock()).toJSON();
-        const miningHalvingInterval : number = <any>(await this._phalaApi.query.phalaMining.miningHalvingInterval()).toJSON();
-        
-        return Math.floor((blockNumber - miningStartBlock) / miningHalvingInterval);
     }
     
     /**
@@ -332,11 +331,17 @@ export class StakePoolHistoryCrawler
         this._processedStakePools.push(stakePoolEntry);
     }
     
+    
+    /**
+     * Processing APR
+     */
     protected async _calculateApr ()
     {
         const budgetPerBlock = Phala.Utility.decodeBigNumber(this._tokenomicParameters.budgetPerBlock);
         const treasuryRatio = Phala.Utility.decodeBigNumber(this._tokenomicParameters.treasuryRatio);
-        const rewardsFractionInEra = Math.pow(StakePoolHistoryCrawler.HALVING_FRACTION, this._miningEra);
+        
+        const miningEra = await this._calculateMiningEra(this._nextEntryBlockNumber);
+        const rewardsFractionInEra = Math.pow(HistoryCrawler.HALVING_FRACTION, this._miningEra);
         
         const totalShare = Object.values(this._workers)
             .filter(worker => !worker.isDropped && worker.isMiningState)
@@ -350,9 +355,14 @@ export class StakePoolHistoryCrawler
             const rewardPerBlock = stakePool.snapshotWorkers
                 .filter(worker => !worker.isDropped && worker.isMiningState)
                 .reduce((acc, worker) => {
-                    const workerReward = (worker.getShare() / totalShare) * budgetPerBlock;
-                    const maxReward = (worker.v * 0.0002) / (3600 / 12);
-                    return acc + Math.min(workerReward, maxReward);
+                    let workerRewards = (worker.getShare() / totalShare) * budgetPerBlock;
+                    
+                    const maxRewards = this._getMaxRewards(worker.v);
+                    if (maxRewards !== null) {
+                        workerRewards = Math.min(workerRewards, maxRewards);
+                    }
+                    
+                    return acc + workerRewards;
                 }, 0);
             
             stakePool.lastHistoryEntry.currentApr = rewardPerBlock
@@ -364,6 +374,33 @@ export class StakePoolHistoryCrawler
         }
     }
     
+    protected async _calculateMiningEra (
+        blockNumber : number
+    ) : Promise<number>
+    {
+        const miningStartBlock : number = <any>(await this._phalaApi.query.phalaMining.miningStartBlock.at(this._nextEntryBlockHash)).toJSON();
+        const miningHalvingInterval : number = <any>(await this._phalaApi.query.phalaMining.miningHalvingInterval.at(this._nextEntryBlockHash)).toJSON();
+        
+        return Math.floor((blockNumber - miningStartBlock) / miningHalvingInterval);
+    }
+    
+    protected _getMaxRewards (workerV : number) : number
+    {
+        if (
+            this._network === Network.Khala
+            && this._nextEntryBlockNumber < HistoryCrawler.GEMINI_UPGRADE_BLOCKHEIGHT
+        ) {
+            return (workerV * 0.0002) / (3600 / 12);
+        }
+        
+        // no rewards limit
+        return null;
+    }
+    
+    
+    /**
+     * Processing avg entries
+     */
     protected async _processAvgStakePools () : Promise<void>
     {
         // sort stake pools
@@ -433,7 +470,7 @@ export class StakePoolHistoryCrawler
     
     protected async _calculateAvgApr ()
     {
-        const entriesNum = Math.ceil(30 / StakePoolHistoryCrawler.HISTORY_ENTRY_INTERVAL);
+        const entriesNum = Math.ceil(30 / HistoryCrawler.HISTORY_ENTRY_INTERVAL);
         
         for (const stakePool of this._processedStakePools) {
             // offset last entry (not updated yet)
@@ -446,6 +483,7 @@ export class StakePoolHistoryCrawler
                 .reduce((acc, curr) => acc + curr, 0) / chunk.length;
         }
     }
+    
     
     protected async _processNetworkState ()
     {
