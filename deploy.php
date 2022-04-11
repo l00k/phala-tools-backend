@@ -5,8 +5,8 @@ use Deployer\Exception\Exception;
 
 require 'recipe/common.php';
 
-set('application', 'phala_public_watchdog');
-set('repository', 'git@github.com:l00k/phala-public-watchdog.git');
+set('application', 'phala_tools_backend');
+set('repository', 'git@github.com:l00k/phala-tools-backend.git');
 
 set('git_tty', true);
 set('allow_anonymous_stats', false);
