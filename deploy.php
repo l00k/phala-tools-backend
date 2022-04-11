@@ -14,11 +14,9 @@ set('allow_anonymous_stats', false);
 set('shared_dirs', [
     '.db-data',
 ]);
-set('shared_files', [
-    '.env',
-]);
 set('shared_files:copy', [
     'src/etc/local/config.ts',
+    '.env',
 ]);
 set('copy_dirs', [
     'node_modules',

@@ -22,9 +22,9 @@ export class ApiProvider
     protected _logger : Logger = null;
     
     
-    protected _createApi (provider : ProviderInterface) : ApiPromise
+    protected _createApi (provider : ProviderInterface) : Promise<ApiPromise>
     {
-        return new ApiPromise({
+        return ApiPromise.create({
             provider,
             types: Khala,
         });

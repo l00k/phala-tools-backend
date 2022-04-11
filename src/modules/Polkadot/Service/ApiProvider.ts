@@ -30,38 +30,41 @@ export class ApiProvider
     @Inject({ ctorArgs: [ ApiProvider.SERVICE_NAME ] })
     protected _logger : Logger;
     
+    protected _apiPromise : ApiModeMap<Promise<ApiPromise>> = {};
     protected _api : ApiModeMap<ApiPromise> = {};
     
     
     @Timeout(15000)
     public async getApi (apiMode : ApiMode = ApiMode.HTTP) : Promise<ApiPromise>
     {
-        if (!this._api[apiMode]) {
+        if (!this._apiPromise[apiMode]) {
             this._logger.log('Creating api promise', apiMode);
-            this._api[apiMode] = this._createApiPromise(apiMode);
+            this._apiPromise[apiMode] = this._createApiPromise(apiMode);
         }
         
-        const api = this._api[apiMode];
+        if (!this._api[apiMode]) {
+            this._logger.log('Creating api', apiMode);
+            this._api[apiMode] = await this._apiPromise[apiMode];
+        }
         
-        // wait until is ready
-        await api.isReady;
-        
-        return api;
+        return this._api[apiMode];
     }
     
     public async [ReleaseSymbol] ()
     {
-        if (this._api[ApiMode.WS]) {
+        if (this._apiPromise[ApiMode.WS]) {
+            await this._apiPromise[ApiMode.WS];
+        
             if (this._api[ApiMode.WS].isConnected) {
                 await this._api[ApiMode.WS].disconnect();
                 delete this._api[ApiMode.WS];
             }
             
-            delete this._api[ApiMode.WS];
+            delete this._apiPromise[ApiMode.WS];
         }
     }
     
-    protected _createApiPromise (apiMode : ApiMode) : ApiPromise
+    protected async _createApiPromise (apiMode : ApiMode) : Promise<ApiPromise>
     {
         const url = this._apiUrls[apiMode];
         
@@ -83,9 +86,9 @@ export class ApiProvider
         return this._createApi(provider);
     }
     
-    protected _createApi (provider : ProviderInterface) : ApiPromise
+    protected _createApi (provider : ProviderInterface) : Promise<ApiPromise>
     {
-        return new ApiPromise({ provider });
+        return ApiPromise.create({ provider });
     }
     
     protected _isWsUrl (url : string) : boolean
