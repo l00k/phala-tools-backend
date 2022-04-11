@@ -85,16 +85,7 @@ task('server:up', function () {
     run("
         cd {{deploy_path}}/current
         chmod +x etc/run.sh
-        chmod +x etc/monitor.sh
     ", [ 'tty' => true ]);
-    
-    try {
-        run("
-            cd {{deploy_path}}/current
-            nohup ./etc/monitor.sh &
-        ", [ 'timeout' => 1 ]);
-    }
-    catch (\Exception $e) {}
     
     run("
         cd {{deploy_path}}/current;
