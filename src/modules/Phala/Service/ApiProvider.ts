@@ -7,7 +7,6 @@ import { ApiPromise } from '@polkadot/api';
 import { ProviderInterface } from '@polkadot/rpc-provider/types';
 
 
-
 @Singleton()
 export class ApiProvider
     extends Polkadot.ApiProvider
@@ -23,9 +22,9 @@ export class ApiProvider
     protected _logger : Logger = null;
     
     
-    protected _createApi (provider : ProviderInterface) : Promise<ApiPromise>
+    protected _createApi (provider : ProviderInterface) : ApiPromise
     {
-        return ApiPromise.create({
+        return new ApiPromise({
             provider,
             types: Khala,
         });

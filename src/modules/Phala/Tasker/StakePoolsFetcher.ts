@@ -50,7 +50,11 @@ export class StakePoolsFetcher
         const lastStakePoolId = stakePoolCount - 1;
         
         // check last stake pool
-        const lastStoredStakePool = await stakePoolRepository.findOne({}, [], { onChainId: 'DESC' });
+        const lastStoredStakePool = await stakePoolRepository.findOne(
+            { onChainId: { $ne: null } },
+            [],
+            { onChainId: 'DESC' }
+        );
         const lastStoredStakePoolId : number = lastStoredStakePool
             ? lastStoredStakePool.onChainId
             : -1;

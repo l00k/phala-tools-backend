@@ -1,9 +1,9 @@
 import { Config } from '@inti5/configuration';
 import { Inject, ReleaseSymbol, Singleton } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
+import { Timeout } from '@inti5/utils/Timeout';
 import { ApiPromise, HttpProvider, WsProvider } from '@polkadot/api';
 import { ProviderInterface } from '@polkadot/rpc-provider/types';
-import { Timeout } from '@inti5/utils/Timeout';
 
 
 export enum ApiMode
@@ -30,44 +30,44 @@ export class ApiProvider
     @Inject({ ctorArgs: [ ApiProvider.SERVICE_NAME ] })
     protected _logger : Logger;
     
-    protected _apiPromise : ApiModeMap<Promise<ApiPromise>> = {};
     protected _api : ApiModeMap<ApiPromise> = {};
     
     
     @Timeout(15000)
     public async getApi (apiMode : ApiMode = ApiMode.HTTP) : Promise<ApiPromise>
     {
-        if (!this._apiPromise[apiMode]) {
-            this._apiPromise[apiMode] = this._createApiPromise(apiMode);
-        }
-        
         if (!this._api[apiMode]) {
-            this._api[apiMode] = await this._apiPromise[apiMode];
+            this._logger.log('Creating api promise', apiMode);
+            this._api[apiMode] = this._createApiPromise(apiMode);
         }
         
-        return this._api[apiMode];
+        const api = this._api[apiMode];
+        
+        // wait until is ready
+        await api.isReady;
+        
+        return api;
     }
     
     public async [ReleaseSymbol] ()
     {
-        if (this._apiPromise[ApiMode.WS]) {
-            await this._apiPromise[ApiMode.WS];
-        
+        if (this._api[ApiMode.WS]) {
             if (this._api[ApiMode.WS].isConnected) {
                 await this._api[ApiMode.WS].disconnect();
                 delete this._api[ApiMode.WS];
             }
             
-            delete this._apiPromise[ApiMode.WS];
+            delete this._api[ApiMode.WS];
         }
     }
     
-    protected _createApiPromise (apiMode : ApiMode) : Promise<ApiPromise>
+    protected _createApiPromise (apiMode : ApiMode) : ApiPromise
     {
-        let provider = null;
+        const url = this._apiUrls[apiMode];
         
+        let provider = null;
         if (apiMode == ApiMode.WS) {
-            provider = new WsProvider(this._apiUrls[ApiMode.WS]);
+            provider = new WsProvider(url);
             
             provider.on('connected', () => {
                 this._logger.log('Connected to node.');
@@ -77,15 +77,15 @@ export class ApiProvider
             });
         }
         else {
-            provider = new HttpProvider(this._apiUrls[ApiMode.HTTP]);
+            provider = new HttpProvider(url);
         }
         
         return this._createApi(provider);
     }
     
-    protected _createApi (provider : ProviderInterface) : Promise<ApiPromise>
+    protected _createApi (provider : ProviderInterface) : ApiPromise
     {
-        return ApiPromise.create({ provider });
+        return new ApiPromise({ provider });
     }
     
     protected _isWsUrl (url : string) : boolean
