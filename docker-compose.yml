@@ -27,6 +27,7 @@ services:
             context: .
             dockerfile: app.Dockerfile
         image: ${COMPOSE_PROJECT_NAME}-node
+        user: "1000:1000"
         volumes:
             - .:/usr/src/app/:rw
 
