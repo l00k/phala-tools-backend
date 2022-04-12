@@ -3,7 +3,7 @@ import { EventType } from '#/Stats/Domain/Model/Event';
 export class EventsCrawlerState
 {
     
-    public static ID = 'ps/events';
+    public static ID = 'stats/events';
     
     public [EventType.Transfer] : number = 0;
     
