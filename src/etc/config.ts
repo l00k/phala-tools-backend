@@ -1,5 +1,7 @@
-import { ModuleAppConfig, Network } from '#/App/Domain/Config';
-import { CoreConfig } from '#/BackendCore/Domain/Config';
+import { ModuleAppConfig, Network } from '#/App/Domain/Type/ModuleConfig';
+import { CoreConfig } from '#/BackendCore/Domain/Type/ModuleConfig';
+import { ModulePhalaConfig } from '#/Phala/Domain/Type/ModuleConfig';
+import { ModulePolkadotConfig } from '#/Polkadot/Domain/Type/ModuleConfig';
 
 export default {
     core: {
@@ -59,4 +61,6 @@ export default {
 } as (
     CoreConfig
     | ModuleAppConfig
+    | ModulePolkadotConfig
+    | ModulePhalaConfig
 );
