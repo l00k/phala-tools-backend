@@ -355,15 +355,6 @@ export class HistoryCrawler
         const totalShare = Object.values(this._workers)
             .filter(worker => !worker.isDropped && worker.isMiningState)
             .reduce((acc, worker) => acc + worker.getShare(), 0);
-            
-        console.dir({
-            budgetPerBlock,
-            treasuryRatio,
-            miningEra,
-            rewardsFractionInEra,
-            avgBlockTime,
-            totalShare
-        });
         
         for (const stakePool of this._processedStakePools) {
             if (!stakePool.lastHistoryEntry.stakeTotal) {
