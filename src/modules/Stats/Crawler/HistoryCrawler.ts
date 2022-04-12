@@ -52,10 +52,6 @@ export class HistoryCrawler
     protected _nextEntryBlockNumber : number;
     protected _nextEntryBlockHash : string;
     
-    protected _avgBlockTime : number;
-    
-    protected _miningEra : number;
-    
     protected _stakePoolsCount : number = 0;
     protected _processedStakePools : StakePoolEntry[] = [];
     protected _sortedStakePools : StakePoolEntry[] = [];
@@ -84,6 +80,8 @@ export class HistoryCrawler
             this._previousEntryBlockNumber = this._appState.value.lastProcessedBlock;
             
             this._nextEntryDate = nextEntryMoment.toDate();
+            const nextEntryUts : number = Number(this._nextEntryDate) / 1000;
+            
             this._nextEntryBlockNumber = await this._findFirstBlockOfEntry(this._nextEntryDate, this._appState.value.lastProcessedBlock);
             if (!this._nextEntryBlockNumber || this._nextEntryBlockNumber <= this._previousEntryBlockNumber) {
                 this._logger.info('Unable to find next block! Stop.');
@@ -92,19 +90,17 @@ export class HistoryCrawler
             
             this._nextEntryBlockHash = (await this._phalaApi.rpc.chain.getBlockHash(this._nextEntryBlockNumber)).toString();
             
-            const nextEntryUts : number = Number(this._nextEntryDate) / 1000;
-            this._avgBlockTime = (nextEntryUts - this._appState.value.lastProcessedUts) / (this._nextEntryBlockNumber - this._previousEntryBlockNumber);
-            
             // update block related data
             this._tokenomicParameters =
                 <any>(await this._phalaApi.query.phalaMining.tokenomicParameters.at(this._nextEntryBlockHash)).toJSON();
+            
             
             // log
             this._logger.info('Next entry block found');
             this._logger.info('Prev', this._previousEntryBlockNumber);
             this._logger.info(moment(this._appState.value.lastProcessedUts * 1000).toISOString());
             this._logger.info('Next', this._nextEntryBlockNumber);
-            this._logger.info(moment(nextEntryUts * 1000).toISOString());
+            this._logger.info(moment(this._nextEntryDate).toISOString());
             
             try {
                 // update all stake pools
@@ -247,8 +243,16 @@ export class HistoryCrawler
         
         for (let stakePoolId = 0; stakePoolId < this._stakePoolsCount; ++stakePoolId) {
             await this._processStakePool(stakePoolId);
-            console.log(stakePoolId);
+            
+            if (stakePoolId % 50 == 0) {
+                console.log(
+                    'Progress:',
+                    (stakePoolId / this._stakePoolsCount * 100).toFixed(2) + '%'
+                );
+            }
         }
+        
+        console.log('Progress: 100.00%');
     }
     
     protected async _processStakePool (onChainId : number) : Promise<void>
@@ -343,11 +347,23 @@ export class HistoryCrawler
         const treasuryRatio = Phala.Utility.decodeBigNumber(this._tokenomicParameters.treasuryRatio);
         
         const miningEra = await this._calculateMiningEra(this._nextEntryBlockNumber);
-        const rewardsFractionInEra = Math.pow(HistoryCrawler.HALVING_FRACTION, this._miningEra);
+        const rewardsFractionInEra = Math.pow(HistoryCrawler.HALVING_FRACTION, miningEra);
+        
+        const nextEntryUts : number = Number(this._nextEntryDate) / 1000;
+        const avgBlockTime = (nextEntryUts - this._appState.value.lastProcessedUts) / (this._nextEntryBlockNumber - this._previousEntryBlockNumber);
         
         const totalShare = Object.values(this._workers)
             .filter(worker => !worker.isDropped && worker.isMiningState)
             .reduce((acc, worker) => acc + worker.getShare(), 0);
+            
+        console.dir({
+            budgetPerBlock,
+            treasuryRatio,
+            miningEra,
+            rewardsFractionInEra,
+            avgBlockTime,
+            totalShare
+        });
         
         for (const stakePool of this._processedStakePools) {
             if (!stakePool.lastHistoryEntry.stakeTotal) {
@@ -371,7 +387,7 @@ export class HistoryCrawler
                 * rewardsFractionInEra
                 * (1 - treasuryRatio)
                 * (1 - stakePool.lastHistoryEntry.commission)
-                * (31536000 / this._avgBlockTime)
+                * (31536000 / avgBlockTime)
                 / stakePool.lastHistoryEntry.stakeTotal;
         }
     }
