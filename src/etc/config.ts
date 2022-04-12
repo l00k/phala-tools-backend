@@ -1,7 +1,8 @@
-import { ModuleAppConfig, Network } from '#/App/Domain/Type/ModuleConfig';
+import { ModuleAppConfig } from '#/App/Domain/Type/ModuleConfig';
 import { CoreConfig } from '#/BackendCore/Domain/Type/ModuleConfig';
 import { ModulePhalaConfig } from '#/Phala/Domain/Type/ModuleConfig';
 import { ModulePolkadotConfig } from '#/Polkadot/Domain/Type/ModuleConfig';
+
 
 export default {
     core: {
@@ -53,9 +54,6 @@ export default {
         },
         watchdog: {
             secureKey: 'TOP.SECRET.VALUE'
-        },
-        uptimeNotifier: {
-            heartbeatUrl: null
         }
     }
 } as (

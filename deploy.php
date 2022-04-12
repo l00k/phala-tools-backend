@@ -16,6 +16,8 @@ set('shared_dirs', [
 ]);
 set('shared_files:copy', [
     'src/etc/local/config.ts',
+    'src/etc/local/variants/khala.ts',
+    'src/etc/local/variants/phala.ts',
     '.env',
 ]);
 set('copy_dirs', [
