@@ -1,5 +1,5 @@
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
-import { StakePoolIssueCrawlerState } from '#/Stats/Domain/Model/AppState/StakePoolIssueCrawlerState';
+import { IssueCrawlerState } from '#/Stats/Domain/Model/AppState/IssueCrawlerState';
 import { CommissionChange, Contribution, Event, EventType, Slash } from '#/Stats/Domain/Model/Event';
 import { Issue } from '#/Stats/Domain/Model/Issue';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
@@ -21,8 +21,8 @@ export class IssuesCrawler
     @Inject({ ctorArgs: [ IssuesCrawler.name ] })
     protected _logger : Logger;
     
-    protected _appStateClass : any = StakePoolIssueCrawlerState;
-    protected _appState : AppState<StakePoolIssueCrawlerState>;
+    protected _appStateClass : any = IssueCrawlerState;
+    protected _appState : AppState<IssueCrawlerState>;
     
     
     public async run ()

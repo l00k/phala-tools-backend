@@ -1,6 +1,6 @@
 import { EventType } from '#/Stats/Domain/Model/Event';
 
-export class OnChainEventsCrawlerState
+export class EventsCrawlerState
 {
     
     public static ID = 'ps/events';

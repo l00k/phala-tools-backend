@@ -2,7 +2,7 @@ import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import * as Phala from '#/Phala';
 import { KhalaTypes } from '#/Phala';
 import * as Polkadot from '#/Polkadot';
-import { OnChainEventsCrawlerState } from '#/Stats/Domain/Model/AppState/OnChainEventsCrawlerState';
+import { EventsCrawlerState } from '#/Stats/Domain/Model/AppState/EventsCrawlerState';
 import * as Events from '#/Stats/Domain/Model/Event';
 import { Event, EventType } from '#/Stats/Domain/Model/Event';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
@@ -24,8 +24,8 @@ export class EventsCrawler
     @Inject()
     protected _phalaSubscan : Phala.Subscan;
     
-    protected _appStateClass : any = OnChainEventsCrawlerState;
-    protected _appState : AppState<OnChainEventsCrawlerState>;
+    protected _appStateClass : any = EventsCrawlerState;
+    protected _appState : AppState<EventsCrawlerState>;
     
     
     protected async _process ()
@@ -146,7 +146,7 @@ export class EventsCrawler
     {
         if (this._appState.value[eventType] === undefined) {
             this._appState.value = {
-                ...(new OnChainEventsCrawlerState()),
+                ...(new EventsCrawlerState()),
                 ...this._appState.value
             };
         }

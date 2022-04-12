@@ -1,4 +1,4 @@
-export class StakePoolIssueCrawlerState
+export class IssueCrawlerState
 {
     
     public static ID = 'ps/stakepool_issues';

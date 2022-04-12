@@ -3,7 +3,7 @@ import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import * as Polkadot from '#/Polkadot';
-import { StakePoolHistoryCrawlerState } from '#/Stats/Domain/Model/AppState/StakePoolHistoryCrawlerState';
+import { HistoryCrawlerState } from '#/Stats/Domain/Model/AppState/HistoryCrawlerState';
 import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import { NetworkState } from '#/Stats/Domain/Model/NetworkState';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
@@ -41,8 +41,8 @@ export class HistoryCrawler
     protected _network : Network;
     
     
-    protected _appStateClass : any = StakePoolHistoryCrawlerState;
-    protected _appState : AppState<StakePoolHistoryCrawlerState>;
+    protected _appStateClass : any = HistoryCrawlerState;
+    protected _appState : AppState<HistoryCrawlerState>;
     
     protected _tokenomicParameters : typeof Phala.KhalaTypes.TokenomicParameters;
     
@@ -134,6 +134,8 @@ export class HistoryCrawler
                 ++this._appState.value.lastProcessedNonce;
                 
                 await this._entityManager.flush();
+                
+                this._logger.info('Entry done');
             }
             catch (e) {
                 console.error(e);
@@ -378,7 +380,15 @@ export class HistoryCrawler
         blockNumber : number
     ) : Promise<number>
     {
-        const miningStartBlock : number = <any>(await this._phalaApi.query.phalaMining.miningStartBlock.at(this._nextEntryBlockHash)).toJSON();
+        let miningStartBlock : number = null;
+    
+        try {
+            miningStartBlock = <any>(await this._phalaApi.query.phalaMining.miningStartBlock.at(this._nextEntryBlockHash)).toJSON();
+        }
+        catch (e) {
+            return 0;
+        }
+        
         const miningHalvingInterval : number = <any>(await this._phalaApi.query.phalaMining.miningHalvingInterval.at(this._nextEntryBlockHash)).toJSON();
         
         return Math.floor((blockNumber - miningStartBlock) / miningHalvingInterval);
