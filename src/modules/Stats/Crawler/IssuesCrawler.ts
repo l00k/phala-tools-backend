@@ -57,7 +57,10 @@ export class IssuesCrawler
                     delta: { $gte: IssuesCrawler.BAD_BEHAVIOR_PERCENT_THRESHOLD }
                 }
             },
-            [ 'stakePool' ]
+            [
+                'stakePoolEntry',
+                'stakePoolEntry.stakePool'
+            ]
         );
         if (!commissionEvents.length) {
             return;
@@ -151,7 +154,10 @@ export class IssuesCrawler
                 type: { $eq: EventType.Slash },
                 blockNumber: { $gt: this._appState.value.slashesLastBlock },
             },
-            [ 'stakePool' ]
+            [
+                'stakePoolEntry',
+                'stakePoolEntry.stakePool'
+            ]
         );
         if (!slashEvents.length) {
             return;
