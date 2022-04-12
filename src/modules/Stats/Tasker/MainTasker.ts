@@ -21,7 +21,8 @@ export class MainTasker
     
     
     @Task({
-        cronExpr: '*/15 * * * *'
+        // todo ld 2022-04-12 06:30:44
+        cronExpr: '* * * * *'
     })
     @Timeout(30 * 60 * 1000)
     public processHistory () : Promise<any>

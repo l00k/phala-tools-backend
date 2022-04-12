@@ -20,19 +20,19 @@ export class CrawlerCommand
             await crawler.run();
         }
         
-        // // events
-        // {
-        //     const crawler = ObjectManager.getSingleton()
-        //         .getInstance(EventsCrawler);
-        //     await crawler.run();
-        // }
-        //
-        // // issues
-        // {
-        //     const crawler = ObjectManager.getSingleton()
-        //         .getInstance(IssuesCrawler);
-        //     await crawler.run();
-        // }
+        // events
+        {
+            const crawler = ObjectManager.getSingleton()
+                .getInstance(EventsCrawler);
+            await crawler.run();
+        }
+
+        // issues
+        {
+            const crawler = ObjectManager.getSingleton()
+                .getInstance(IssuesCrawler);
+            await crawler.run();
+        }
     }
     
 }
