@@ -1,8 +1,8 @@
 import { AbstractOwnerController } from '#/Watchdog/Controller/AbstractOwnerController';
+import { EntityNotExistException } from '#/Watchdog/Domain/Exception/EntityNotExistException';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
-import { RuntimeException } from '@inti5/utils/Exception';
 import { Assert } from '@inti5/validator/Method';
 import { EntitySerializationGraph } from 'core/serializer';
 
@@ -72,6 +72,9 @@ export class ObservationController
     ) : Promise<Observation>
     {
         const observation = await this._repository.findOne(id);
+        if (!observation) {
+            throw new EntityNotExistException();
+        }
         
         // verify ownership
         await this._verifyOwnership(observation.user, authData);
@@ -95,7 +98,7 @@ export class ObservationController
         // load
         const observation = await this._repository.findOne(id);
         if (!observation) {
-            throw new RuntimeException('Item not found', 1649519212197);
+            throw new EntityNotExistException();
         }
         
         // verify ownership

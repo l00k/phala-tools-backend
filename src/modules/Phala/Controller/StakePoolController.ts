@@ -1,6 +1,5 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { StakePool } from '#/Phala/Domain/Model';
-import { User } from '#/Watchdog/Domain/Model/User';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
@@ -16,8 +15,11 @@ export class StakePoolController
     
     
     @API.CRUD.GetCollection(() => StakePool, { path: '#PATH#/find/:term' })
-    @API.Serialize({
-        items: '*',
+    @API.Serialize<Api.Domain.Collection<StakePool>>({
+        items: {
+            onChainId: true,
+            owner: '*'
+        },
         total: true,
     })
     public async getStakePoolsByTerm (
