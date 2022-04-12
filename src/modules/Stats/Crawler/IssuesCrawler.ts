@@ -25,11 +25,6 @@ export class IssuesCrawler
     protected _appState : AppState<IssueCrawlerState>;
     
     
-    public async run ()
-    {
-        return super.run();
-    }
-    
     protected async _process ()
     {
         await this._findBadBahaviours();
@@ -137,6 +132,7 @@ export class IssuesCrawler
         
         await this._entityManager.flush();
     }
+    
     
     protected async _findSlashes ()
     {
