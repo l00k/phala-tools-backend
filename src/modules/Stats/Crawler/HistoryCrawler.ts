@@ -281,7 +281,7 @@ export class HistoryCrawler
         historyEntry.withdrawals = Phala.Utility.parseRawAmount(withdrawals);
         historyEntry.stakeRemaining = historyEntry.cap
             ? (historyEntry.cap - historyEntry.stakeTotal + historyEntry.withdrawals)
-            : null;
+            : 1e12;
         
         // process workers
         stakePoolEntry.snapshotWorkers = [];
