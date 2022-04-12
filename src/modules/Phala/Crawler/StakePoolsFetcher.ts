@@ -1,17 +1,14 @@
 import { AbstractTasker } from '#/App/Service/AbstractTasker';
-import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import * as Phala from '#/Phala';
 import { StakePool } from '#/Phala/Domain/Model';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
 import { ApiMode } from '#/Polkadot';
-import { Inject, Injectable } from '@inti5/object-manager';
-import { PromiseAggregator } from '@inti5/utils/PromiseAggregator';
-import { Timeout } from '@inti5/utils/Timeout';
 import { ApiPromise } from '@polkadot/api';
+import { Inject } from 'core/object-manager';
+import { PromiseAggregator } from 'core/utils/PromiseAggregator';
 import range from 'lodash/range';
 
 
-@Injectable({ tag: 'tasker.handler' })
 export class StakePoolsFetcher
     extends AbstractTasker
 {
@@ -24,15 +21,6 @@ export class StakePoolsFetcher
     
     protected _phalaApi : ApiPromise;
     
-    
-    @Task({
-        cronExpr: '45 * * * *'
-    })
-    @Timeout(5 * 60 * 1000)
-    public async run ()
-    {
-        return super.run();
-    }
     
     protected async _init ()
     {
@@ -63,10 +51,9 @@ export class StakePoolsFetcher
             return;
         }
         
-        await PromiseAggregator.allSettled(
-            range(lastStoredStakePoolId + 1, stakePoolCount - 1),
-            (pid) => this._phalaEntityFetcher.getOrCreateStakePool(pid)
-        );
+        for (let pid = lastStoredStakePoolId + 1; pid < stakePoolCount; ++pid) {
+            await this._phalaEntityFetcher.getOrCreateStakePool(pid);
+        }
     }
     
     

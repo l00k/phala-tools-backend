@@ -1,15 +1,12 @@
 import { AbstractTasker } from '#/App/Service/AbstractTasker';
-import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import { ApiMode } from '#/Polkadot';
-import { Inject, Injectable } from '@inti5/object-manager';
-import { Timeout } from '@inti5/utils/Timeout';
 import { ApiPromise } from '@polkadot/api';
 import * as PolkadotUtils from '@polkadot/util';
+import { Inject } from 'core/object-manager';
 
 
-@Injectable({ tag: 'tasker.handler' })
 export class AccountsUpdater
     extends AbstractTasker
 {
@@ -19,15 +16,6 @@ export class AccountsUpdater
     
     protected phalaApi : ApiPromise;
     
-    
-    @Task({
-        cronExpr: '50 4 * * *'
-    })
-    @Timeout(5 * 60 * 1000)
-    public async run ()
-    {
-        return super.run();
-    }
     
     protected async _init ()
     {

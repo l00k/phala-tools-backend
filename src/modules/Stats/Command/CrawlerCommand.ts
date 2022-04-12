@@ -1,3 +1,4 @@
+import { StakePoolsFetcher } from '#/Phala/Crawler/StakePoolsFetcher';
 import { EventsCrawler } from '#/Stats/Crawler/EventsCrawler';
 import { HistoryCrawler } from '#/Stats/Crawler/HistoryCrawler';
 import { IssuesCrawler } from '#/Stats/Crawler/IssuesCrawler';
@@ -13,26 +14,33 @@ export class CrawlerCommand
     
     public async execute () : Promise<void>
     {
-        // history entries
+        // stake pool list
         {
-            const crawler = ObjectManager.getSingleton()
-                .getInstance(HistoryCrawler);
-            await crawler.run();
+            const fetcher = ObjectManager.getSingleton()
+                .getInstance(StakePoolsFetcher);
+            await fetcher.run();
         }
         
+        // history entries
+        // {
+        //     const crawler = ObjectManager.getSingleton()
+        //         .getInstance(HistoryCrawler);
+        //     await crawler.run();
+        // }
+        
         // events
-        {
-            const crawler = ObjectManager.getSingleton()
-                .getInstance(EventsCrawler);
-            await crawler.run();
-        }
+        // {
+        //     const crawler = ObjectManager.getSingleton()
+        //         .getInstance(EventsCrawler);
+        //     await crawler.run();
+        // }
 
         // issues
-        {
-            const crawler = ObjectManager.getSingleton()
-                .getInstance(IssuesCrawler);
-            await crawler.run();
-        }
+        // {
+        //     const crawler = ObjectManager.getSingleton()
+        //         .getInstance(IssuesCrawler);
+        //     await crawler.run();
+        // }
     }
     
 }
