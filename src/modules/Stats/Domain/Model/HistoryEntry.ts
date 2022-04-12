@@ -79,11 +79,11 @@ export class HistoryEntry
     @API.Sortable()
     public stakeReleasing : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
+    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE, nullable: true })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
-    public stakeRemaining : number = 0;
+    public stakeRemaining : number = null;
     
     @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
     @API.Property()
