@@ -18,7 +18,7 @@ export class NetworkState
     @API.Id()
     public id : number;
     
-    @ORM.Property({ index: true })
+    @ORM.Property({ unique: true })
     @API.Property()
     public entryNonce : number;
     
