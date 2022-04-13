@@ -6,7 +6,9 @@ import { Inject, Injectable } from '@inti5/object-manager';
 import { Timeout } from '@inti5/utils/Timeout';
 
 
-@Injectable({ tag: 'tasker.handler' })
+// todo ld 2022-04-13 02:01:09
+// temporarly disabled
+//@Injectable({ tag: 'tasker.handler' })
 export class MainTasker
 {
     
@@ -21,8 +23,7 @@ export class MainTasker
     
     
     @Task({
-        // todo ld 2022-04-12 06:30:44
-        cronExpr: '* * * * *'
+        cronExpr: '*/15 * * * *'
     })
     @Timeout(30 * 60 * 1000)
     public processHistory () : Promise<any>

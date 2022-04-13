@@ -17,11 +17,11 @@ export class ProcessingApp
             'Tasker'
         ]);
         
-        // run crawlers
+        // watchdog crawler
         const crawler = objectManager.getInstance(CrawlerService);
         await crawler.run();
         
-        // run taskers
+        // global taskers
         const tasker = objectManager.getInstance(TaskerService);
         await tasker.run();
     }
