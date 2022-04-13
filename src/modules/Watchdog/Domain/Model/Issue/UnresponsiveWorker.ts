@@ -8,6 +8,13 @@ import { EntityManager } from '@mikro-orm/mysql';
 @ORM.Entity({
     tableName: 'watchdog_issue_uworker'
 })
+@ORM.Unique({
+    properties: [
+        'workerAccount',
+        'workerPubKey',
+        'stakePool',
+    ]
+})
 export class UnresponsiveWorker
     extends AbstractIssue<UnresponsiveWorker>
 {
@@ -15,10 +22,10 @@ export class UnresponsiveWorker
     public static readonly REMINDER_DELAY : number = 15;
     
     
-    @ORM.Property({ unique: true })
+    @ORM.Property()
     public workerAccount : string;
     
-    @ORM.Property({ unique: true })
+    @ORM.Property()
     public workerPubKey : string;
     
     @ORM.ManyToOne(() => StakePool, { eager: true })

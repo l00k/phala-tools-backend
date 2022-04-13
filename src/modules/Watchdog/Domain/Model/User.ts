@@ -12,7 +12,12 @@ import * as Trans from 'class-transformer';
 @ORM.Entity({
     tableName: 'watchdog_user',
 })
-@ORM.Unique({ properties: [ 'msgChannel', 'msgUserId' ] })
+@ORM.Unique({
+    properties: [
+        'msgChannel',
+        'msgUserId'
+    ]
+})
 @API.Resource('Watchdog/User')
 export class User
     extends AbstractModel<User>
@@ -32,9 +37,6 @@ export class User
     
     @ORM.Property({ index: true })
     public msgUserId : string;
-    
-    @ORM.Property({ nullable: true })
-    public token : string;
     
     @ORM.Property()
     @API.Property()

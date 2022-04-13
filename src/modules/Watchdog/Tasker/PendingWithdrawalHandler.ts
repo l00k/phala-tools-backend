@@ -60,7 +60,7 @@ export class PendingWithdrawalHandler
             const stakePool : typeof KhalaTypes.PoolInfo =
                 <any>(await this._api.query.phalaStakePool.stakePools(onChainPoolId)).toJSON();
             
-            if (stakePool.withdrawQueue.length) {
+            if (stakePool.withdrawQueue.length > 0) {
                 const totalRaw = stakePool.withdrawQueue.reduce((acc, r) => acc + Number(r.shares), 0);
                 const totalText = Utility.formatCoin(totalRaw, true, true);
                 

@@ -29,7 +29,9 @@ export abstract class AbstractTasker
     protected async _init () : Promise<any>
     {
         this._logger = ObjectManager.getSingleton().getInstance(Logger, [ this.constructor.name ]);
-        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        
+        const entityManagerKey = 'tasker::' + this.constructor.name;
+        this._entityManager = this._entityManagerWrapper.getDirectEntityManager(entityManagerKey);
     }
     
     protected abstract _process () : Promise<any>;
