@@ -32,8 +32,8 @@ export class MinerEnterUnresponsiveCrawler
         const workerAccount : string = event.data[0];
         
         // confirm unresponsivness
-        const workerState : typeof KhalaTypes.MinerInfo =
-            <any>(await this._api.query.phalaMining.miners(workerAccount)).toJSON();
+        const workerStateRaw : any = await this._api.query.phalaMining.miners(workerAccount);
+        const workerState : typeof KhalaTypes.MinerInfo = workerStateRaw.toJSON();
         if (
             !workerState
             || workerState.state != WorkerState.MiningUnresponsive
@@ -109,9 +109,12 @@ export class MinerEnterUnresponsiveCrawler
         additionalData : any = null
     ) : string
     {
-        return observedValue == 1
+        let message = '`#' + onChainId + '` ';
+        message += observedValue == 1
             ? `1 worker is in unresponsive state`
             : `${observedValue} workers are in unresponsive state`;
+        
+        return message;
     }
     
 }

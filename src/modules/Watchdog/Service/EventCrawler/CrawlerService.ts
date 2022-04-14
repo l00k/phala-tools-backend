@@ -13,6 +13,7 @@ import { ApiPromise } from '@polkadot/api';
 import { Header } from '@polkadot/types/interfaces/runtime';
 import * as Trans from 'class-transformer';
 import colors from 'colors';
+import isEmpty from 'lodash/isEmpty';
 
 
 type ObjectMap<V> = {
@@ -23,7 +24,7 @@ type ObjectMap<V> = {
 export class CrawlerService
 {
     
-    protected static readonly BLOCK_HISTORY = 1000;
+    protected static readonly BLOCK_HISTORY = 250;
     protected static readonly BLOCK_CHUNK = 100;
     
     
@@ -55,7 +56,7 @@ export class CrawlerService
         await this._init();
         this._logger.log('Crawler ready');
         
-        if (!this._handlers) {
+        if (isEmpty(this._handlers)) {
             this._logger.debug('No handlers');
         }
         

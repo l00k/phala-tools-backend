@@ -1,6 +1,6 @@
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
-import { AccountsUpdater } from '#/Phala/Crawler/AccountsUpdater';
-import { StakePoolsFetcher } from '#/Phala/Crawler/StakePoolsFetcher';
+import { AccountsCrawler } from '#/Phala/Crawler/AccountsCrawler';
+import { StakePoolsCrawler } from '#/Phala/Crawler/StakePoolsCrawler';
 import { Inject, Injectable } from '@inti5/object-manager';
 import { Timeout } from '@inti5/utils/Timeout';
 
@@ -10,10 +10,10 @@ export class MainTasker
 {
     
     @Inject()
-    protected _accountsUpdater : AccountsUpdater;
+    protected _accountsUpdater : AccountsCrawler;
     
     @Inject()
-    protected _stakePoolsFetcher : StakePoolsFetcher;
+    protected _stakePoolsFetcher : StakePoolsCrawler;
     
     
     @Task({ cronExpr: '50 4 * * *' })

@@ -1,30 +1,13 @@
-import { AbstractTasker } from '#/App/Service/AbstractTasker';
-import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
-import { ApiMode } from '#/Polkadot';
-import { ApiPromise } from '@polkadot/api';
+import { AbstractCrawler } from '#/Phala/Service/AbstractCrawler';
 import * as PolkadotUtils from '@polkadot/util';
-import { Inject } from '@inti5/object-manager';
 
 
-export class AccountsUpdater
-    extends AbstractTasker
+export class AccountsCrawler
+    extends AbstractCrawler
 {
     
-    @Inject()
-    protected phalaApiProvider : Phala.ApiProvider;
-    
-    protected phalaApi : ApiPromise;
-    
-    
-    protected async _init ()
-    {
-        await super._init();
-        
-        this.phalaApi = await this.phalaApiProvider.getApi(ApiMode.WS);
-    }
-    
-    protected async _process ()
+    protected async _process () : Promise<boolean>
     {
         const accountRepository = this._entityManager.getRepository(Account);
         const accounts = await accountRepository.findAll();
@@ -32,8 +15,8 @@ export class AccountsUpdater
         let accountIdx = 0;
         for (const account of accounts) {
             // update identity
-            const onChainIdentity : any =
-                (await this.phalaApi.query.identity.identityOf(account.address)).toHuman();
+            const onChainIdentityRaw : any = await this._api.query.identity.identityOf(account.address);
+            const onChainIdentity : any = onChainIdentityRaw.toHuman();
             
             if (onChainIdentity) {
                 account.identity = PolkadotUtils.isHex(onChainIdentity.info.display.Raw)
@@ -48,7 +31,7 @@ export class AccountsUpdater
             }
         }
         
-        this._entityManager.flush();
+        return true;
     }
     
     

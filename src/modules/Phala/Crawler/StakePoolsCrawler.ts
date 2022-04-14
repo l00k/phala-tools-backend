@@ -1,40 +1,23 @@
-import { AbstractTasker } from '#/App/Service/AbstractTasker';
-import * as Phala from '#/Phala';
 import { StakePool } from '#/Phala/Domain/Model';
+import { AbstractCrawler } from '#/Phala/Service/AbstractCrawler';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
-import { ApiMode } from '#/Polkadot';
-import { ApiPromise } from '@polkadot/api';
 import { Inject } from '@inti5/object-manager';
-import { PromiseAggregator } from '@inti5/utils/PromiseAggregator';
-import range from 'lodash/range';
 
 
-export class StakePoolsFetcher
-    extends AbstractTasker
+export class StakePoolsCrawler
+    extends AbstractCrawler
 {
-    
-    @Inject()
-    protected _phalaApiProvider : Phala.ApiProvider;
     
     @Inject()
     protected _phalaEntityFetcher : PhalaEntityFetcher;
     
-    protected _phalaApi : ApiPromise;
     
-    
-    protected async _init ()
-    {
-        await super._init();
-        
-        this._phalaApi = await this._phalaApiProvider.getApi(ApiMode.WS);
-    }
-    
-    protected async _process ()
+    protected async _process () : Promise<boolean>
     {
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
         
         // get stake pool count
-        const stakePoolCount : number = <any>(await this._phalaApi.query.phalaStakePool.poolCount()).toJSON();
+        const stakePoolCount : number = <any>(await this._api.query.phalaStakePool.poolCount()).toJSON();
         const lastStakePoolId = stakePoolCount - 1;
         
         // check last stake pool
@@ -48,12 +31,14 @@ export class StakePoolsFetcher
             : -1;
         
         if (lastStoredStakePoolId == lastStakePoolId) {
-            return;
+            return false;
         }
         
         for (let pid = lastStoredStakePoolId + 1; pid < stakePoolCount; ++pid) {
             await this._phalaEntityFetcher.getOrCreateStakePool(pid);
         }
+        
+        return true;
     }
     
     
