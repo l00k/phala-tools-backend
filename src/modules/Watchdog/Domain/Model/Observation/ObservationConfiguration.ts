@@ -1,7 +1,7 @@
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import { Annotation as API } from '@inti5/api-backend';
-import * as Trans from 'class-transformer';
 import { Assert, AssertObject } from '@inti5/validator/Object';
+import * as Trans from 'class-transformer';
 
 
 @API.Resource('Watchdog/Observation/NotificationConfig')

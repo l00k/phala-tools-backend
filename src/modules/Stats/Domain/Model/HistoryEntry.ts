@@ -22,7 +22,7 @@ export class HistoryEntry
     @API.Id()
     public id : number;
     
-    @ORM.ManyToOne(() => StakePoolEntry, { lazy: true })
+    @ORM.ManyToOne(() => StakePoolEntry)
     public stakePoolEntry : StakePoolEntry;
     
     @ORM.Property({ index: true })

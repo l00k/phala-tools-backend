@@ -4,7 +4,7 @@ import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { ApiMode } from '#/Polkadot';
 import { CrawlerState } from '#/Watchdog/Domain/Model/AppState/CrawlerState';
-import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { AbstractEventCrawler } from '#/Watchdog/Service/EventCrawler/AbstractEventCrawler';
 import { Event } from '#/Watchdog/Service/EventCrawler/Event';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
@@ -37,7 +37,7 @@ export class CrawlerService
     protected _apiProvider : ApiProvider;
     
     @Inject({ tag: 'watchdog.crawler.handler' })
-    protected _handlers : { [key : string] : AbstractCrawler };
+    protected _handlers : { [key : string] : AbstractEventCrawler };
     
     
     protected _txEntityManager : EntityManager;

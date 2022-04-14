@@ -7,12 +7,12 @@ import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCraw
 import { Utility } from '#/Watchdog/Utility/Utility';
 
 
-export class PendingWithdrawalCrawler
+export class FreePoolFundsCrawler
     extends AbstractPeriodicCrawler
 {
     
-    protected readonly _messageTitle : string = '🚨 Pending withdrawal(s) in queue';
-    protected readonly _observationType : ObservationType = ObservationType.PendingWithdrawals;
+    protected readonly _messageTitle : string = '🤑 Free funds in pools';
+    protected readonly _observationType : ObservationType = ObservationType.FreePoolFunds;
     protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
@@ -21,12 +21,7 @@ export class PendingWithdrawalCrawler
         const onChainStakePoolRaw : any = await this._api.query.phalaStakePool.stakePools(onChainId);
         const onChainStakePool : typeof KhalaTypes.PoolInfo = onChainStakePoolRaw.toJSON();
         
-        if (onChainStakePool.withdrawQueue.length == 0) {
-            return null;
-        }
-        
-        const totalRaw = onChainStakePool.withdrawQueue.reduce((acc, r) => acc + Number(r.shares), 0);
-        return PhalaUtility.parseRawAmount(totalRaw);
+        return PhalaUtility.parseRawAmount(onChainStakePool.freeStake);
     }
     
     protected _prepareMessage (
@@ -37,7 +32,7 @@ export class PendingWithdrawalCrawler
     {
         const totalText = Utility.formatCoin(observedValue, true);
         
-        return '`#' + onChainId + '` total `' + totalText + '`';
+        return '`#' + onChainId + '` total free funds: `' + totalText + '`';
     }
     
 }

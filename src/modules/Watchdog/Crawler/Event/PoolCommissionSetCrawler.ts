@@ -1,29 +1,31 @@
-import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
-import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { AbstractEventCrawler } from '#/Watchdog/Service/EventCrawler/AbstractEventCrawler';
 import { Listen } from '#/Watchdog/Service/EventCrawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/EventCrawler/Event';
-import { Inject, Injectable } from '@inti5/object-manager';
+import { Injectable } from '@inti5/object-manager';
 
 
 @Injectable({ tag: 'watchdog.crawler.handler' })
 export class PoolCommissionSetCrawler
-    extends AbstractCrawler
+    extends AbstractEventCrawler
 {
     
-    @Inject({ ctorArgs: [ '🚨 Pool owner changed commission' ] })
-    protected _notificationAggregator : NotificationAggregator;
+    protected readonly _messageTitle : string = '🚨 Pool owner changed commission';
+    protected readonly _observationType : ObservationType = ObservationType.PoolCommissionChange;
+    protected readonly _observationMode : ObservationMode = ObservationMode.Delegator;
     
     
     @Listen([
         EventType.PoolCommissionSet
     ])
-    protected async _handle (event : Event) : Promise<boolean>
+    protected async _handleEvent (event : Event) : Promise<boolean>
     {
+        const observationRepository = this._entityManager.getRepository(Observation);
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this._entityManager.getRepository(Observation);
         
         const onChainId : number = Number(event.data[0]);
         const newCommissionPercent : number = Number(event.data[1]) / 10000;
@@ -35,46 +37,47 @@ export class PoolCommissionSetCrawler
             return false;
         }
         
-        // inform delegators (only!)
-        const stakePoolObservations = await stakePoolObservationRepository.find(
-            {
-                stakePool,
-                mode: ObservationMode.Delegator
-            }
-        );
-        if (!stakePoolObservations.length) {
-            // no stake pool observations
+        const stakePoolObservationCount = await observationRepository.count({
+            stakePool,
+            mode: ObservationMode.Delegator
+        });
+        if (!stakePoolObservationCount) {
+            // no observations
             return false;
         }
         
         // fetch previous commission value
-        const previousBlockHash : string =
-            (await this._api.rpc.chain.getBlockHash(event.blockNumber - 1)).toString();
+        const previousBlockHash : string = (await this._api.rpc.chain.getBlockHash(event.blockNumber - 1)).toString();
         
-        const onChainStakePoolBefore : typeof KhalaTypes.PoolInfo =
-            <any>(await this._api.query.phalaStakePool.stakePools.at(previousBlockHash, onChainId)).toJSON();
+        const onChainStakePoolBeforeRaw : any = await this._api.query.phalaStakePool.stakePools.at(previousBlockHash, onChainId);
+        const onChainStakePoolBefore : typeof KhalaTypes.PoolInfo = onChainStakePoolBeforeRaw.toJSON();
         
         const previousCommissionPercent = onChainStakePoolBefore.payoutCommission / 10000;
         const commissionDelta = newCommissionPercent - previousCommissionPercent;
         
-        for (const observation of stakePoolObservations) {
-            const threshold = observation.user.getConfig('changeCommissionThreshold');
-            if (Math.abs(commissionDelta) < threshold) {
-                continue;
+        await this._processObservations(
+            onChainId,
+            commissionDelta,
+            {
+                previous: previousCommissionPercent,
+                current: newCommissionPercent,
             }
-            
-            const text = '`#' + String(onChainId) + '` '
-                + (commissionDelta < 0 ? 'decreased' : 'increased')
-                + ' by `' + Math.abs(commissionDelta).toFixed(1) + '%` to `' + newCommissionPercent.toFixed(1) + '%`';
-            
-            this._notificationAggregator.aggregate(
-                observation.user.msgChannel,
-                observation.user.msgUserId,
-                text
-            );
-        }
+        );
         
         return true;
+    }
+    
+    protected _prepareMessage (
+        onChainId : number,
+        observation : Observation,
+        observedValue : number,
+        additionalData : { previous : number, current : number }
+    ) : string
+    {
+        return '`#' + onChainId + '` '
+            + (observedValue < 0 ? 'decreased' : 'increased')
+            + ' from `' + additionalData.previous.toFixed(1) + '%`'
+            + ' to `' + additionalData.current.toFixed(1) + '%`';
     }
     
 }

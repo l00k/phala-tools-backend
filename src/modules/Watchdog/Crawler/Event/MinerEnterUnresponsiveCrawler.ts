@@ -1,22 +1,24 @@
-import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
 import { KhalaTypes } from '#/Phala';
 import { StakePool } from '#/Phala/Domain/Model';
 import { WorkerState } from '#/Stats/Domain/Model/Worker';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
-import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { AbstractEventCrawler } from '#/Watchdog/Service/EventCrawler/AbstractEventCrawler';
 import { Listen } from '#/Watchdog/Service/EventCrawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/EventCrawler/Event';
-import { Inject, Injectable } from '@inti5/object-manager';
+import { Injectable } from '@inti5/object-manager';
 
 
 @Injectable({ tag: 'watchdog.crawler.handler' })
 export class MinerEnterUnresponsiveCrawler
-    extends AbstractCrawler
+    extends AbstractEventCrawler
 {
     
-    @Inject({ ctorArgs: [ '🚨 Worker enter unresponsive state' ] })
-    protected _notificationAggregator : NotificationAggregator;
+    protected readonly _messageTitle : string = '🚨 Worker enter unresponsive state';
+    protected readonly _observationType : ObservationType = ObservationType.UnresponsiveWorker;
+    protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
     protected _unresponsiveWorkersCounter : { [onChainId : number] : number } = {};
@@ -58,7 +60,6 @@ export class MinerEnterUnresponsiveCrawler
         
         // create issue if it doesn't exists yet
         const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
-        
         const issueAlreadyExists = await issueRepository.findOne({
             stakePool,
             workerAccount,
@@ -79,59 +80,38 @@ export class MinerEnterUnresponsiveCrawler
         return true;
     }
     
-    public async chunkPostProcess ()
+    public async postProcess ()
     {
-        await this._prepareMessages();
+        await this._handleGrouppedEvents();
         
         // clear counters
         this._unresponsiveWorkersCounter = {};
         
-        await super.chunkPostProcess();
+        await super.postProcess();
     }
     
-    protected async _prepareMessages ()
+    protected async _handleGrouppedEvents ()
     {
-        const stakePoolRepository = this._entityManager.getRepository(StakePool);
-        const stakePoolObservationRepository = this._entityManager.getRepository(Observation);
-        
-        for (const [ onChainId, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
-            if (unresponsiveCount == 0) {
-                continue;
-            }
+        for (const [ onChainIdStr, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
+            const onChainId = Number(onChainIdStr);
             
-            // fetch stake pool
-            const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: Number(onChainId) });
-            if (!stakePool) {
-                // no stake pool entry
-                continue;
-            }
-            
-            // inform owners (only!)
-            const stakePoolObservations = await stakePoolObservationRepository.find({
-                stakePool,
-                mode: ObservationMode.Owner,
-            });
-            if (!stakePoolObservations.length) {
-                // no stake pool observations
-                return;
-            }
-            
-            for (const observation of stakePoolObservations) {
-                if (observation.user.getConfig('delayUnresponsiveWorkerNotification')) {
-                    continue;
-                }
-                
-                const text = unresponsiveCount == 1
-                    ? `1 worker is in unresponsive state`
-                    : `${unresponsiveCount} workers are in unresponsive state`;
-                
-                this._notificationAggregator.aggregate(
-                    observation.user.msgChannel,
-                    observation.user.msgUserId,
-                    text
-                );
-            }
+            await this._processObservations(
+                onChainId,
+                unresponsiveCount
+            );
         }
+    }
+    
+    protected _prepareMessage (
+        onChainId : number,
+        observation : Observation,
+        observedValue : number,
+        additionalData : any = null
+    ) : string
+    {
+        return observedValue == 1
+            ? `1 worker is in unresponsive state`
+            : `${observedValue} workers are in unresponsive state`;
     }
     
 }

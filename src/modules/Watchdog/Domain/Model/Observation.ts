@@ -3,31 +3,13 @@ import { Account, StakePool } from '#/Phala/Domain/Model';
 import { ObservationConfiguration } from '#/Watchdog/Domain/Model/Observation/ObservationConfiguration';
 import { ObservationNotifications } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
 import { User } from '#/Watchdog/Domain/Model/User';
+import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import { Annotation as API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
 import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
 import * as Trans from 'class-transformer';
-
-
-
-export enum ObservationMode
-{
-    Owner = 'owner',
-    Delegator = 'delegator',
-}
-
-export enum ObservationType
-{
-    ClaimableRewards = 'claimableRewards',
-    RewardsDrop = 'rewardsDrop',
-    PoolCommissionChange = 'poolCommissionChange',
-    
-    UnresponsiveWorker = 'unresponsiveWorker',
-    StuckedNode = 'stuckedNode',
-    FreePoolFunds = 'freePoolFunds',
-    PendingWithdrawals = 'pendingWithdrawals',
-}
 
 
 @ORM.Entity({

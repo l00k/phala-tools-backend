@@ -1,5 +1,5 @@
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
-import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { AbstractEventCrawler } from '#/Watchdog/Service/EventCrawler/AbstractEventCrawler';
 import { Listen } from '#/Watchdog/Service/EventCrawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/EventCrawler/Event';
 import { Injectable } from '@inti5/object-manager';
@@ -7,13 +7,13 @@ import { Injectable } from '@inti5/object-manager';
 
 @Injectable({ tag: 'watchdog.crawler.handler' })
 export class MinerExitUnresponsiveCrawler
-    extends AbstractCrawler
+    extends AbstractEventCrawler
 {
     
     @Listen([
         EventType.MinerExitUnresponsive
     ])
-    protected async _handle (event : Event) : Promise<boolean>
+    protected async _handleEvent (event : Event) : Promise<boolean>
     {
         const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
         

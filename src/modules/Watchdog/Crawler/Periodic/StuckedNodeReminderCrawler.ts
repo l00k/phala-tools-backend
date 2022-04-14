@@ -1,11 +1,11 @@
 import { NodeState } from '#/Watchdog/Domain/Model/MetricState/NodeState';
 import { NodeStateVerificator } from '#/Watchdog/Service/NodeStateVerificator';
-import { AbstractCrawler } from '#/Watchdog/Service/PeriodicCrawler/AbstractCrawler';
+import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 import { Inject } from '@inti5/object-manager';
 
 
 export class StuckedNodeReminderCrawler
-    extends AbstractCrawler
+    extends AbstractPeriodicCrawler
 {
     
     @Inject()

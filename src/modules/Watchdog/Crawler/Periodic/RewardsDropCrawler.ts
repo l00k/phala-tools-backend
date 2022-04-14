@@ -1,14 +1,15 @@
 import { Exception } from '#/BackendCore/Exception';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
-import { Observation, ObservationMode } from '#/Watchdog/Domain/Model/Observation';
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractCrawler } from '#/Watchdog/Service/PeriodicCrawler/AbstractCrawler';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 import { Header } from '@polkadot/types/interfaces/runtime';
 
 
 export class RewardsDropCrawler
-    extends AbstractCrawler
+    extends AbstractPeriodicCrawler
 {
     
     protected static readonly BLOCKS_CHUNK = 3600; // 1d based on 24bps

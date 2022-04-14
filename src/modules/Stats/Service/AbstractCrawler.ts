@@ -10,7 +10,7 @@ import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
 import { EntityManager } from '@mikro-orm/core';
 import { ApiPromise } from '@polkadot/api';
 import { Header } from '@polkadot/types/interfaces/runtime';
-import { Logger } from 'core/utils/Logger';
+import { Logger } from '@inti5/utils/Logger';
 
 
 

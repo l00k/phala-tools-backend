@@ -1,37 +1,32 @@
-import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
-import { AbstractHandler } from '#/BackendCore/Service/Tasker/AbstractHandler';
 import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregator';
-import { ApiProvider } from '#/Phala';
+import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { ApiMode } from '#/Polkadot';
-import { Observation, ObservationMode } from '#/Watchdog/Domain/Model/Observation';
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
-import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { ListenSymbol } from '#/Watchdog/Service/EventCrawler/def';
+import { Event } from '#/Watchdog/Service/EventCrawler/Event';
+import { InitializeSymbol, Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
-import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 import { ApiPromise } from '@polkadot/api';
 import groupBy from 'lodash/groupBy';
+import * as ORM from '@mikro-orm/core';
 
 
-export type ThresholdCallback = (observation : Observation) => Promise<number>;
-export type MessageCallback = (observation : Observation, value : number) => string;
-
-
-export abstract class AbstractCrawler
-    extends AbstractHandler
+export abstract class AbstractEventCrawler
 {
     
-    protected readonly _messageTitle : string;
-    protected readonly _observationType : ObservationType;
-    protected readonly _observationMode : ObservationMode;
+    protected static readonly [ListenSymbol] : {
+        [eventType : string] : string[]
+    };
     
-    
-    protected _logger : Logger;
-    
-    protected _notificationAggregator : NotificationAggregator;
     
     @Inject()
-    protected _entityManagerWrapper : EntityManagerWrapper;
+    protected _logger : Logger;
+    
+    @Inject()
+    protected _notificationAggregator : NotificationAggregator;
     
     @Inject()
     protected _apiProvider : ApiProvider;
@@ -41,32 +36,66 @@ export abstract class AbstractCrawler
     protected _api : ApiPromise;
     
     
+    protected readonly _messageTitle : string;
+    protected readonly _observationType : ObservationType;
+    protected readonly _observationMode : ObservationMode;
+    
+    
     public [InitializeSymbol] ()
     {
-        const Constructor : typeof AbstractCrawler = <any>this.constructor;
-        
-        const objectManager = ObjectManager.getSingleton();
-        this._logger = objectManager.getInstance(Logger, [ Constructor.name ]);
-        this._notificationAggregator = objectManager.getInstance(NotificationAggregator);
+        this._logger.setServiceName(this.constructor.name);
     }
     
-    public async run () : Promise<boolean>
-    {
-        await this._init();
-        const result = await this._handle();
-        await this._postProcess();
-        
-        return result;
-    }
-    
-    protected async _init ()
+    public async init ()
     {
         this._notificationAggregator.setTitle(this._messageTitle);
-        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
         this._api = await this._apiProvider.getApi(ApiMode.WS);
     }
     
-    protected async _handle () : Promise<boolean>
+    public async tryHandle (
+        event : Event,
+        entityManager : EntityManager,
+    ) : Promise<boolean>
+    {
+        const Prototype : typeof AbstractEventCrawler = Object.getPrototypeOf(this);
+        
+        const methods = Prototype[ListenSymbol][event.type];
+        if (!methods) {
+            return false;
+        }
+        
+        // bind entity manager
+        this._entityManager = entityManager;
+        
+        let handled = false;
+        
+        try {
+            for (const method of methods) {
+                const onceHandled = await this[method](event);
+                if (onceHandled) {
+                    handled = true;
+                }
+            }
+        }
+        catch (e) {
+            this._logger.error(e);
+            return false;
+        }
+        
+        return handled;
+    }
+    
+    public async postProcess ()
+    {
+        await this._notificationAggregator.send();
+    }
+    
+    
+    protected async _processObservations (
+        onChainId : number,
+        observedValue : number,
+        additionalData : any = null
+    ) : Promise<boolean>
     {
         const observations = await this._fetchObservations();
         if (!observations.length) {
@@ -79,9 +108,9 @@ export abstract class AbstractCrawler
         
         for (const [ onChainIdStr, observations ] of Object.entries(observationGroups)) {
             const onChainId : number = Number(onChainIdStr);
-        
+            
             this._logger.debug('StakePool', onChainId);
-        
+            
             for (const observation of observations) {
                 this._logger.debug('Observation', observation.id);
                 
@@ -89,19 +118,6 @@ export abstract class AbstractCrawler
                 if (deltaTime < observation.config[this._observationType].frequency) {
                     // too frequent - skip
                     this._logger.debug('Too frequent');
-                    continue;
-                }
-                
-                let observedValue : number = await this._getObservedValuePerObservation(
-                    onChainId,
-                    observation
-                );
-                if (observedValue === null) {
-                    observedValue = await this._getObservedValuePerStakePool(onChainId);
-                }
-                if (observedValue === null) {
-                    // skip
-                    this._logger.debug(`Undefined value`);
                     continue;
                 }
                 
@@ -115,7 +131,8 @@ export abstract class AbstractCrawler
                 const message = this._prepareMessage(
                     onChainId,
                     observation,
-                    observedValue
+                    observedValue,
+                    additionalData
                 );
                 
                 this._notificationAggregator.aggregate(
@@ -130,12 +147,6 @@ export abstract class AbstractCrawler
         }
         
         return true;
-    }
-    
-    protected async _postProcess ()
-    {
-        await this._notificationAggregator.send();
-        await this._entityManager.flush();
     }
     
     protected async _fetchObservations () : Promise<Observation[]>
@@ -157,23 +168,11 @@ export abstract class AbstractCrawler
         return await observationRepository.find(filters);
     }
     
-    protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
-    {
-        return null;
-    }
-    
-    protected async _getObservedValuePerObservation (
-        onChainId : number,
-        observation : Observation
-    ) : Promise<number>
-    {
-        return null;
-    }
-    
     protected _prepareMessage (
         onChainId : number,
         observation : Observation,
-        observedValue : number
+        observedValue : number,
+        additionalData : any = null
     ) : string
     {
         return '';

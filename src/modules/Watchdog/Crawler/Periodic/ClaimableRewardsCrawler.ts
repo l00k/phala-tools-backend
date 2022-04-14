@@ -1,13 +1,14 @@
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
-import { Observation, ObservationMode } from '#/Watchdog/Domain/Model/Observation';
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractCrawler } from '#/Watchdog/Service/PeriodicCrawler/AbstractCrawler';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 import { Utility } from '#/Watchdog/Utility/Utility';
 
 
 export class ClaimableRewardsCrawler
-    extends AbstractCrawler
+    extends AbstractPeriodicCrawler
 {
     
     protected readonly _messageTitle : string = '💰 Pending rewards';

@@ -1,13 +1,14 @@
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { WorkerState } from '#/Stats/Domain/Model/Worker';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
-import { Observation, ObservationMode } from '#/Watchdog/Domain/Model/Observation';
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractCrawler } from '#/Watchdog/Service/PeriodicCrawler/AbstractCrawler';
+import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
+import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 
 
 export class UnresponsiveWorkerReminderCrawler
-    extends AbstractCrawler
+    extends AbstractPeriodicCrawler
 {
     
     protected readonly _messageTitle : string = '🚨 Worker still in unresponsive state';

@@ -1,4 +1,4 @@
-import { Logger, LoggerLevel } from 'core/utils/Logger';
+import { Logger, LoggerLevel } from '@inti5/utils/Logger';
 
 const env = process.env.NODE_ENV || 'production';
 const isDev = env !== 'production';
