@@ -4,10 +4,8 @@ import { Observation, ObservationMode } from '#/Watchdog/Domain/Model/Observatio
 import { ObservationType } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
 import { AbstractCrawler } from '#/Watchdog/Service/PeriodicCrawler/AbstractCrawler';
 import { Utility } from '#/Watchdog/Utility/Utility';
-import { Injectable } from '@inti5/object-manager';
 
 
-@Injectable({ tag: 'tasker.handler' })
 export class ClaimableRewardsCrawler
     extends AbstractCrawler
 {
@@ -17,7 +15,7 @@ export class ClaimableRewardsCrawler
     protected readonly _observationMode : ObservationMode = null;
     
     
-    protected async _getThresholdPerObservation (
+    protected async _getObservedValuePerObservation (
         onChainId : number,
         observation : Observation
     ) : Promise<number>
@@ -56,7 +54,7 @@ export class ClaimableRewardsCrawler
     protected _prepareMessage (
         onChainId : number,
         observation : Observation,
-        observationValue : number
+        observedValue : number
     ) : string
     {
         let message = '';
@@ -64,7 +62,7 @@ export class ClaimableRewardsCrawler
             message += 'Account: `' + Utility.formatAddress(observation.account.address) + '`\n';
         }
         message += 'Stake pool: `#' + onChainId + '`\n'
-            + 'Amount: `' + Utility.formatCoin(observationValue, true) + '`\n';
+            + 'Amount: `' + Utility.formatCoin(observedValue, true) + '`\n';
         
         return message;
     }

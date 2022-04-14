@@ -70,7 +70,9 @@ export abstract class AbstractCrawler
         
         const observationGroups = groupBy(observations, obs => obs.stakePool.onChainId);
         
-        for (const [ onChainId, observations ] of Object.entries(observationGroups)) {
+        for (const [ onChainIdStr, observations ] of Object.entries(observationGroups)) {
+            const onChainId : number = Number(onChainIdStr);
+        
             this._logger.debug('StakePool', onChainId);
         
             for (const observation of observations) {
@@ -83,30 +85,30 @@ export abstract class AbstractCrawler
                     continue;
                 }
                 
-                let observationValue : number = await this._getThresholdPerObservation(
-                    Number(onChainId),
+                let observedValue : number = await this._getObservedValuePerObservation(
+                    onChainId,
                     observation
                 );
-                if (observationValue === null) {
-                    observationValue = await this._getThresholdPerStakePool(Number(onChainId));
+                if (observedValue === null) {
+                    observedValue = await this._getObservedValuePerStakePool(onChainId);
                 }
-                if (observationValue === null) {
+                if (observedValue === null) {
                     // skip
                     this._logger.debug(`Undefined value`);
                     continue;
                 }
                 
                 const threshold = observation.config[this._observationType].threshold;
-                if (observationValue < threshold) {
+                if (observedValue < threshold) {
                     // below threshold - skip
-                    this._logger.debug(`Value ${observationValue.toFixed(2)} below threshold ${threshold.toFixed(2)}`);
+                    this._logger.debug(`Value ${observedValue.toFixed(2)} below threshold ${threshold.toFixed(2)}`);
                     continue;
                 }
                 
                 const message = this._prepareMessage(
-                    Number(onChainId),
+                    onChainId,
                     observation,
-                    observationValue
+                    observedValue
                 );
                 
                 this._notificationAggregator.aggregate(
@@ -155,12 +157,12 @@ export abstract class AbstractCrawler
         return await observationRepository.find(filters);
     }
     
-    protected async _getThresholdPerStakePool (onChainId : number) : Promise<number>
+    protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
     {
         return null;
     }
     
-    protected async _getThresholdPerObservation (
+    protected async _getObservedValuePerObservation (
         onChainId : number,
         observation : Observation
     ) : Promise<number>
@@ -171,7 +173,7 @@ export abstract class AbstractCrawler
     protected _prepareMessage (
         onChainId : number,
         observation : Observation,
-        observationValue : number
+        observedValue : number
     ) : string
     {
         return '';

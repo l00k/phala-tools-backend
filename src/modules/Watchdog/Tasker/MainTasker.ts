@@ -1,6 +1,7 @@
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { ClaimableRewardsCrawler } from '#/Watchdog/Crawler/Periodic/ClaimableRewardsCrawler';
 import { PendingWithdrawalCrawler } from '#/Watchdog/Crawler/Periodic/PendingWithdrawalCrawler';
+import { RewardsDropCrawler } from '#/Watchdog/Crawler/Periodic/RewardsDropCrawler';
 import { Injectable, ObjectManager } from '@inti5/object-manager';
 import { Timeout } from '@inti5/utils/Timeout';
 
@@ -20,11 +21,20 @@ export class MainTasker
     }
     
     @Task({
-        cronExpr: '0 */4 * * *',
+        cronExpr: '5 */1 * * *',
     })
     public async processClaimableRewards () : Promise<boolean>
     {
         const crawler = ObjectManager.getSingleton().getInstance(ClaimableRewardsCrawler);
+        return crawler.run();
+    }
+    
+    @Task({
+        cronExpr: '10 */12 * * *'
+    })
+    public async processPoolPerformanceDrop ()
+    {
+        const crawler = ObjectManager.getSingleton().getInstance(RewardsDropCrawler);
         return crawler.run();
     }
     

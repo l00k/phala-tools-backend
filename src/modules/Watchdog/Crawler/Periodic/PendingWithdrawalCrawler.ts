@@ -15,10 +15,11 @@ export class PendingWithdrawalCrawler
     protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
-    protected async _getThresholdPerStakePool (onChainId : number) : Promise<number>
+    protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
     {
-        const onChainStakePool : typeof KhalaTypes.PoolInfo =
-            <any>(await this._api.query.phalaStakePool.stakePools(onChainId)).toJSON();
+        const onChainStakePoolRaw : any = await this._api.query.phalaStakePool.stakePools(onChainId);
+        const onChainStakePool : typeof KhalaTypes.PoolInfo = onChainStakePoolRaw.toJSON();
+        
         if (onChainStakePool.withdrawQueue.length == 0) {
             return null;
         }
@@ -30,10 +31,10 @@ export class PendingWithdrawalCrawler
     protected _prepareMessage (
         onChainId : number,
         observation : Observation,
-        observationValue : number
+        observedValue : number
     ) : string
     {
-        const totalText = Utility.formatCoin(observationValue, true);
+        const totalText = Utility.formatCoin(observedValue, true);
         
         return '`#' + onChainId + '` total `' + totalText + '`';
     }
