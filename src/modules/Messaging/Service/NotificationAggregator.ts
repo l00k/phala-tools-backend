@@ -29,6 +29,11 @@ export class NotificationAggregator
     )
     {}
     
+    public setTitle(title : string)
+    {
+        this._title = title;
+    }
+    
     
     public aggregate (
         channel : MessagingChannel,

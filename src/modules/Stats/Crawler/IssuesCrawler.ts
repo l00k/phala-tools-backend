@@ -35,7 +35,7 @@ export class IssuesCrawler
     
     protected async _findBadBahaviours ()
     {
-        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
         
         const issueRepository = this._entityManager.getRepository(Issue);
         const eventRepository = this._entityManager.getRepository(Event);
@@ -136,7 +136,7 @@ export class IssuesCrawler
     
     protected async _findSlashes ()
     {
-        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
         
         const issueRepository = this._entityManager.getRepository(Issue);
         const eventRepository = this._entityManager.getRepository(Event);

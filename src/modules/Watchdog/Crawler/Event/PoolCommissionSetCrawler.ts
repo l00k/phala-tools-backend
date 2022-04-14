@@ -2,15 +2,15 @@ import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregat
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
 import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
-import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
-import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
+import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { Listen } from '#/Watchdog/Service/EventCrawler/Annotation';
+import { Event, EventType } from '#/Watchdog/Service/EventCrawler/Event';
 import { Inject, Injectable } from '@inti5/object-manager';
 
 
 @Injectable({ tag: 'watchdog.crawler.handler' })
-export class PoolCommissionSetHandler
-    extends AbstractHandler
+export class PoolCommissionSetCrawler
+    extends AbstractCrawler
 {
     
     @Inject({ ctorArgs: [ '🚨 Pool owner changed commission' ] })

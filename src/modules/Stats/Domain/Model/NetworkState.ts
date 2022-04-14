@@ -3,7 +3,6 @@ import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 
 
 @ORM.Entity({
@@ -34,7 +33,7 @@ export class NetworkState
     public totalShares : number = 0;
     
     
-    public constructor (data? : Partial<NetworkState>, entityManager? : EntityManager)
+    public constructor (data? : Partial<NetworkState>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

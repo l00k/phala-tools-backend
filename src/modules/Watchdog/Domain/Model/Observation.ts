@@ -2,7 +2,7 @@ import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account, StakePool } from '#/Phala/Domain/Model';
 import { ObservationConfiguration } from '#/Watchdog/Domain/Model/Observation/ObservationConfiguration';
 import {
-    NotificationType,
+    ObservationType,
     ObservationNotifications
 } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
 import { User } from '#/Watchdog/Domain/Model/User';
@@ -80,14 +80,14 @@ export class Observation
         return this.config[key];
     }
     
-    public getLastNotification (notificationType : NotificationType) : number
+    public getLastNotification (observationType : ObservationType) : number
     {
-        return this.lastNotifications[notificationType];
+        return this.lastNotifications[observationType];
     }
     
-    public updateLastNotification (notificationType : NotificationType)
+    public updateLastNotification (observationType : ObservationType)
     {
-        this.lastNotifications[notificationType] = Date.now();
+        this.lastNotifications[observationType] = Date.now();
     }
     
 }

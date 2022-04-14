@@ -22,7 +22,7 @@ export class NodeStateController
     
     public async [InitializeSymbol] ()
     {
-        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
         this._nodeStateRepository = this._entityManager.getRepository(NodeState);
     }
     

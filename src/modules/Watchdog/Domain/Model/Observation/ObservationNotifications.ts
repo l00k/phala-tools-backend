@@ -2,7 +2,7 @@ import { Annotation as API } from '@inti5/api-backend';
 import * as Trans from 'class-transformer';
 
 
-export enum NotificationType
+export enum ObservationType
 {
     ClaimableRewards = 'claimableRewards',
     RewardsDrop = 'rewardsDrop',
@@ -20,26 +20,26 @@ export class ObservationNotifications
 {
     
     @API.Property()
-    public [NotificationType.ClaimableRewards] : number;
+    public [ObservationType.ClaimableRewards] : number;
     
     @API.Property()
-    public [NotificationType.RewardsDrop] : number;
+    public [ObservationType.RewardsDrop] : number;
     
     @API.Property()
-    public [NotificationType.PoolCommissionChange] : number;
+    public [ObservationType.PoolCommissionChange] : number;
     
     
     @API.Property()
-    public [NotificationType.UnresponsiveWorker] : number;
+    public [ObservationType.UnresponsiveWorker] : number;
     
     @API.Property()
-    public [NotificationType.NodeStuck] : number;
+    public [ObservationType.NodeStuck] : number;
     
     @API.Property()
-    public [NotificationType.FreePoolFunds] : number;
+    public [ObservationType.FreePoolFunds] : number;
     
     @API.Property()
-    public [NotificationType.PendingWithdrawals] : number;
+    public [ObservationType.PendingWithdrawals] : number;
     
     
     public constructor (data? : Partial<ObservationNotifications>)

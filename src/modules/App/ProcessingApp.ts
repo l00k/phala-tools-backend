@@ -1,6 +1,6 @@
 import { AbstractApp } from '#/BackendCore/Module/AbstractApp';
 import { TaskerService } from '#/BackendCore/Service/Tasker/TaskerService';
-import { CrawlerService } from '#/Watchdog/Service/Crawler/CrawlerService';
+import { CrawlerService } from '#/Watchdog/Service/EventCrawler/CrawlerService';
 import { ObjectManager } from '@inti5/object-manager';
 
 

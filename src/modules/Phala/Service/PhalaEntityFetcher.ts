@@ -45,7 +45,7 @@ export class PhalaEntityFetcher
     
     protected async _createStakePool (onChainId : number) : Promise<StakePool>
     {
-        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        const entityManager = this._entityManagerWrapper.getCommonEntityManager();
         const stakePoolRepository = entityManager.getRepository(StakePool);
         
         let stakePool = await stakePoolRepository.findOne({ onChainId });
@@ -82,7 +82,7 @@ export class PhalaEntityFetcher
     
     protected async _createAccount (address : string) : Promise<Account>
     {
-        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        const entityManager = this._entityManagerWrapper.getCommonEntityManager();
         const accountRepository = entityManager.getRepository(Account);
         
         let account = await accountRepository.findOne({ address });

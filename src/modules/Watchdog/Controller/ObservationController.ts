@@ -4,7 +4,7 @@ import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import { Assert } from '@inti5/validator/Method';
-import { EntitySerializationGraph } from 'core/serializer';
+import { EntitySerializationGraph } from '@inti5/serializer';
 
 
 const observationSanitizationGraph : EntitySerializationGraph<Observation> = {

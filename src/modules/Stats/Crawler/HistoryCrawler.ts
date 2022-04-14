@@ -9,7 +9,7 @@ import { NetworkState } from '#/Stats/Domain/Model/NetworkState';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker, WorkerState } from '#/Stats/Domain/Model/Worker';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
-import { Config } from 'core/configuration';
+import { Config } from '@inti5/configuration';
 import moment from 'moment';
 
 

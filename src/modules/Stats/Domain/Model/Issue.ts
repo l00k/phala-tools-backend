@@ -1,6 +1,5 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 import { Annotation as API } from '@inti5/api-backend';
 
 
@@ -34,7 +33,7 @@ export class Issue
     public color : string;
     
     
-    public constructor (data? : Partial<Issue>, entityManager? : EntityManager)
+    public constructor (data? : Partial<Issue>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

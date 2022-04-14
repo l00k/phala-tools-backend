@@ -4,7 +4,6 @@ import * as ExtORM from '#/BackendCore/ORM/Ext';
 import { Account } from '#/Phala/Domain/Model';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 
 
 export enum WorkerState
@@ -111,7 +110,7 @@ export class Worker
     }
     
     
-    public constructor (data? : Partial<Worker>, entityManager? : EntityManager)
+    public constructor (data? : Partial<Worker>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

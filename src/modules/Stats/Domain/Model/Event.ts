@@ -6,7 +6,6 @@ import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { EventRepository } from '#/Stats/Domain/Repository/EventRepository';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 
 
 export enum EventType
@@ -116,7 +115,7 @@ export class Event<T extends AbstractEventData = AbstractEventData>
     public additionalData : T = <any>{};
     
     
-    public constructor (data? : Partial<Event<T>>, entityManager? : EntityManager)
+    public constructor (data? : Partial<Event<T>>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

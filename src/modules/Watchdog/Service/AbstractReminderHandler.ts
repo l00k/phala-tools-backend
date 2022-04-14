@@ -50,7 +50,7 @@ export abstract class AbstractReminderHandler
     public async init ()
     {
         this._api = await this._apiProvider.getApi(ApiMode.WS);
-        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
     }
     
     public async postProcess ()

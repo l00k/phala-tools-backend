@@ -5,7 +5,6 @@ import { Issue } from '#/Stats/Domain/Model/Issue';
 import { Worker } from '#/Stats/Domain/Model/Worker';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 
 
 @ORM.Entity({
@@ -67,7 +66,7 @@ export class StakePoolEntry
     public snapshotWorkers : Worker[] = [];
     
     
-    public constructor (data? : Partial<StakePoolEntry>, entityManager? : EntityManager)
+    public constructor (data? : Partial<StakePoolEntry>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         

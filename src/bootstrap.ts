@@ -1,14 +1,21 @@
-import { ObjectManager } from '@inti5/object-manager';
-import { timeout } from '@inti5/utils/Timeout';
-import dotenv from 'dotenv';
+import { Logger, LoggerLevel } from 'core/utils/Logger';
+
+const env = process.env.NODE_ENV || 'production';
+const isDev = env !== 'production';
+
+Logger.LOGGER_LEVEL = isDev
+    ? LoggerLevel.Debug
+    : LoggerLevel.Warn;
 
 globalThis['__basedir'] = __dirname;
 
 const component = process.argv[2];
 
 (async() => {
+    const dotenv = require('dotenv');
     dotenv.config();
     
+    const { ObjectManager } = require('@inti5/object-manager');
     const objectManager = ObjectManager.getSingleton();
     
     let app = null;
@@ -30,6 +37,7 @@ const component = process.argv[2];
         await app.run();
     }
     
+    const { timeout } = require('@inti5/utils/Timeout');
     await timeout(
         async() => await objectManager.releaseAll(),
         5000

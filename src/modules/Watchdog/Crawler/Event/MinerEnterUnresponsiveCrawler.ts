@@ -4,15 +4,15 @@ import { StakePool } from '#/Phala/Domain/Model';
 import { WorkerState } from '#/Stats/Domain/Model/Worker';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
-import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
-import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
+import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { Listen } from '#/Watchdog/Service/EventCrawler/Annotation';
+import { Event, EventType } from '#/Watchdog/Service/EventCrawler/Event';
 import { Inject, Injectable } from '@inti5/object-manager';
 
 
 @Injectable({ tag: 'watchdog.crawler.handler' })
-export class MinerEnterUnresponsiveHandler
-    extends AbstractHandler
+export class MinerEnterUnresponsiveCrawler
+    extends AbstractCrawler
 {
     
     @Inject({ ctorArgs: [ '🚨 Worker enter unresponsive state' ] })

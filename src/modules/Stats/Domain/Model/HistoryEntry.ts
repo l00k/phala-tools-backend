@@ -5,7 +5,6 @@ import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { HistoryEntryRepository } from '#/Stats/Domain/Repository/HistoryEntryRepository';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 
 
 @ORM.Entity({
@@ -105,7 +104,7 @@ export class HistoryEntry
     public avgApr : number = null;
     
     
-    public constructor (data? : Partial<HistoryEntry>, entityManager? : EntityManager)
+    public constructor (data? : Partial<HistoryEntry>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

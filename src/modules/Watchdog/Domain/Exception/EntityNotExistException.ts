@@ -1,5 +1,5 @@
 import { ValidationException } from '@inti5/validator';
-import { ValidationResult } from 'core/validator/ValidationResult';
+import { ValidationResult } from '@inti5/validator/ValidationResult';
 
 export class EntityNotExistException
     extends ValidationException

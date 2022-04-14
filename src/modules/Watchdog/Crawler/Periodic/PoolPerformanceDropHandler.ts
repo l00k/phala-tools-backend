@@ -47,7 +47,7 @@ export class PoolPerformanceDropHandler
     
     public async init ()
     {
-        this._entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
         this._api = await this._apiProvider.getApi(ApiMode.WS);
     }
     

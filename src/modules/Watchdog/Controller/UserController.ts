@@ -37,7 +37,10 @@ export class UserController
     {
         return this.getItem(
             authData.userId,
-            [ 'observations', 'observations.stakePool.owner' ]
+            [
+                'observations',
+                'observations.stakePool.owner'
+            ]
         );
     }
     

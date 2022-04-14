@@ -4,7 +4,7 @@ import { Account } from '#/Phala/Domain/Model';
 import { ApiMode } from '#/Polkadot';
 import { ApiPromise } from '@polkadot/api';
 import * as PolkadotUtils from '@polkadot/util';
-import { Inject } from 'core/object-manager';
+import { Inject } from '@inti5/object-manager';
 
 
 export class AccountsUpdater

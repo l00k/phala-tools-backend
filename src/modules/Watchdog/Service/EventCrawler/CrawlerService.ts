@@ -4,8 +4,8 @@ import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { ApiMode } from '#/Polkadot';
 import { CrawlerState } from '#/Watchdog/Domain/Model/AppState/CrawlerState';
-import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
-import { Event } from '#/Watchdog/Service/Crawler/Event';
+import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { Event } from '#/Watchdog/Service/EventCrawler/Event';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { EntityManager } from '@mikro-orm/mysql';
@@ -37,7 +37,7 @@ export class CrawlerService
     protected _apiProvider : ApiProvider;
     
     @Inject({ tag: 'watchdog.crawler.handler' })
-    protected _handlers : { [key : string] : AbstractHandler };
+    protected _handlers : { [key : string] : AbstractCrawler };
     
     
     protected _txEntityManager : EntityManager;
@@ -97,7 +97,7 @@ export class CrawlerService
         this._api = await this._apiProvider.getApi(ApiMode.WS);
         
         // fetch app state
-        const entityManager = await this._entityManagerWrapper.getDirectEntityManager();
+        const entityManager = await this._entityManagerWrapper.getCommonEntityManager();
         const appStateRepository = entityManager.getRepository(AppState);
         
         this._appState = await appStateRepository.findOne(CrawlerState.ID);

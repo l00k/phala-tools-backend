@@ -2,24 +2,24 @@ import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregat
 import { StakePool } from '#/Phala/Domain/Model';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
 import { ObservationMode, Observation } from '#/Watchdog/Domain/Model/Observation';
-import { AbstractHandler } from '#/Watchdog/Service/Crawler/AbstractHandler';
-import { Listen } from '#/Watchdog/Service/Crawler/Annotation';
-import { Event, EventType } from '#/Watchdog/Service/Crawler/Event';
+import { AbstractCrawler } from '#/Watchdog/Service/EventCrawler/AbstractCrawler';
+import { Listen } from '#/Watchdog/Service/EventCrawler/Annotation';
+import { Event, EventType } from '#/Watchdog/Service/EventCrawler/Event';
 import { Utility } from '#/Watchdog/Utility/Utility';
 import { Inject, Injectable } from '@inti5/object-manager';
 
 
 @Injectable({ tag: 'watchdog.crawler.handler' })
-export class ContributionHandler
-    extends AbstractHandler
+export class WithdrawalCrawler
+    extends AbstractCrawler
 {
     
-    @Inject({ ctorArgs: [ '🤑 New contribution in your pool' ] })
+    @Inject({ ctorArgs: [ '😥 Withdrawal from your pool' ] })
     protected _notificationAggregator : NotificationAggregator;
     
     
     @Listen([
-        EventType.Contribution
+        EventType.Withdrawal
     ])
     protected async _handle (event : Event) : Promise<boolean>
     {
@@ -28,7 +28,7 @@ export class ContributionHandler
         
         const onChainStakePoolId : number = Number(event.data[0]);
         const delegator : string = String(event.data[1]);
-        const stakedAmount : number = PhalaUtility.parseRawAmount(Number(event.data[2]));
+        const withdrawAmount : number = PhalaUtility.parseRawAmount(Number(event.data[2]));
         
         // fetch stake pool
         const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: onChainStakePoolId });
@@ -50,13 +50,13 @@ export class ContributionHandler
         }
         
         for (const observation of stakePoolObservations) {
-            const threshold = observation.user.getConfig('contributionThreshold');
-            if (stakedAmount < threshold) {
+            const threshold = observation.user.getConfig('withdrawalThreshold');
+            if (withdrawAmount < threshold) {
                 continue;
             }
             
-            const text = '`' + Utility.formatAddress(delegator) + '` staked '
-                + '`' + Utility.formatCoin(stakedAmount, true) + '` into pool '
+            const text = '`' + Utility.formatAddress(delegator) + '` withdrawed '
+                + '`' + Utility.formatCoin(withdrawAmount, true) + '` from pool '
                 + '`#' + onChainStakePoolId + '`';
             
             this._notificationAggregator.aggregate(

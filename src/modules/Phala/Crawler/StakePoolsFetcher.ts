@@ -4,8 +4,8 @@ import { StakePool } from '#/Phala/Domain/Model';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
 import { ApiMode } from '#/Polkadot';
 import { ApiPromise } from '@polkadot/api';
-import { Inject } from 'core/object-manager';
-import { PromiseAggregator } from 'core/utils/PromiseAggregator';
+import { Inject } from '@inti5/object-manager';
+import { PromiseAggregator } from '@inti5/utils/PromiseAggregator';
 import range from 'lodash/range';
 
 

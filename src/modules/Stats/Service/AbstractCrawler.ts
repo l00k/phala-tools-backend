@@ -1,29 +1,35 @@
-import { AbstractTasker } from '#/App/Service/AbstractTasker';
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
+import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
 import { ApiMode } from '#/Polkadot';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker } from '#/Stats/Domain/Model/Worker';
-import { Inject } from '@inti5/object-manager';
+import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
+import { EntityManager } from '@mikro-orm/core';
 import { ApiPromise } from '@polkadot/api';
 import { Header } from '@polkadot/types/interfaces/runtime';
+import { Logger } from 'core/utils/Logger';
 
-
-
-type Mapped<T> = { [key : string | number] : T };
 
 
 export abstract class AbstractCrawler
-    extends AbstractTasker
 {
+    
+    protected _logger : Logger;
+    
+    @Inject()
+    protected _entityManagerWrapper : EntityManagerWrapper;
     
     @Inject()
     protected _phalaApiProvider : Phala.ApiProvider;
     
     @Inject({ ctorArgs: [ ApiMode.WS ] })
     protected _phalaEntityFetcher : PhalaEntityFetcher;
+    
+    protected _entityManager : EntityManager;
+    protected _txEntityManager : EntityManager;
     
     protected _phalaApi : ApiPromise;
     
@@ -33,15 +39,26 @@ export abstract class AbstractCrawler
     protected _finalizedBlockHeader : Header;
     protected _finalizedBlockNumber : number;
     
-    protected _stakePoolEntries : Mapped<StakePoolEntry> = {};
-    protected _accounts : Mapped<Account> = {};
-    protected _workers : Mapped<Worker> = {};
+    protected _stakePoolEntries : Record<number, StakePoolEntry> = {};
+    protected _accounts : Record<string, Account> = {};
+    protected _workers : Record<string, Worker> = {};
     
     
+    
+    public [InitializeSymbol] ()
+    {
+        this._logger = ObjectManager.getSingleton().getInstance(Logger, [ this.constructor.name ]);
+    }
+    
+    public async run () : Promise<any>
+    {
+        await this._init();
+        await this._process();
+    }
     
     protected async _init ()
     {
-        await super._init();
+        this._entityManager = this._entityManagerWrapper.getCleanEntityManager();
         
         this._phalaApi = await this._phalaApiProvider.getApi(ApiMode.WS);
         
@@ -68,14 +85,16 @@ export abstract class AbstractCrawler
         }
     }
     
+    protected abstract _process () : Promise<any>;
+    
+    
+    
     protected async _clearContext ()
     {
         this._stakePoolEntries = {};
         this._accounts = {};
         this._workers = {};
     }
-    
-    
     
     protected async _getOrCreateStakePool (onChainId : number) : Promise<StakePoolEntry>
     {

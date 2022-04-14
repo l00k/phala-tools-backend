@@ -71,7 +71,7 @@ export class MessagingProvider
         );
         
         // send message
-        return <any>this._discordRest.post(
+        const message : Message = <any> this._discordRest.post(
             Routes.channelMessages(channel.id),
             {
                 body: {
@@ -79,6 +79,8 @@ export class MessagingProvider
                 }
             }
         );
+        
+        return message;
     }
     
     protected async _sendMessageViaTelegram (

@@ -77,7 +77,7 @@ export class TelegramLoginController
     
     protected async _getOrCreateUser (telegramUser : TelegramLoginDto) : Promise<User>
     {
-        const entityManager = this._entityManagerWrapper.getDirectEntityManager();
+        const entityManager = this._entityManagerWrapper.getCommonEntityManager();
         const userRepository = entityManager.getRepository(User);
         
         let user = await userRepository.findOne({
