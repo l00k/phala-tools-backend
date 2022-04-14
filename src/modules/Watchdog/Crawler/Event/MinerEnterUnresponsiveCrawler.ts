@@ -42,11 +42,12 @@ export class MinerEnterUnresponsiveCrawler
         }
         
         const workerPubKey = (await this._api.query.phalaMining.minerBindings(workerAccount)).toString();
-        const onChainId : number = <number>(await this._api.query.phalaStakePool.workerAssignments(workerPubKey)).toJSON();
+        const onChainIdRaw : any = await this._api.query.phalaStakePool.workerAssignments(workerPubKey);
+        const onChainId : number = Number(onChainIdRaw.toJSON());
         
         // load pool
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
-        const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId: Number(onChainId) });
+        const stakePool : StakePool = await stakePoolRepository.findOne({ onChainId });
         if (!stakePool) {
             // skip - no observation for it
             return false;
@@ -92,6 +93,8 @@ export class MinerEnterUnresponsiveCrawler
     
     protected async _handleGrouppedEvents ()
     {
+        this._unresponsiveWorkersCounter[226] = 2;
+    
         for (const [ onChainIdStr, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
             const onChainId = Number(onChainIdStr);
             
@@ -109,12 +112,8 @@ export class MinerEnterUnresponsiveCrawler
         additionalData : any = null
     ) : string
     {
-        let message = '`#' + onChainId + '` ';
-        message += observedValue == 1
-            ? `1 worker is in unresponsive state`
-            : `${observedValue} workers are in unresponsive state`;
-        
-        return message;
+        return '`#' + onChainId + '` '
+            + observedValue + 'worker(s) in unresponsive state';
     }
     
 }

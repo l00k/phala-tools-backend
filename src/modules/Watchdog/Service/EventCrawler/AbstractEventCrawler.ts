@@ -52,10 +52,12 @@ export abstract class AbstractEventCrawler
         this._api = await this._apiProvider.getApi(ApiMode.WS);
     }
     
-    public async tryHandle (
-        event : Event,
-        entityManager : EntityManager,
-    ) : Promise<boolean>
+    public bindEntityManager (entityManager : EntityManager)
+    {
+        this._entityManager = entityManager;
+    }
+    
+    public async tryHandle (event : Event) : Promise<boolean>
     {
         const Prototype : typeof AbstractEventCrawler = Object.getPrototypeOf(this);
         
@@ -63,9 +65,6 @@ export abstract class AbstractEventCrawler
         if (!methods) {
             return false;
         }
-        
-        // bind entity manager
-        this._entityManager = entityManager;
         
         let handled = false;
         
@@ -97,7 +96,7 @@ export abstract class AbstractEventCrawler
         additionalData : any = null
     ) : Promise<boolean>
     {
-        const observations = await this._fetchObservations();
+        const observations = await this._fetchObservations(onChainId);
         if (!observations.length) {
             return false;
         }
@@ -149,7 +148,9 @@ export abstract class AbstractEventCrawler
         return true;
     }
     
-    protected async _fetchObservations () : Promise<Observation[]>
+    protected async _fetchObservations (
+        onChainId : number
+    ) : Promise<Observation[]>
     {
         const observationRepository = this._entityManager.getRepository(Observation);
         
@@ -163,6 +164,10 @@ export abstract class AbstractEventCrawler
         
         if (this._observationMode) {
             filters.mode = this._observationMode;
+        }
+        
+        if (onChainId) {
+            filters.stakePool = { onChainId };
         }
         
         return await observationRepository.find(filters);

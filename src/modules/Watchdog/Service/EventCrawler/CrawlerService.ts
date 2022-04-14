@@ -130,6 +130,10 @@ export class CrawlerService
         await this._entityManagerWrapper.transaction(async(txEntitiyManager) => {
             this._txEntityManager = txEntitiyManager;
             
+            for (const handler of Object.values(this._handlers)) {
+                await handler.bindEntityManager(txEntitiyManager);
+            }
+            
             while (blockNumber < lastBlockToIndex) {
                 ++blockNumber;
                 
@@ -177,7 +181,7 @@ export class CrawlerService
     protected async _handleEvent (event : Event)
     {
         for (const handler of Object.values(this._handlers)) {
-            const handled = await handler.tryHandle(event, this._txEntityManager);
+            const handled = await handler.tryHandle(event);
             if (handled) {
                 this._logger.log('Event', colors.brightCyan(event.type), 'handled');
             }
