@@ -93,8 +93,6 @@ export class MinerEnterUnresponsiveCrawler
     
     protected async _handleGrouppedEvents ()
     {
-        this._unresponsiveWorkersCounter[226] = 2;
-    
         for (const [ onChainIdStr, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
             const onChainId = Number(onChainIdStr);
             
