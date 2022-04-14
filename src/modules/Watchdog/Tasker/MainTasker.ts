@@ -2,6 +2,7 @@ import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { ClaimableRewardsCrawler } from '#/Watchdog/Crawler/Periodic/ClaimableRewardsCrawler';
 import { PendingWithdrawalCrawler } from '#/Watchdog/Crawler/Periodic/PendingWithdrawalCrawler';
 import { RewardsDropCrawler } from '#/Watchdog/Crawler/Periodic/RewardsDropCrawler';
+import { UnresponsiveWorkerReminderCrawler } from '#/Watchdog/Crawler/Periodic/UnresponsiveWorkerReminderCrawler';
 import { Injectable, ObjectManager } from '@inti5/object-manager';
 import { Timeout } from '@inti5/utils/Timeout';
 
@@ -35,6 +36,15 @@ export class MainTasker
     public async processPoolPerformanceDrop ()
     {
         const crawler = ObjectManager.getSingleton().getInstance(RewardsDropCrawler);
+        return crawler.run();
+    }
+    
+    @Task({
+        cronExpr: '*/15 * * * *'
+    })
+    public async processUnresponsiveWorkerReminder ()
+    {
+        const crawler = ObjectManager.getSingleton().getInstance(UnresponsiveWorkerReminderCrawler);
         return crawler.run();
     }
     

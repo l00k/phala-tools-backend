@@ -59,6 +59,13 @@ export abstract class AbstractCrawler
         return result;
     }
     
+    protected async _init ()
+    {
+        this._notificationAggregator.setTitle(this._messageTitle);
+        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
+        this._api = await this._apiProvider.getApi(ApiMode.WS);
+    }
+    
     protected async _handle () : Promise<boolean>
     {
         const observations = await this._fetchObservations();
@@ -123,13 +130,6 @@ export abstract class AbstractCrawler
         }
         
         return true;
-    }
-    
-    protected async _init ()
-    {
-        this._notificationAggregator.setTitle(this._messageTitle);
-        this._entityManager = this._entityManagerWrapper.getCommonEntityManager();
-        this._api = await this._apiProvider.getApi(ApiMode.WS);
     }
     
     protected async _postProcess ()
