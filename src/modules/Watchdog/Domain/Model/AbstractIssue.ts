@@ -1,5 +1,4 @@
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 
 
@@ -18,7 +17,7 @@ export abstract class AbstractIssue<T>
     public occurrenceDate : Date;
     
     
-    public constructor (data? : Partial<AbstractIssue<T>>, entityManager? : EntityManager)
+    public constructor (data? : Partial<AbstractIssue<T>>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

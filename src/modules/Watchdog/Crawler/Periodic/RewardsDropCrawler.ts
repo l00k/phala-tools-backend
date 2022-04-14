@@ -2,7 +2,7 @@ import { Exception } from '#/BackendCore/Exception';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
 import { Observation, ObservationMode } from '#/Watchdog/Domain/Model/Observation';
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
+import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
 import { AbstractCrawler } from '#/Watchdog/Service/PeriodicCrawler/AbstractCrawler';
 import { Header } from '@polkadot/types/interfaces/runtime';
 

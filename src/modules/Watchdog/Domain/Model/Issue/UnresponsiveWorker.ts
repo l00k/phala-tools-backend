@@ -1,12 +1,10 @@
 import { StakePool } from '#/Phala/Domain/Model';
 import { AbstractIssue } from '#/Watchdog/Domain/Model/AbstractIssue';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
-
 
 
 @ORM.Entity({
-    tableName: 'watchdog_issue_uworker'
+    tableName: 'watchdog_issue_unresp_worker'
 })
 @ORM.Unique({
     properties: [
@@ -32,7 +30,7 @@ export class UnresponsiveWorker
     public stakePool : StakePool;
     
     
-    public constructor (data? : Partial<UnresponsiveWorker>, entityManager? : EntityManager)
+    public constructor (data? : Partial<UnresponsiveWorker>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

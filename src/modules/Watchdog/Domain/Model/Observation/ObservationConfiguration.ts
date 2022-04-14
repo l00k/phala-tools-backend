@@ -1,4 +1,4 @@
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
+import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Trans from 'class-transformer';
 import { Assert, AssertObject } from '@inti5/validator/Object';
@@ -91,7 +91,7 @@ export class ObservationConfiguration
     
     @API.Property(() => NotificationConfig)
     @Assert()
-    public [ObservationType.NodeStuck] : NotificationConfig = new NotificationConfig({
+    public [ObservationType.StuckedNode] : NotificationConfig = new NotificationConfig({
         active: true,
         frequency: 3600,
     });

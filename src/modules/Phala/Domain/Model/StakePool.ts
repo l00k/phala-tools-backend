@@ -1,7 +1,6 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account } from '#/Phala/Domain/Model/Account';
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 import { Annotation as API } from '@inti5/api-backend';
 
 
@@ -40,7 +39,7 @@ export class StakePool
     public updatedAt : Date = new Date();
     
     
-    public constructor (data? : Partial<StakePool>, entityManager? : EntityManager)
+    public constructor (data? : Partial<StakePool>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

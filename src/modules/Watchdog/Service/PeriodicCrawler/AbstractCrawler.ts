@@ -4,7 +4,7 @@ import { NotificationAggregator } from '#/Messaging/Service/NotificationAggregat
 import { ApiProvider } from '#/Phala';
 import { ApiMode } from '#/Polkadot';
 import { Observation, ObservationMode } from '#/Watchdog/Domain/Model/Observation';
-import { ObservationType } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
+import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
 import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import * as ORM from '@mikro-orm/core';

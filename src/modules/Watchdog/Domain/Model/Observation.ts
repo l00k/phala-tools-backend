@@ -1,16 +1,12 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account, StakePool } from '#/Phala/Domain/Model';
 import { ObservationConfiguration } from '#/Watchdog/Domain/Model/Observation/ObservationConfiguration';
-import {
-    ObservationType,
-    ObservationNotifications
-} from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
+import { ObservationNotifications } from '#/Watchdog/Domain/Model/Observation/ObservationNotifications';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
 import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
-import { EntityManager } from '@mikro-orm/mysql';
 import * as Trans from 'class-transformer';
 
 
@@ -19,6 +15,18 @@ export enum ObservationMode
 {
     Owner = 'owner',
     Delegator = 'delegator',
+}
+
+export enum ObservationType
+{
+    ClaimableRewards = 'claimableRewards',
+    RewardsDrop = 'rewardsDrop',
+    PoolCommissionChange = 'poolCommissionChange',
+    
+    UnresponsiveWorker = 'unresponsiveWorker',
+    StuckedNode = 'stuckedNode',
+    FreePoolFunds = 'freePoolFunds',
+    PendingWithdrawals = 'pendingWithdrawals',
 }
 
 
@@ -63,7 +71,7 @@ export class Observation
     public lastNotifications : ObservationNotifications = new ObservationNotifications();
     
     
-    public constructor (data? : EntityData<Observation>, entityManager? : EntityManager)
+    public constructor (data? : EntityData<Observation>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

@@ -1,8 +1,6 @@
 import * as ORM from '@mikro-orm/core';
-import { EntityManager } from '@mikro-orm/mysql';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { User } from '#/Watchdog/Domain/Model/User';
-
 
 
 type ChainState = {
@@ -62,7 +60,7 @@ export class NodeState
     public lastUpdate : Date = new Date();
 
 
-    public constructor (data? : Partial<NodeState>, entityManager? : EntityManager)
+    public constructor (data? : Partial<NodeState>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         if (data) {

@@ -5,7 +5,6 @@ import { UserConfiguration } from '#/Watchdog/Domain/Model/UserConfiguration';
 import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
-import { EntityManager } from '@mikro-orm/mysql';
 import * as Trans from 'class-transformer';
 
 
@@ -59,7 +58,7 @@ export class User
     public observations : ORM.Collection<Observation>;
     
     
-    public constructor (data? : EntityData<User>, entityManager? : EntityManager)
+    public constructor (data? : EntityData<User>, entityManager? : ORM.EntityManager)
     {
         super(data, entityManager);
         

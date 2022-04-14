@@ -1,18 +1,6 @@
+import { ObservationType } from '#/Watchdog/Domain/Model/Observation';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Trans from 'class-transformer';
-
-
-export enum ObservationType
-{
-    ClaimableRewards = 'claimableRewards',
-    RewardsDrop = 'rewardsDrop',
-    PoolCommissionChange = 'poolCommissionChange',
-    
-    UnresponsiveWorker = 'unresponsiveWorker',
-    NodeStuck = 'nodeStuck',
-    FreePoolFunds = 'freePoolFunds',
-    PendingWithdrawals = 'pendingWithdrawals',
-}
 
 
 @API.Resource('Watchdog/Observation/Notifications')
@@ -33,7 +21,7 @@ export class ObservationNotifications
     public [ObservationType.UnresponsiveWorker] : number;
     
     @API.Property()
-    public [ObservationType.NodeStuck] : number;
+    public [ObservationType.StuckedNode] : number;
     
     @API.Property()
     public [ObservationType.FreePoolFunds] : number;
