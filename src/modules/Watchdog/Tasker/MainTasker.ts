@@ -1,5 +1,6 @@
 import { Task } from '#/BackendCore/Service/Tasker/Annotation';
 import { ClaimableRewardsCrawler } from '#/Watchdog/Crawler/Periodic/ClaimableRewardsCrawler';
+import { FreePoolFundsCrawler } from '#/Watchdog/Crawler/Periodic/FreePoolFundsCrawler';
 import { PendingWithdrawalCrawler } from '#/Watchdog/Crawler/Periodic/PendingWithdrawalCrawler';
 import { RewardsDropCrawler } from '#/Watchdog/Crawler/Periodic/RewardsDropCrawler';
 import { UnresponsiveWorkerReminderCrawler } from '#/Watchdog/Crawler/Periodic/UnresponsiveWorkerReminderCrawler';
@@ -22,8 +23,19 @@ export class MainTasker
     }
     
     @Task({
-        cronExpr: '5 */1 * * *',
+        cronExpr: '0 * * * *'
     })
+    @Timeout(5 * 60 * 1000)
+    public processFreePoolFunds () : Promise<any>
+    {
+        const crawler = ObjectManager.getSingleton().getInstance(FreePoolFundsCrawler);
+        return crawler.run();
+    }
+    
+    @Task({
+        cronExpr: '5 * * * *',
+    })
+    @Timeout(5 * 60 * 1000)
     public async processClaimableRewards () : Promise<boolean>
     {
         const crawler = ObjectManager.getSingleton().getInstance(ClaimableRewardsCrawler);
@@ -33,6 +45,7 @@ export class MainTasker
     @Task({
         cronExpr: '10 */12 * * *'
     })
+    @Timeout(5 * 60 * 1000)
     public async processPoolPerformanceDrop ()
     {
         const crawler = ObjectManager.getSingleton().getInstance(RewardsDropCrawler);
@@ -42,6 +55,7 @@ export class MainTasker
     @Task({
         cronExpr: '*/15 * * * *'
     })
+    @Timeout(5 * 60 * 1000)
     public async processUnresponsiveWorkerReminder ()
     {
         const crawler = ObjectManager.getSingleton().getInstance(UnresponsiveWorkerReminderCrawler);
@@ -51,6 +65,7 @@ export class MainTasker
     @Task({
         cronExpr: '*/15 * * * *'
     })
+    @Timeout(5 * 60 * 1000)
     public async processNodeStucked ()
     {
         const crawler = ObjectManager.getSingleton().getInstance(UnresponsiveWorkerReminderCrawler);

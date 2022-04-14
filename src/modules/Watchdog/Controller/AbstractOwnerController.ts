@@ -1,7 +1,7 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
-import { OwnershipException } from '#/Watchdog/Domain/Exception/OwnershipException';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { EntityRepository } from '@mikro-orm/core';
+import { ValidationException } from 'core/validator';
 import express from 'express';
 
 
@@ -27,7 +27,7 @@ export abstract class AbstractOwnerController<T>
     ) : Promise<void>
     {
         if (owner.id !== authData.userId) {
-            throw new OwnershipException();
+            throw new ValidationException('Ownership verificaiton failed', 1649520720489);
         }
     }
     

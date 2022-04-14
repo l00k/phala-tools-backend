@@ -1,10 +1,10 @@
 import { AbstractOwnerController } from '#/Watchdog/Controller/AbstractOwnerController';
-import { EntityNotExistException } from '#/Watchdog/Domain/Exception/EntityNotExistException';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
+import { User } from '#/Watchdog/Domain/Model/User';
 import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
-import { Assert } from '@inti5/validator/Method';
 import { EntitySerializationGraph } from '@inti5/serializer';
+import { Assert, ValidationException } from '@inti5/validator/Method';
 
 
 const observationSanitizationGraph : EntitySerializationGraph<Observation> = {
@@ -44,8 +44,20 @@ export class ObservationController
             observation : Observation
     ) : Promise<Observation>
     {
+        const user : User = await this._userRepository.findOne(authData.userId);
+        await user.observations.loadItems();
+        
+        // limit
+        const perUserLimit = User.MAX_OBSERVATION_COUNT;
+        if (user.observations.length > perUserLimit) {
+            throw new ValidationException(
+                `Observation count exceed limit (${perUserLimit})`,
+                1649911666498
+            );
+        }
+        
         // assign owner
-        observation.user = await this._userRepository.findOne(authData.userId);
+        observation.user = user;
         
         await this._entityManager.persistAndFlush(observation);
         return observation;
@@ -73,7 +85,7 @@ export class ObservationController
     {
         const observation = await this._repository.findOne(id);
         if (!observation) {
-            throw new EntityNotExistException();
+            throw new ValidationException('Entity not exist', 1649806927410);
         }
         
         // verify ownership
@@ -98,7 +110,7 @@ export class ObservationController
         // load
         const observation = await this._repository.findOne(id);
         if (!observation) {
-            throw new EntityNotExistException();
+            throw new ValidationException('Entity not exist', 1649911734566);
         }
         
         // verify ownership

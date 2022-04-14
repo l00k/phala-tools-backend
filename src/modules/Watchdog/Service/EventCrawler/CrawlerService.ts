@@ -24,7 +24,7 @@ export class CrawlerService
 {
     
     protected static readonly BLOCK_HISTORY = 1000;
-    protected static readonly BLOCK_CHUNK = 25;
+    protected static readonly BLOCK_CHUNK = 100;
     
     
     @Inject({ ctorArgs: [ CrawlerService.name ] })
@@ -140,8 +140,7 @@ export class CrawlerService
             this._logger.log('Handlers post processing');
             
             for (const handler of Object.values(this._handlers)) {
-                handler.beforeHandle(txEntitiyManager);
-                await handler.chunkPostProcess();
+                await handler.postProcess();
             }
         });
         
@@ -176,16 +175,8 @@ export class CrawlerService
     
     protected async _handleEvent (event : Event)
     {
-        let canHandle = Object.values(this._handlers)
-            .find(handler => handler.canHandle(event));
-        if (!canHandle) {
-            return;
-        }
-        
         for (const handler of Object.values(this._handlers)) {
-            handler.beforeHandle(this._txEntityManager);
-            
-            const handled = await handler.tryHandle(event);
+            const handled = await handler.tryHandle(event, this._txEntityManager);
             if (handled) {
                 this._logger.log('Event', colors.brightCyan(event.type), 'handled');
             }
