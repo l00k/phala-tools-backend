@@ -31,10 +31,12 @@ export class Observation
     
     @ORM.ManyToOne(() => StakePool, { eager: true })
     @API.Property(() => StakePool)
+    @Assert(() => StakePool)
     public stakePool : StakePool;
     
     @ORM.ManyToOne(() => Account, { nullable: true, eager: true })
     @API.Property(() => Account)
+    @Assert(() => Account)
     public account : Account;
     
     @ORM.Enum({ items: () => ObservationMode, nullable: true })
@@ -45,11 +47,13 @@ export class Observation
     
     @ORM.Property({ type: ORM.JsonType })
     @API.Property(() => ObservationConfiguration)
+    @Assert({}, () => ObservationConfiguration)
     public config : ObservationConfiguration = new ObservationConfiguration();
     
     
     @ORM.Property({ type: ORM.JsonType })
     @API.Property(() => ObservationNotifications)
+    @Assert({}, () => ObservationNotifications)
     public lastNotifications : ObservationNotifications = new ObservationNotifications();
     
     

@@ -5,8 +5,8 @@ import { ApiMode } from '#/Polkadot';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { EntityManager } from '@mikro-orm/mysql';
 import { ApiPromise } from '@polkadot/api';
-import { InitializeSymbol, Inject } from 'core/object-manager';
-import { Logger } from 'core/utils/Logger';
+import { InitializeSymbol, Inject } from '@inti5/object-manager';
+import { Logger } from '@inti5/utils/Logger';
 
 
 export type ThresholdCallback = (observation : Observation) => Promise<number>;

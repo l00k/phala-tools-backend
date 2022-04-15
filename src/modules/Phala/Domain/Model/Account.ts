@@ -1,6 +1,7 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ORM from '@mikro-orm/core';
 import { Annotation as API } from '@inti5/api-backend';
+import { Assert } from '@inti5/validator/Object';
 
 
 
@@ -21,17 +22,20 @@ export class Account
     @ORM.Property({ unique: true })
     @API.Property()
     @API.Filterable()
+    @Assert()
     public address : string;
     
     @ORM.Property({ nullable: true })
     @API.Property()
     @API.Filterable()
+    @Assert()
     public identity : string;
     
     @ORM.Property()
     @API.Property()
     @API.Filterable()
     @API.Sortable()
+    @Assert()
     public identityVerified : boolean = false;
     
     

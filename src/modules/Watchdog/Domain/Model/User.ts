@@ -6,6 +6,7 @@ import { Annotation as API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
 import * as Trans from 'class-transformer';
+import { Assert } from '@inti5/validator/Object';
 
 
 @ORM.Entity({
@@ -52,10 +53,12 @@ export class User
     
     @ORM.Property({ type: ORM.JsonType })
     @API.Property(() => UserConfiguration)
+    @Assert({}, () => UserConfiguration)
     public config : UserConfiguration = new UserConfiguration();
     
     @ORM.OneToMany(() => Observation, o => o.user)
     @API.Property(() => [ Observation ])
+    @Assert({}, () => [ Observation ])
     public observations : ORM.Collection<Observation>;
     
     

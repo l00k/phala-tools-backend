@@ -1,7 +1,7 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { User } from '#/Watchdog/Domain/Model/User';
 import { EntityRepository } from '@mikro-orm/core';
-import { ValidationException } from 'core/validator';
+import { ValidationException } from '@inti5/validator';
 import express from 'express';
 
 

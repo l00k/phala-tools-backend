@@ -1,4 +1,4 @@
-import { Network } from '#/App/Domain/Type/ModuleConfig';
+import { Network } from '#/App/Domain/Type/Network';
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import * as Phala from '#/Phala';
 import { Account } from '#/Phala/Domain/Model';

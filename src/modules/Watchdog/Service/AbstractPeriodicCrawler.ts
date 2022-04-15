@@ -9,8 +9,8 @@ import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import * as ORM from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/mysql';
 import { ApiPromise } from '@polkadot/api';
-import { InitializeSymbol, Inject, ObjectManager } from 'core/object-manager';
-import { Logger } from 'core/utils/Logger';
+import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
+import { Logger } from '@inti5/utils/Logger';
 import groupBy from 'lodash/groupBy';
 
 

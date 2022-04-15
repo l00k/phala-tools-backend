@@ -18,7 +18,7 @@ export class NotificationConfig
     @Assert({
         numericality: {
             onlyInteger: true,
-            greaterThan: 0,
+            greaterThanOrEqualTo: 0,
         }
     })
     public frequency : number;
@@ -27,7 +27,7 @@ export class NotificationConfig
     @Assert({
         numericality: {
             onlyInteger: true,
-            greaterThan: 0,
+            greaterThanOrEqualTo: 0,
         }
     })
     public threshold : number;

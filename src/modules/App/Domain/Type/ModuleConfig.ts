@@ -1,9 +1,4 @@
-export enum Network
-{
-    Khala = 'khala',
-    Phala = 'phala',
-}
-
+import { Network } from '#/App/Domain/Type/Network';
 
 export type ModuleAppConfig = {
     modules : {
