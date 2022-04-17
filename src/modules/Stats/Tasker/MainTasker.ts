@@ -6,9 +6,7 @@ import { Inject, Injectable } from '@inti5/object-manager';
 import { Timeout } from '@inti5/utils/Timeout';
 
 
-// todo ld 2022-04-13 02:01:09
-// temporarly disabled
-//@Injectable({ tag: 'tasker.handler' })
+@Injectable({ tag: 'tasker.handler' })
 export class MainTasker
 {
     
