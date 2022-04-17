@@ -2,8 +2,10 @@ import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Issue } from '#/Stats/Domain/Model/Issue';
 import * as Api from '@inti5/api-backend';
 import { Annotation as API } from '@inti5/api-backend';
+import * as Router from 'core/express-ext';
 
 
+@Router.Headers.CacheControl('public, max-age=86400')
 export class IssueController
     extends CrudController<Issue>
 {

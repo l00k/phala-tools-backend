@@ -9,6 +9,7 @@ import * as ORM from '@mikro-orm/core';
 import * as Trans from 'class-transformer';
 
 
+@Router.Headers.CacheControl('public, max-age=900')
 export class StakePoolEntryController
     extends CrudController<StakePoolEntry>
 {

@@ -6,6 +6,7 @@ import * as Router from '@inti5/express-ext';
 import * as ORM from '@mikro-orm/core';
 
 
+@Router.Headers.CacheControl('public, max-age=900')
 export class HistoryEntryController
     extends CrudController<HistoryEntry>
 {

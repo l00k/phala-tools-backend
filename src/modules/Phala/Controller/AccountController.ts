@@ -6,9 +6,9 @@ import { Annotation as API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-ext';
 import { Inject } from '@inti5/object-manager';
 import { Assert } from '@inti5/validator/Method';
-import validateJsExt from 'validate.js';
 
 
+@Router.Headers.CacheControl('public, max-age=900')
 export class AccountController
     extends CrudController<Account>
 {

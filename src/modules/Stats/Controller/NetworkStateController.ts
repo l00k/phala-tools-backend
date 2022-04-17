@@ -1,8 +1,10 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { NetworkState } from '#/Stats/Domain/Model/NetworkState';
 import { Annotation as API } from '@inti5/api-backend';
+import * as Router from 'core/express-ext';
 
 
+@Router.Headers.CacheControl('public, max-age=900')
 export class NetworkStateController
     extends CrudController<NetworkState>
 {

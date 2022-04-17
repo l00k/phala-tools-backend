@@ -7,6 +7,7 @@ import { Assert } from '@inti5/validator/Method';
 import * as ORM from '@mikro-orm/core';
 
 
+@Router.Headers.CacheControl('public, max-age=900')
 export class StakePoolController
     extends CrudController<StakePool>
 {
