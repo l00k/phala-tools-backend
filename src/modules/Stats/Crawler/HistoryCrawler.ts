@@ -356,12 +356,12 @@ export class HistoryCrawler
             .filter(worker => !worker.isDropped && worker.isMiningState)
             .reduce((acc, worker) => acc + worker.getShare(), 0);
         
-        for (const stakePool of this._processedStakePools) {
-            if (!stakePool.lastHistoryEntry.stakeTotal) {
+        for (const stakePoolEntry of this._processedStakePools) {
+            if (!stakePoolEntry.lastHistoryEntry.stakeTotal) {
                 continue;
             }
             
-            const rewardPerBlock = stakePool.snapshotWorkers
+            const rewardPerBlock = stakePoolEntry.snapshotWorkers
                 .filter(worker => !worker.isDropped && worker.isMiningState)
                 .reduce((acc, worker) => {
                     let workerRewards = (worker.getShare() / totalShare) * budgetPerBlock;
@@ -374,12 +374,17 @@ export class HistoryCrawler
                     return acc + workerRewards;
                 }, 0);
             
-            stakePool.lastHistoryEntry.currentApr = rewardPerBlock
+            stakePoolEntry.lastHistoryEntry.currentApr = rewardPerBlock
                 * rewardsFractionInEra
                 * (1 - treasuryRatio)
-                * (1 - stakePool.lastHistoryEntry.commission)
+                * (1 - stakePoolEntry.lastHistoryEntry.commission)
                 * (31536000 / avgBlockTime)
-                / stakePool.lastHistoryEntry.stakeTotal;
+                / stakePoolEntry.lastHistoryEntry.stakeTotal;
+                
+            console.log(
+                stakePoolEntry.stakePool.onChainId,
+                stakePoolEntry.lastHistoryEntry.currentApr
+            );
         }
     }
     
