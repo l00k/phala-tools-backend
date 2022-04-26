@@ -13,11 +13,6 @@ import { Config } from '@inti5/configuration';
 import moment from 'moment';
 
 
-type ObjectMap<V> = {
-    [index : string] : V
-};
-
-
 export class HistoryCrawler
     extends AbstractCrawler
 {
@@ -380,11 +375,6 @@ export class HistoryCrawler
                 * (1 - stakePoolEntry.lastHistoryEntry.commission)
                 * (31536000 / avgBlockTime)
                 / stakePoolEntry.lastHistoryEntry.stakeTotal;
-                
-            console.log(
-                stakePoolEntry.stakePool.onChainId,
-                stakePoolEntry.lastHistoryEntry.currentApr
-            );
         }
     }
     
