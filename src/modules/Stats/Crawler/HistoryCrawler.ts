@@ -59,79 +59,88 @@ export class HistoryCrawler
         
         // max 10 entries per execution
         for (let i = 0; i < 10; ++i) {
-            const nextEntryMoment = moment(this._appState.value.lastProcessedUts * 1000)
-                .minute(0)
-                .second(0)
-                .millisecond(0)
-                .add(6, 'hour');
-            const dateThresholdMoment = moment().subtract(5, 'minutes');
-            
-            if (nextEntryMoment.isAfter(dateThresholdMoment)) {
-                this._logger.info('Not processed yet! Stop.');
-                break;
-            }
-            
-            // find first block of next entry
-            this._previousEntryBlockNumber = this._appState.value.lastProcessedBlock;
-            
-            this._nextEntryDate = nextEntryMoment.toDate();
-            const nextEntryUts : number = Number(this._nextEntryDate) / 1000;
-            
-            this._nextEntryBlockNumber = await this._findFirstBlockOfEntry(this._nextEntryDate, this._appState.value.lastProcessedBlock);
-            if (!this._nextEntryBlockNumber || this._nextEntryBlockNumber <= this._previousEntryBlockNumber) {
-                this._logger.info('Unable to find next block! Stop.');
-                break;
-            }
-            
-            this._nextEntryBlockHash = (await this._phalaApi.rpc.chain.getBlockHash(this._nextEntryBlockNumber)).toString();
-            
-            // update block related data
-            this._tokenomicParameters =
-                <any>(await this._phalaApi.query.phalaMining.tokenomicParameters.at(this._nextEntryBlockHash)).toJSON();
-            
-            
-            // log
-            this._logger.info('Next entry block found');
-            this._logger.info('Prev', this._previousEntryBlockNumber);
-            this._logger.info(moment(this._appState.value.lastProcessedUts * 1000).toISOString());
-            this._logger.info('Next', this._nextEntryBlockNumber);
-            this._logger.info(moment(this._nextEntryDate).toISOString());
-            
             try {
-                // update all stake pools
-                await this._entityManagerWrapper.transaction(async(entityManager) => {
-                    this._txEntityManager = entityManager;
-                    
-                    await this._clearContext();
-                    await this._processNextHistoryEntry();
-                    
-                    await this._calculateApr();
-                    
-                    await entityManager.flush();
-                    
-                    await this._calculateAvgApr();
-                    await this._processAvgStakePools();
-                    
-                    await entityManager.flush();
-                    
-                    await this._processNetworkState();
-                    
-                    await entityManager.flush();
-                });
-                
-                // update app state
-                this._appState.value.lastProcessedBlock = this._nextEntryBlockNumber;
-                this._appState.value.lastProcessedUts = nextEntryUts;
-                ++this._appState.value.lastProcessedNonce;
-                
-                await this._entityManager.flush();
-                
-                this._logger.info('Entry done');
+                const continueRunning = await this._processOnce();
+                if (!continueRunning) {
+                    break;
+                }
             }
             catch (e) {
                 console.error(e);
             }
         }
+    }
+    
+    protected async _processOnce () : Promise<boolean>
+    {
+        const nextEntryMoment = moment(this._appState.value.lastProcessedUts * 1000)
+            .minute(0)
+            .second(0)
+            .millisecond(0)
+            .add(6, 'hour');
+        
+        const dateThresholdMoment = moment().subtract(5, 'minutes');
+        if (nextEntryMoment.isAfter(dateThresholdMoment)) {
+            this._logger.info('Not processed yet! Stop.');
+            return false;
+        }
+        
+        // find first block of next entry
+        this._previousEntryBlockNumber = this._appState.value.lastProcessedBlock;
+        
+        this._nextEntryDate = nextEntryMoment.toDate();
+        const nextEntryUts : number = Number(this._nextEntryDate) / 1000;
+        
+        this._nextEntryBlockNumber = await this._findFirstBlockOfEntry(this._nextEntryDate, this._appState.value.lastProcessedBlock);
+        if (!this._nextEntryBlockNumber || this._nextEntryBlockNumber <= this._previousEntryBlockNumber) {
+            this._logger.info('Unable to find next block! Stop.');
+            return false;
+        }
+        
+        this._nextEntryBlockHash = (await this._phalaApi.rpc.chain.getBlockHash(this._nextEntryBlockNumber)).toString();
+        
+        // update block related data
+        this._tokenomicParameters =
+            <any>(await this._phalaApi.query.phalaMining.tokenomicParameters.at(this._nextEntryBlockHash)).toJSON();
+        
+        // log
+        this._logger.info('Next entry block found');
+        this._logger.info('Prev', this._previousEntryBlockNumber);
+        this._logger.info(moment(this._appState.value.lastProcessedUts * 1000).toISOString());
+        this._logger.info('Next', this._nextEntryBlockNumber);
+        this._logger.info(moment(this._nextEntryDate).toISOString());
+        
+        // update all stake pools
+        await this._entityManagerWrapper.transaction(async(entityManager) => {
+            this._txEntityManager = entityManager;
+            
+            await this._clearContext();
+            await this._processNextHistoryEntry();
+            
+            await this._calculateApr();
+            
+            await entityManager.flush();
+            
+            await this._calculateAvgApr();
+            await this._processAvgStakePools();
+            
+            await entityManager.flush();
+            
+            await this._processNetworkState();
+            
+            await entityManager.flush();
+        });
+        
+        // update app state
+        this._appState.value.lastProcessedBlock = this._nextEntryBlockNumber;
+        this._appState.value.lastProcessedUts = nextEntryUts;
+        ++this._appState.value.lastProcessedNonce;
+        
+        await this._entityManager.flush();
+        
+        this._logger.info('Entry done');
+        
+        return true;
     }
     
     protected async _clearContext ()
@@ -290,9 +299,7 @@ export class HistoryCrawler
             
             stakePoolEntry.snapshotWorkers.push(worker);
             
-            if (!worker.bindingAccount) {
-                worker.bindingAccount = (await this._phalaApi.query.phalaMining.workerBindings.at(this._nextEntryBlockHash, workerPublicKey)).toString();
-            }
+            worker.bindingAccount = (await this._phalaApi.query.phalaMining.workerBindings.at(this._nextEntryBlockHash, workerPublicKey)).toString();
             
             const onChainMiner : typeof Phala.KhalaTypes.MinerInfo =
                 <any>(await this._phalaApi.query.phalaMining.miners.at(this._nextEntryBlockHash, worker.bindingAccount)).toJSON();
@@ -383,7 +390,7 @@ export class HistoryCrawler
     ) : Promise<number>
     {
         let miningStartBlock : number = null;
-    
+        
         try {
             miningStartBlock = <any>(await this._phalaApi.query.phalaMining.miningStartBlock.at(this._nextEntryBlockHash)).toJSON();
         }
