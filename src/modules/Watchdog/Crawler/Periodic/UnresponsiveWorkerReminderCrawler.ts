@@ -56,7 +56,7 @@ export class UnresponsiveWorkerReminderCrawler
     ) : string
     {
         return '`#' + onChainId + '` '
-            + observedValue + 'worker(s) in unresponsive state';
+            + observedValue + ' worker(s) in unresponsive state';
     }
     
 }
