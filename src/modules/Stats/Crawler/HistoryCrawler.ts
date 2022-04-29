@@ -16,9 +16,10 @@ import moment from 'moment';
 export class HistoryCrawler
     extends AbstractCrawler
 {
+
+    public static readonly HISTORY_ENTRY_INTERVAL = 0.25;
     
     protected static readonly HALVING_FRACTION = 0.75;
-    protected static readonly HISTORY_ENTRY_INTERVAL = 0.25;
     protected static readonly BLOCK_INTERVAL = 2048;
     
     protected static readonly TARGET_BLOCK_TIME = 12;
@@ -57,8 +58,8 @@ export class HistoryCrawler
     {
         this._logger.log('Processing history entries');
         
-        // max 10 entries per execution
-        for (let i = 0; i < 10; ++i) {
+        // max 3 entries per execution
+        for (let i = 0; i < 1; ++i) {
             try {
                 const continueRunning = await this._processOnce();
                 if (!continueRunning) {
@@ -119,16 +120,10 @@ export class HistoryCrawler
             
             await this._calculateApr();
             
-            await entityManager.flush();
-            
             await this._calculateAvgApr();
             await this._processAvgStakePools();
             
-            await entityManager.flush();
-            
             await this._processNetworkState();
-            
-            await entityManager.flush();
         });
         
         // update app state
