@@ -11,6 +11,13 @@ import * as ORM from '@mikro-orm/core';
     tableName: 'stats_historyentry',
     customRepository: () => HistoryEntryRepository
 })
+@ORM.Index({
+    properties: [
+        'stakePoolEntry',
+        'entryNonce',
+        'finalized'
+    ]
+})
 @API.Resource('Stats/HistoryEntry')
 export class HistoryEntry
     extends AbstractModel<HistoryEntry>
@@ -34,6 +41,10 @@ export class HistoryEntry
     @API.Filterable()
     @API.Sortable()
     public entryDate : Date;
+    
+    @ORM.Property()
+    @API.Property()
+    public finalized : boolean = false;
     
     
     @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.PERCENT })
