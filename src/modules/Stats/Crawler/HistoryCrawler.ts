@@ -135,7 +135,7 @@ export class HistoryCrawler
             await entityManager.flush();
             
             await this._calculateAvgApr();
-            await this._processAvgStakePools();
+            await this._processAvgStakePools(finalized);
             
             await entityManager.flush();
             
@@ -472,7 +472,9 @@ export class HistoryCrawler
     /**
      * Processing avg entries
      */
-    protected async _processAvgStakePools () : Promise<void>
+    protected async _processAvgStakePools (
+        finalized : boolean
+    ) : Promise<void>
     {
         // sort stake pools
         this._sortedStakePools = this._processedStakePools
@@ -483,28 +485,34 @@ export class HistoryCrawler
         // process avg entries
         await this._processAvgStakePool(
             this._specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID],
-            this._sortedStakePools
+            this._sortedStakePools,
+            finalized
         );
         
         await this._processAvgStakePool(
             this._specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID],
-            this._sortedStakePools.slice(0, 100)
+            this._sortedStakePools.slice(0, 100),
+            finalized
         );
     }
     
     protected async _processAvgStakePool (
-        stakePool : StakePoolEntry,
-        limitedStakePools : StakePoolEntry[]
+        stakePoolEntry : StakePoolEntry,
+        limitedStakePools : StakePoolEntry[],
+        finalized : boolean
     ) : Promise<void>
     {
         const oneOfHistoryEntries : HistoryEntry = this._processedStakePools[0].lastHistoryEntry;
-        const historyEntry : HistoryEntry = new HistoryEntry({
-            stakePoolEntry: stakePool,
-            entryNonce: oneOfHistoryEntries.entryNonce,
-            entryDate: oneOfHistoryEntries.entryDate,
-        }, this._entityManager);
         
-        stakePool.lastHistoryEntry = historyEntry;
+        const historyEntry : HistoryEntry = await this._getOrCreateHistoryEntry(
+            stakePoolEntry,
+            oneOfHistoryEntries.entryNonce
+        );
+        
+        historyEntry.assign({
+            entryDate: oneOfHistoryEntries.entryDate,
+            lastHistoryEntry: historyEntry,
+        });
         
         this._txEntityManager.persist(historyEntry);
         
