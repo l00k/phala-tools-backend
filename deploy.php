@@ -137,7 +137,7 @@ task('db:backup', function () {
     run("
         cd {{deploy_path}}
         set -o allexport; source $envPath; set +o allexport
-        mysqldump --column-statistics=0 -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME > .dep/dbdumps/$dumpname
+        mysqldump -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME > .dep/dbdumps/$dumpname
     ", [ 'tty' => true ]);
 });
 

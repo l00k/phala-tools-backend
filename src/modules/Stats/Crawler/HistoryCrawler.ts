@@ -263,8 +263,6 @@ export class HistoryCrawler
         this._stakePoolsCount = <any>(await this._phalaApi.query.phalaStakePool.poolCount.at(this._nextEntryBlockHash)).toJSON();
         this._logger.log('Stake pools num', this._stakePoolsCount);
         
-        this._stakePoolsCount = 25;
-        
         for (let stakePoolId = 0; stakePoolId < this._stakePoolsCount; ++stakePoolId) {
             await this._processStakePool(
                 stakePoolId,
