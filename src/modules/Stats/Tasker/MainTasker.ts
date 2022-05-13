@@ -35,7 +35,7 @@ export class MainTasker
     @Timeout(5 * 60 * 1000)
     public processIssues () : Promise<any>
     {
-        return this._historyCrawler.run();
+        return this._issuesCrawler.run();
     }
     
     @Task({
@@ -44,7 +44,7 @@ export class MainTasker
     @Timeout(5 * 60 * 1000)
     public processEvents () : Promise<any>
     {
-        return this._historyCrawler.run();
+        return this._eventsCrawler.run();
     }
     
 }
