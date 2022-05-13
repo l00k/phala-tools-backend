@@ -59,7 +59,7 @@ export class HistoryCrawler
         this._logger.log('Processing history entries');
         
         // max 3 entries per execution
-        for (let i = 0; i < 1000; ++i) {
+        for (let i = 0; i < 1; ++i) {
             try {
                 const continueRunning = await this._processOnce();
                 if (!continueRunning) {
