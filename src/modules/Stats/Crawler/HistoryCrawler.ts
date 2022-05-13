@@ -57,19 +57,7 @@ export class HistoryCrawler
     protected async _process ()
     {
         this._logger.log('Processing history entries');
-        
-        // max 3 entries per execution
-        for (let i = 0; i < 1; ++i) {
-            try {
-                const continueRunning = await this._processOnce();
-                if (!continueRunning) {
-                    break;
-                }
-            }
-            catch (e) {
-                console.error(e);
-            }
-        }
+        await this._processOnce();
     }
     
     protected async _processOnce () : Promise<boolean>
