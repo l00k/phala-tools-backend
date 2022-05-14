@@ -154,6 +154,19 @@ task('db:restore', function () {
     ", ['tty' => true]);
 });
 
+task('db:cleanup', function () {
+    $envPath = test('[[ -e {{deploy_path}}/shared ]]')
+        ? 'shared/.env'
+        : './.env';
+
+    writeln('Cleaning up...');
+    run("
+        cd {{deploy_path}}
+        set -o allexport; source $envPath; set +o allexport
+        mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME -e 'truncate `stats_stakepoolentry_issues`;'
+    ", ['tty' => true]);
+});
+
 task('db:pull', function () {
     $localCwd = runLocally('pwd');
     $dumpname = date('Y-m-d-H-i-s') . '-' . uniqid() . '.sql';

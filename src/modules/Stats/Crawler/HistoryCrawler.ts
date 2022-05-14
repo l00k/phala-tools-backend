@@ -415,6 +415,8 @@ export class HistoryCrawler
                 continue;
             }
             
+            const historyEntry = stakePoolEntry.lastHistoryEntry;
+            
             const rewardPerBlock = stakePoolEntry.snapshotWorkers
                 .filter(worker => !worker.isDropped && worker.isMiningState)
                 .reduce((acc, worker) => {
@@ -428,12 +430,18 @@ export class HistoryCrawler
                     return acc + workerRewards;
                 }, 0);
             
-            stakePoolEntry.lastHistoryEntry.currentApr = rewardPerBlock
+            const currentApr = rewardPerBlock
                 * rewardsFractionInEra
                 * (1 - treasuryRatio)
                 * (1 - stakePoolEntry.lastHistoryEntry.commission)
                 * (31536000 / avgBlockTime)
                 / stakePoolEntry.lastHistoryEntry.stakeTotal;
+            
+            historyEntry.currentApr = (
+                historyEntry.currentApr * historyEntry.intermediateStep
+                + currentApr
+            ) / (historyEntry.intermediateStep + 1);
+            ++historyEntry.intermediateStep;
         }
     }
     

@@ -43,8 +43,10 @@ export class HistoryEntry
     public entryDate : Date;
     
     @ORM.Property()
-    @API.Property()
     public finalized : boolean = false;
+    
+    @ORM.Property()
+    public intermediateStep : number = 0;
     
     
     @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.PERCENT })
