@@ -81,10 +81,9 @@ export class HistoryCrawler
             .add(6, 'hour');
         
         const finalizedThresholdMoment = moment();
-        const hardThresholdMoment = moment().add(6, 'hours');
-        
         const finalized = !nextEntryMoment.isAfter(finalizedThresholdMoment);
         
+        const hardThresholdMoment = moment().add(6, 'hours');
         if (nextEntryMoment.isAfter(hardThresholdMoment)) {
             this._logger.info('Not processed yet! Stop.');
             return false;
@@ -156,7 +155,16 @@ export class HistoryCrawler
         
         this._logger.info('Entry done');
         
-        return finalized;
+        if (finalized) {
+            // finalized entry processed
+            // continue only if processed entry is old enough
+            const continueDiff = moment().diff(nextEntryMoment, 'minutes', true);
+            return continueDiff > 30;
+        }
+        else {
+            // non finalized entry processed - stop
+            return false;
+        }
     }
     
     protected async _clearContext ()
