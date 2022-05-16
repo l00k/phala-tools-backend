@@ -89,7 +89,7 @@ export class MessagingProvider
     ) : Promise<ExtraReplyMessage>
     {
         if (this._telegramConfig.redirectMsgTo) {
-            text = `## Redirected from ${chatId}\n` + text;
+            text = `\\#\\# Redirected from ${chatId}\n` + text;
             chatId = this._telegramConfig.redirectMsgTo;
         }
         
