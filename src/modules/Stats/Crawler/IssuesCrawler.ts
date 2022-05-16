@@ -15,7 +15,7 @@ export class IssuesCrawler
     protected static readonly NEW_STAKEPOOL_THRESHOLD = 7;
     protected static readonly BAD_BEHAVIOR_DAY_THRESHOLD = 2;
     protected static readonly BAD_BEHAVIOR_PERCENT_THRESHOLD = 0.1;
-    protected static readonly MEANINGFUL_STAKE_RATIO = 0.1;
+    protected static readonly MEANINGFUL_STAKE_RATIO = 0.025;
     
     
     @Inject({ ctorArgs: [ IssuesCrawler.name ] })
@@ -55,7 +55,8 @@ export class IssuesCrawler
             [
                 'stakePoolEntry',
                 'stakePoolEntry.stakePool'
-            ]
+            ],
+            { stakePoolEntry: 'ASC', blockNumber: 'ASC' }
         );
         if (!commissionEvents.length) {
             return;
@@ -87,7 +88,7 @@ export class IssuesCrawler
                     return false;
                 }
                 
-                if (contributionEvent.sourceAccount.id != stakePoolEntry.stakePool.owner.id) {
+                if (contributionEvent.sourceAccount.id == stakePoolEntry.stakePool.owner.id) {
                     return false;
                 }
                 
