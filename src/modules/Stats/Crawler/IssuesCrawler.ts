@@ -27,9 +27,8 @@ export class IssuesCrawler
     
     protected async _process ()
     {
-        await this._findBadBahaviours();
-        
         // todo ld 2022-03-07 22:34:26
+        // await this._findBadBahaviours();
         // await this.findSlashes();
     }
     
