@@ -1,5 +1,5 @@
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import * as Trans from 'class-transformer';
 import { Assert } from '@inti5/validator/Object';
 

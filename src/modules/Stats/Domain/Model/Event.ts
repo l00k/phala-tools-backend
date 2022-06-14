@@ -4,8 +4,9 @@ import * as ExtORM from '#/BackendCore/ORM/Ext';
 import { Account } from '#/Phala/Domain/Model';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { EventRepository } from '#/Stats/Domain/Repository/EventRepository';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
+import { Type } from '@inti5/graph-typing';
 
 
 export enum EventType
@@ -111,7 +112,8 @@ export class Event<T extends AbstractEventData = AbstractEventData>
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => EventAdditionalData)
+    @API.Property()
+    @Type(() => EventAdditionalData)
     public additionalData : T = <any>{};
     
     

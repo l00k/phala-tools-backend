@@ -48,12 +48,12 @@ export class UpdateDto
     
     @Assert({
         presence: true,
-    }, false)
+    })
     public relayChain : ChainStateDto;
     
     @Assert({
         presence: true,
-    }, false)
+    })
     public paraChain : ChainStateDto;
     
 }

@@ -1,4 +1,4 @@
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
 
 

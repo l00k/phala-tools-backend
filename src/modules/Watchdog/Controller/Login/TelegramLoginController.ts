@@ -4,7 +4,7 @@ import { TelegramConfig } from '#/Messaging/Domain/types';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { TelegramLoginDto } from '#/Watchdog/Controller/Login/Dto/TelegramLoginDto';
 import { User } from '#/Watchdog/Domain/Model/User';
-import { Body, Controller, Endpoint } from '@inti5/express-ext';
+import { Body, Controller, Endpoint } from '@inti5/express-router';
 import { Inject } from '@inti5/object-manager';
 import { Assert, Validate } from '@inti5/validator/Method';
 import { Config } from '@inti5/configuration';

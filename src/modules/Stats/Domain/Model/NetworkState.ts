@@ -1,7 +1,7 @@
 import { ColumnType } from '#/App/Domain/DbConfig';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 
 

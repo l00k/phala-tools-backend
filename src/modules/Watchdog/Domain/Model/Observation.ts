@@ -5,11 +5,12 @@ import { ObservationNotifications } from '#/Watchdog/Domain/Model/Observation/Ob
 import { User } from '#/Watchdog/Domain/Model/User';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
 import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
 import * as Trans from 'class-transformer';
+import { Type } from 'core/graph-typing';
 
 
 @ORM.Entity({
@@ -30,30 +31,33 @@ export class Observation
     public user : User;
     
     @ORM.ManyToOne(() => StakePool, { eager: true })
-    @API.Property(() => StakePool)
-    @Assert(() => StakePool)
+    @API.Property()
+    @Assert()
+    @Type(() => StakePool)
     public stakePool : StakePool;
     
     @ORM.ManyToOne(() => Account, { nullable: true, eager: true })
-    @API.Property(() => Account)
-    @Assert(() => Account)
+    @API.Property()
+    @Assert()
+    @Type(() => Account)
     public account : Account;
     
     @ORM.Enum({ items: () => ObservationMode, nullable: true })
     @API.Property()
-    @Assert()
     public mode : ObservationMode;
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => ObservationConfiguration)
-    @Assert({}, () => ObservationConfiguration)
+    @API.Property()
+    @Assert()
+    @Type(() => ObservationConfiguration)
     public config : ObservationConfiguration = new ObservationConfiguration();
     
     
     @ORM.Property({ type: ORM.JsonType })
-    @API.Property(() => ObservationNotifications)
-    @Assert({}, () => ObservationNotifications)
+    @API.Property()
+    @Assert()
+    @Type(() => ObservationNotifications)
     public lastNotifications : ObservationNotifications = new ObservationNotifications();
     
     

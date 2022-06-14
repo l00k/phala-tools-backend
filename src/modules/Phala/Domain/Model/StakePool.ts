@@ -1,8 +1,9 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import { Account } from '#/Phala/Domain/Model/Account';
 import * as ORM from '@mikro-orm/core';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import { Assert } from '@inti5/validator/Object';
+import { Type } from '@inti5/graph-typing';
 
 
 
@@ -28,10 +29,11 @@ export class StakePool
     public onChainId : number;
     
     @ORM.ManyToOne(() => Account)
-    @API.Property(() => Account)
+    @API.Property()
     @API.Filterable()
     @API.Sortable()
-    @Assert()
+    @Assert({})
+    @Type(() => Account)
     public owner : Account;
     
     

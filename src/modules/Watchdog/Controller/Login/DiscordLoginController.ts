@@ -4,7 +4,7 @@ import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
 import { IdentityProvider as DiscordIdentityProvider } from '#/Messaging/Service/Discord/IdentityProvider';
 import { DiscordLoginDto } from '#/Watchdog/Controller/Login/Dto/DiscordLoginDto';
 import { User } from '#/Watchdog/Domain/Model/User';
-import { Body, Controller, Endpoint } from '@inti5/express-ext';
+import { Body, Controller, Endpoint } from '@inti5/express-router';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { Assert, Validate } from '@inti5/validator/Method';

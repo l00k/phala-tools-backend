@@ -1,9 +1,8 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { User } from '#/Watchdog/Domain/Model/User';
-import { Annotation as API } from '@inti5/api-backend';
-import * as Router from '@inti5/express-ext';
-import { Assert } from '@inti5/validator/Method';
-import { Annotation as Srl } from '@inti5/serializer';
+import { API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-router';
+import { Type } from '@inti5/graph-typing';
 
 
 @Router.AuthOnly()
@@ -29,7 +28,8 @@ export class UserController
             config: '**',
             lastNotifications: '*',
         }
-    }, () => User)
+    })
+    @Type(() => User)
     public async getUserMe (
         @Router.AuthData()
             authData : any

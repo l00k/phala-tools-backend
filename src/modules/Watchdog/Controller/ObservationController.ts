@@ -1,13 +1,14 @@
 import { AbstractOwnerController } from '#/Watchdog/Controller/AbstractOwnerController';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { User } from '#/Watchdog/Domain/Model/User';
-import { Annotation as API } from '@inti5/api-backend';
-import * as Router from '@inti5/express-ext';
-import { EntitySerializationGraph } from '@inti5/serializer';
+import { API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-router';
+import { EntitySanitizationGraph } from '@inti5/graph-sanitizer';
 import { Assert, ValidationException } from '@inti5/validator/Method';
+import { Type } from 'core/graph-typing';
 
 
-const observationSanitizationGraph : EntitySerializationGraph<Observation> = {
+const observationSanitizationGraph : EntitySanitizationGraph<Observation> = {
     stakePool: {
         onChainId: true,
         owner: '*',
@@ -27,8 +28,9 @@ export class ObservationController
     
     
     @API.CRUD.Create(() => Observation)
-    @API.Serialize(observationSanitizationGraph, () => Observation)
+    @API.Serialize(observationSanitizationGraph)
     @Router.AuthOnly()
+    @Type(() => Observation)
     public async create (
         @Router.AuthData()
             authData : any,
@@ -39,7 +41,7 @@ export class ObservationController
             mode: true,
             config: '**',
             lastNotifications: false,
-        }, () => Observation)
+        })
         @Assert()
             observation : Observation
     ) : Promise<Observation>
@@ -64,8 +66,9 @@ export class ObservationController
     }
     
     @API.CRUD.Update(() => Observation)
-    @API.Serialize(observationSanitizationGraph, () => Observation)
+    @API.Serialize(observationSanitizationGraph)
     @Router.AuthOnly()
+    @Type(() => Observation)
     public async update (
         @Router.AuthData()
             authData : any,
@@ -78,7 +81,7 @@ export class ObservationController
             mode: true,
             config: '**',
             lastNotifications: false,
-        }, () => Observation)
+        })
         @Assert()
             observationUpdate : Observation
     ) : Promise<Observation>
@@ -100,6 +103,7 @@ export class ObservationController
     @API.CRUD.Delete(() => Observation)
     @API.Serialize(true)
     @Router.AuthOnly()
+    @Type(() => Boolean)
     public async delete (
         @Router.AuthData()
             authData : any,

@@ -1,8 +1,8 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { StakePool } from '#/Phala/Domain/Model';
 import * as Api from '@inti5/api-backend';
-import { Annotation as API } from '@inti5/api-backend';
-import * as Router from '@inti5/express-ext';
+import { API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-router';
 import { Assert } from '@inti5/validator/Method';
 import * as ORM from '@mikro-orm/core';
 

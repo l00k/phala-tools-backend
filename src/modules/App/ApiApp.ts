@@ -1,7 +1,7 @@
 import { AbstractApp } from '#/BackendCore/Module/AbstractApp';
 import * as Api from '@inti5/api-backend';
 import { Configuration } from '@inti5/configuration';
-import { ExpressConfig, ExpressFactory } from '@inti5/express-ext';
+import { ExpressConfig, ExpressFactory } from '@inti5/express-router';
 import { ObjectManager } from '@inti5/object-manager';
 import { MikroORM } from '@mikro-orm/core';
 

@@ -2,8 +2,8 @@ import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Account } from '#/Phala/Domain/Model';
 import { PhalaEntityFetcher } from '#/Phala/Service/PhalaEntityFetcher';
 import * as Polkadot from '#/Polkadot';
-import { Annotation as API } from '@inti5/api-backend';
-import * as Router from '@inti5/express-ext';
+import { API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-router';
 import { Inject } from '@inti5/object-manager';
 import { Assert } from '@inti5/validator/Method';
 

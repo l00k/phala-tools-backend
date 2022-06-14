@@ -1,6 +1,6 @@
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ORM from '@mikro-orm/core';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 
 
 @ORM.Entity({

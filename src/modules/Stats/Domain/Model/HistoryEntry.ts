@@ -3,7 +3,7 @@ import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { HistoryEntryRepository } from '#/Stats/Domain/Repository/HistoryEntryRepository';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
 
 

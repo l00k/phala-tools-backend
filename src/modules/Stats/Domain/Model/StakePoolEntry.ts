@@ -3,8 +3,9 @@ import { StakePool } from '#/Phala/Domain/Model';
 import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import { Issue } from '#/Stats/Domain/Model/Issue';
 import { Worker } from '#/Stats/Domain/Model/Worker';
-import { Annotation as API } from '@inti5/api-backend';
+import { API } from '@inti5/api-backend';
 import * as ORM from '@mikro-orm/core';
+import { Type } from '@inti5/graph-typing';
 
 
 @ORM.Entity({
@@ -26,9 +27,10 @@ export class StakePoolEntry
     
     
     @ORM.OneToOne(() => StakePool, null, { nullable: true, eager: true })
-    @API.Property(() => StakePool)
+    @API.Property()
     @API.Filterable()
     @API.Sortable()
+    @Type(() => StakePool)
     public stakePool : StakePool;
     
     
@@ -37,9 +39,10 @@ export class StakePoolEntry
     public special : string;
     
     @ORM.OneToOne(() => HistoryEntry, null, { nullable: true, eager: true })
-    @API.Property(() => HistoryEntry)
+    @API.Property()
     @API.Filterable()
     @API.Sortable()
+    @Type(() => HistoryEntry)
     public lastHistoryEntry : HistoryEntry = null;
     
     @ORM.OneToMany(() => HistoryEntry, entry => entry.stakePoolEntry, { lazy: true })
@@ -50,8 +53,9 @@ export class StakePoolEntry
     
     
     @ORM.ManyToMany(() => Issue, null, { lazy: true })
-    @API.Property(() => [ Issue ])
+    @API.Property()
     @API.Filterable()
+    @Type(() => [ Issue ])
     public issues : ORM.Collection<Issue>;
     
     

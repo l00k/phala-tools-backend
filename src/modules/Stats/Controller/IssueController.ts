@@ -1,8 +1,8 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
 import { Issue } from '#/Stats/Domain/Model/Issue';
 import * as Api from '@inti5/api-backend';
-import { Annotation as API } from '@inti5/api-backend';
-import * as Router from 'core/express-ext';
+import { API } from '@inti5/api-backend';
+import * as Router from '@inti5/express-router';
 
 
 @Router.Headers.CacheControl('public, max-age=86400')
