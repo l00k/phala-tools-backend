@@ -80,11 +80,8 @@ export class HistoryCrawler
             .millisecond(0)
             .add(6, 'hour');
         
-        const finalizedThresholdMoment = moment();
-        const finalized = !nextEntryMoment.isAfter(finalizedThresholdMoment);
-        
-        const hardThresholdMoment = moment().add(6, 'hours');
-        if (nextEntryMoment.isAfter(hardThresholdMoment)) {
+        const dateThresholdMoment = moment().subtract(5, 'minutes');
+        if (nextEntryMoment.isAfter(dateThresholdMoment)) {
             this._logger.info('Not processed yet! Stop.');
             return false;
         }
@@ -92,18 +89,10 @@ export class HistoryCrawler
         // find first block of next entry
         this._previousEntryBlockNumber = this._appState.value.lastProcessedBlock;
         
-        if (finalized) {
-            this._nextEntryDate = nextEntryMoment.toDate();
-            this._nextEntryBlockNumber = await this._findFirstBlockOfEntry(
-                this._nextEntryDate,
-                this._appState.value.lastProcessedBlock
-            );
-        }
-        else {
-            this._nextEntryDate = new Date();
-            this._nextEntryBlockNumber = this._finalizedBlockNumber;
-        }
+        this._nextEntryDate = nextEntryMoment.toDate();
+        const nextEntryUts : number = Number(this._nextEntryDate) / 1000;
         
+        this._nextEntryBlockNumber = await this._findFirstBlockOfEntry(this._nextEntryDate, this._appState.value.lastProcessedBlock);
         if (!this._nextEntryBlockNumber || this._nextEntryBlockNumber <= this._previousEntryBlockNumber) {
             this._logger.info('Unable to find next block! Stop.');
             return false;
@@ -127,44 +116,31 @@ export class HistoryCrawler
             this._txEntityManager = entityManager;
             
             await this._clearContext();
-            await this._processNextHistoryEntry(finalized);
+            await this._processNextHistoryEntry();
             
             await this._calculateApr();
             
             await entityManager.flush();
             
             await this._calculateAvgApr();
-            await this._processAvgStakePools(finalized);
+            await this._processAvgStakePools();
             
             await entityManager.flush();
             
-            if (finalized) {
-                await this._processNetworkState();
-                await entityManager.flush();
-            }
+            await this._processNetworkState();
+            await entityManager.flush();
         });
         
-        if (finalized) {
-            // update app state
-            this._appState.value.lastProcessedBlock = this._nextEntryBlockNumber;
-            this._appState.value.lastProcessedUts = Number(this._nextEntryDate) / 1000;
-            ++this._appState.value.lastProcessedNonce;
-        }
+        // update app state
+        this._appState.value.lastProcessedBlock = this._nextEntryBlockNumber;
+        this._appState.value.lastProcessedUts = Number(this._nextEntryDate) / 1000;
+        ++this._appState.value.lastProcessedNonce;
         
         await this._entityManager.flush();
         
         this._logger.info('Entry done');
         
-        if (finalized) {
-            // finalized entry processed
-            // continue only if processed entry is old enough
-            const continueDiff = moment().diff(nextEntryMoment, 'minutes', true);
-            return continueDiff > 30;
-        }
-        else {
-            // non finalized entry processed - stop
-            return false;
-        }
+        return true;
     }
     
     protected async _clearContext ()
@@ -210,7 +186,10 @@ export class HistoryCrawler
     /**
      * Find first block of day
      */
-    protected async _findFirstBlockOfEntry (targetDate : Date, previousEntryBlock : number) : Promise<number>
+    protected async _findFirstBlockOfEntry (
+        targetDate : Date,
+        previousEntryBlock : number
+    ) : Promise<number>
     {
         let blockInterval : number = HistoryCrawler.BLOCK_INTERVAL;
         let targetBlockToCheck = previousEntryBlock;
@@ -264,18 +243,13 @@ export class HistoryCrawler
     /**
      * Process stake pools
      */
-    protected async _processNextHistoryEntry (
-        finalized : boolean
-    ) : Promise<void>
+    protected async _processNextHistoryEntry () : Promise<void>
     {
         this._stakePoolsCount = <any>(await this._phalaApi.query.phalaStakePool.poolCount.at(this._nextEntryBlockHash)).toJSON();
         this._logger.log('Stake pools num', this._stakePoolsCount);
         
         for (let stakePoolId = 0; stakePoolId < this._stakePoolsCount; ++stakePoolId) {
-            await this._processStakePool(
-                stakePoolId,
-                finalized
-            );
+            await this._processStakePool(stakePoolId);
             
             if (stakePoolId % 50 == 0) {
                 console.log(
@@ -288,10 +262,7 @@ export class HistoryCrawler
         console.log('Progress: 100.00%');
     }
     
-    protected async _processStakePool (
-        onChainId : number,
-        finalized : boolean
-    ) : Promise<void>
+    protected async _processStakePool (onChainId : number) : Promise<void>
     {
         const stakePoolEntry : StakePoolEntry = await this._getOrCreateStakePool(onChainId);
         
@@ -299,21 +270,17 @@ export class HistoryCrawler
             <any>(await this._phalaApi.query.phalaStakePool.stakePools.at(this._nextEntryBlockHash, stakePoolEntry.stakePool.onChainId)).toJSON();
         
         // fetch simple data
-        const historyEntry : HistoryEntry = await this._getOrCreateHistoryEntry(
-            stakePoolEntry,
-            this._appState.value.lastProcessedNonce + 1
-        );
-        
-        historyEntry.assign({
+        const historyEntry : HistoryEntry = new HistoryEntry({
+            stakePoolEntry: stakePoolEntry,
+            entryNonce: this._appState.value.lastProcessedNonce + 1,
             entryDate: this._nextEntryDate,
-            finalized,
             
             commission: Polkadot.Utility.parseRawPercent(onChainStakePool.payoutCommission || 0),
             cap: Phala.Utility.parseRawAmount(onChainStakePool.cap),
             stakeTotal: Phala.Utility.parseRawAmount(onChainStakePool.totalStake),
             stakeFree: Phala.Utility.parseRawAmount(onChainStakePool.freeStake),
             stakeReleasing: Phala.Utility.parseRawAmount(onChainStakePool.releasingStake),
-        });
+        }, this._entityManager);
         
         const withdrawals = onChainStakePool.withdrawQueue
             .reduce((acc, prev) => acc + Number(prev.shares), 0);
@@ -373,30 +340,6 @@ export class HistoryCrawler
         this._txEntityManager.persist(historyEntry);
         
         this._processedStakePools.push(stakePoolEntry);
-    }
-    
-    protected async _getOrCreateHistoryEntry(
-        stakePoolEntry : StakePoolEntry,
-        entryNonce : number
-    ) : Promise<HistoryEntry>
-    {
-        const historyEntryRepository = this._entityManager.getRepository(HistoryEntry);
-    
-        let historyEntry : HistoryEntry = await historyEntryRepository.findOne({
-            stakePoolEntry,
-            entryNonce,
-            finalized: false,
-        });
-        if (!historyEntry) {
-            historyEntry = new HistoryEntry({
-                stakePoolEntry,
-                entryNonce
-            }, this._entityManager);
-            
-            historyEntryRepository.persist(historyEntry);
-        }
-        
-        return historyEntry;
     }
     
     
@@ -488,9 +431,7 @@ export class HistoryCrawler
     /**
      * Processing avg entries
      */
-    protected async _processAvgStakePools (
-        finalized : boolean
-    ) : Promise<void>
+    protected async _processAvgStakePools () : Promise<void>
     {
         // sort stake pools
         this._sortedStakePools = this._processedStakePools
@@ -501,29 +442,26 @@ export class HistoryCrawler
         // process avg entries
         await this._processAvgStakePool(
             this._specialStakePools[StakePoolEntry.SPECIAL_NETWORK_AVG_ID],
-            this._sortedStakePools,
-            finalized
+            this._sortedStakePools
         );
         
         await this._processAvgStakePool(
             this._specialStakePools[StakePoolEntry.SPECIAL_TOP_AVG_ID],
-            this._sortedStakePools.slice(0, 100),
-            finalized
+            this._sortedStakePools.slice(0, 100)
         );
     }
     
     protected async _processAvgStakePool (
         stakePoolEntry : StakePoolEntry,
-        limitedStakePools : StakePoolEntry[],
-        finalized : boolean
+        limitedStakePools : StakePoolEntry[]
     ) : Promise<void>
     {
         const oneOfHistoryEntries : HistoryEntry = this._processedStakePools[0].lastHistoryEntry;
-        
-        const historyEntry : HistoryEntry = await this._getOrCreateHistoryEntry(
+        const historyEntry : HistoryEntry = new HistoryEntry({
             stakePoolEntry,
-            oneOfHistoryEntries.entryNonce
-        );
+            entryNonce: oneOfHistoryEntries.entryNonce,
+            entryDate: oneOfHistoryEntries.entryDate,
+        }, this._entityManager);
         
         historyEntry.assign({
             entryDate: oneOfHistoryEntries.entryDate,

@@ -28,7 +28,7 @@ export class HistoryEntryController
             pagination : Api.Domain.Pagination
     ) : Promise<Api.Domain.Collection<HistoryEntry>>
     {
-        return super.getCollection(
+        return super._getCollection(
             {
                 stakePoolEntry: { id }
             },

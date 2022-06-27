@@ -14,8 +14,7 @@ import * as ORM from '@mikro-orm/core';
 @ORM.Index({
     properties: [
         'stakePoolEntry',
-        'entryNonce',
-        'finalized'
+        'entryNonce'
     ]
 })
 @API.Resource('Stats/HistoryEntry')
@@ -41,9 +40,6 @@ export class HistoryEntry
     @API.Filterable()
     @API.Sortable()
     public entryDate : Date;
-    
-    @ORM.Property()
-    public finalized : boolean = false;
     
     @ORM.Property()
     public intermediateStep : number = 0;

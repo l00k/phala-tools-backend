@@ -31,7 +31,7 @@ export class StakePoolEntryController
             id : number
     ) : Promise<StakePoolEntry>
     {
-        return super.getItem(
+        return super._getItem(
             id,
             [
                 'stakePool.owner',
