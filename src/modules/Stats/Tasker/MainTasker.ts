@@ -23,7 +23,7 @@ export class MainTasker
     @Task({
         cronExpr: '30 * * * *'
     })
-    @Timeout(10 * 60 * 1000)
+    @Timeout(30 * 60 * 1000)
     public processHistory () : Promise<any>
     {
         return this._historyCrawler.run();

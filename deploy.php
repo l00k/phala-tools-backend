@@ -163,7 +163,7 @@ task('db:cleanup', function () {
     run("
         cd {{deploy_path}}
         set -o allexport; source $envPath; set +o allexport
-        mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME -e 'truncate `stats_stakepoolentry_issues`;'
+        mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME -e 'delete from `stats_historyentry` where entry_nonce = 1129;'
     ", ['tty' => true]);
 });
 
@@ -199,7 +199,7 @@ task('db:pull', function () {
         cd $localCwd
         set -o allexport; source $localCwd/.env; set +o allexport;
         mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME < $localCwd/.dep/dbdumps/$dumpname;
-    ", ['tty' => true]);
+    ", ['timeout' => 0, 'tty' => true]);
 
     run("cd {{deploy_path}} && rm .dep/dbdumps/$dumpname");
 });
@@ -236,7 +236,7 @@ task('db:push', function () {
         cd {{deploy_path}}
         set -o allexport; source shared/.env; set +o allexport
         mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME < .dep/dbdumps/$dumpname;
-    ");
+    ", ['timeout' => 0, 'tty' => true]);
 
     runLocally("rm .dep/dbdumps/$dumpname");
 });
