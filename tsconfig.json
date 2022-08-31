@@ -5,12 +5,10 @@
         "lib": ["esnext"],
         "moduleResolution": "node",
 
-        "baseUrl": ".",
-        "outDir": "./build",
+        "baseUrl": "./src",
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "removeComments": true,
-        "declaration": true,
 
         "strict": true,
         "noImplicitAny": false,
@@ -26,9 +24,9 @@
             "node_modules/@types"
         ],
         "paths": {
-            "#/*": ["./src/modules/*"],
-            "@inti5/*": ["./src/core/*"],
-            "etc/*": ["./etc/*"],
+            "#/*": ["./modules/*"],
+            "@inti5/*": ["./core/*"],
+            "etc/*": ["./*"],
             "migrations/*": ["./migrations/*"],
             "modules/*": ["./modules/*"]
         }

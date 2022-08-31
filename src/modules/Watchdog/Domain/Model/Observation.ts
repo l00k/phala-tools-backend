@@ -9,7 +9,7 @@ import { API } from '@inti5/api-backend';
 import { Type } from '@inti5/graph-typing';
 import { Assert } from '@inti5/validator/Object';
 import * as ORM from '@mikro-orm/core';
-import { EntityData } from '@mikro-orm/core/typings';
+import type { EntityData } from '@mikro-orm/core/typings';
 import * as Trans from 'class-transformer';
 
 

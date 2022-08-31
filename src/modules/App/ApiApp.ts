@@ -1,34 +1,32 @@
 import { BaseApp } from '#/BackendCore/Module/BaseApp';
+import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import * as Api from '@inti5/api-backend';
 import { Configuration } from '@inti5/configuration';
-import { ExpressConfig, ExpressFactory } from '@inti5/express-router';
+import { ExpressFactory } from '@inti5/express-router';
 import { ObjectManager } from '@inti5/object-manager';
-import { MikroORM } from '@mikro-orm/core';
 
 
 export class ApiApp
     extends BaseApp
 {
     
-    protected async _main ()
+    public async run () : Promise<void>
     {
         const objectManager = ObjectManager.getSingleton();
-    
+        
         // load additional modules
         this.loadModules([
             'Controller'
         ]);
         
         // bootstrap api
-        const apiService = objectManager.getInstance(Api.Service);
-        apiService.bootstrap();
+        const api = objectManager.getInstance(Api.Service);
+        api.bootstrap();
         
-        // get entity manager and bind to api
-        const orm = objectManager.getService<MikroORM>('orm');
-        const entityManager = orm.em.fork(true);
+        const entityManagerWrapper = objectManager.getInstance(EntityManagerWrapper);
+        const entityManager = entityManagerWrapper.getCleanEntityManager();
+        api.bindEntityManager(entityManager);
         
-        apiService.bindEntityManager(entityManager);
-    
         // setup express server
         const configuration = Configuration.getSingleton();
         const expressFactory = objectManager.getInstance(ExpressFactory);
@@ -62,8 +60,9 @@ export class ApiApp
             Number(process.env.API_PORT),
         );
         
+        // infinite promise until kill signal
         return new Promise(solve => {
-            process.once('SIGINT', () => solve(true));
+            process.once('SIGINT', () => solve());
         });
     }
     

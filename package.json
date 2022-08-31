@@ -3,10 +3,11 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "app": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts",
-        "app:dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only -r tsconfig-paths/register src/bootstrap.ts",
-        "app:watch": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev --respawn -r tsconfig-paths/register src/bootstrap.ts",
-        "app:inspect": "NODE_ENV=development NODE_OPTIONS='--inspect --unhandled-rejections=strict' ts-node -r tsconfig-paths/register src/bootstrap.ts",
+        "prod": "NODE_ENV=production NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only src/bootstrap.ts",
+        "dev": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node --transpile-only src/bootstrap.ts",
+        "watch": "NODE_ENV=development NODE_OPTIONS='--unhandled-rejections=strict' ts-node-dev -r tsconfig-paths/register --respawn src/bootstrap.ts",
+        "inspect": "NODE_ENV=development NODE_OPTIONS='--inspect --unhandled-rejections=strict' ts-node src/bootstrap.ts",
+        "test": "NODE_OPTIONS='--unhandled-rejections=strict' jest",
         "postinstall": "patch-package"
     },
     "workspaces": [
