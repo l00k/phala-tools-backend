@@ -53,7 +53,7 @@ export class StakePoolEntry
     
     
     @ORM.ManyToMany(() => Issue, null, { lazy: true })
-    @API.Property()
+    @API.Property({ isCollection: true })
     @API.Filterable()
     @Type(() => [ Issue ])
     public issues : ORM.Collection<Issue>;

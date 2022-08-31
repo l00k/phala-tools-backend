@@ -59,7 +59,7 @@ export class User
     public config : UserConfiguration = new UserConfiguration();
     
     @ORM.OneToMany(() => Observation, o => o.user)
-    @API.Property()
+    @API.Property({ isCollection: true })
     @Assert()
     @Type(() => [ Observation ])
     public observations : ORM.Collection<Observation>;
