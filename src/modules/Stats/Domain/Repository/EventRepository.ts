@@ -17,7 +17,7 @@ export class EventRepository<T>
             .groupBy([ 'sourceAccount', 'stakePool' ])
             .getResult();
         
-        await this.em.populate(events, [ 'sourceAccount', 'stakePool' ]);
+        await this.em.populate(events, [ 'sourceAccount', 'stakePoolEntry' ]);
         
         return events;
     }

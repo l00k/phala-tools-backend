@@ -13,6 +13,7 @@
     "devDependencies": {
         "@types/moment-duration-format": "^2.2.3",
         "@types/prompts": "^2.0.14",
-        "@types/ssh2": "^0.5.48"
+        "@types/ssh2": "^0.5.48",
+        "discord-api-types": "^0.37.5"
     }
 }

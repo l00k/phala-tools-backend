@@ -8,7 +8,7 @@ import { Body, Controller, Endpoint } from '@inti5/express-router';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
 import { Assert, Validate } from '@inti5/validator/Method';
-import { APIUser } from 'discord-api-types';
+import type { APIUser } from 'discord-api-types/v9';
 
 
 export class DiscordLoginController
@@ -39,7 +39,7 @@ export class DiscordLoginController
         try {
             const discordAccessToken = await this._discordIdentityProvider.getAccessTokenViaCode(body.code);
             const identity = await this._discordIdentityProvider.getIdentity(discordAccessToken.access_token);
-            const user = await this._getOrCreateUser(identity);
+            const user = await this._getOrCreateUser(<any> identity);
             
             return this._jwtSigner.createTokens({
                 userId: user.id,

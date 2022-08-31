@@ -35,9 +35,9 @@ export class UserController
             authData : any
     ) : Promise<User>
     {
-        return this.getItem(
+        return this._getItem(
             authData.userId,
-            [
+            <any> [
                 'observations',
                 'observations.stakePool.owner'
             ]

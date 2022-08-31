@@ -7,10 +7,11 @@ import { API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-router';
 import * as ORM from '@mikro-orm/core';
 import * as Trans from 'class-transformer';
+import type { AutoPath } from '@mikro-orm/core/typings';
 
 
 @Router.Headers.CacheControl('public, max-age=900')
-export class StakePoolEntryController
+export class StakePoolEntryController<P extends string = never>
     extends CrudController<StakePoolEntry>
 {
     
@@ -33,7 +34,7 @@ export class StakePoolEntryController
     {
         return super._getItem(
             id,
-            [
+            <any> [
                 'stakePool.owner',
                 'issues',
             ]
@@ -77,15 +78,14 @@ export class StakePoolEntryController
             total: 0,
         };
         
-        const queryFilters : ORM.FilterQuery<StakePoolEntry> = Trans.instanceToPlain(finalFilters);
-        const querySorting : ORM.QueryOrderMap = Trans.instanceToPlain(sorting);
-        
         const qb = this._repository.createQueryBuilder('m');
         qb.select('*');
-        qb.leftJoin('m.stakePool.owner', 'o');
-        qb.leftJoin('issues', 'i');
-        qb.where(queryFilters);
-        qb.orderBy(querySorting);
+        qb.leftJoin('m.issues', 'i');
+        qb.leftJoin('m.stakePool', 's');
+        qb.leftJoin('s.owner', 'o');
+        
+        qb.where(finalFilters);
+        qb.orderBy(sorting.toOrderByMap());
         
         const qbCount = qb.clone();
         

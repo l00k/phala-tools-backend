@@ -2,7 +2,7 @@ import { DiscordConfig } from '#/Messaging/Domain/types';
 import { REST } from '@discordjs/rest';
 import { Config } from '@inti5/configuration';
 import { InitializeSymbol } from '@inti5/object-manager';
-import { APIUser, RESTPostOAuth2AccessTokenResult } from 'discord-api-types';
+import type { APIUser, RESTPostOAuth2AccessTokenResult } from 'discord-api-types/v9';
 import { Routes } from 'discord-api-types/v9';
 
 
