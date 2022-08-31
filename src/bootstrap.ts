@@ -34,6 +34,7 @@ const component = process.argv[2];
     }
     
     if (app) {
+        await app.init();
         await app.run();
     }
     

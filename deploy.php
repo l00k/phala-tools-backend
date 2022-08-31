@@ -65,6 +65,17 @@ task('deploy', [
 after('deploy:failed', 'deploy:unlock');
 
 
+task('server:restart', function () {
+    if (!test('[[ -e {{deploy_path}}/current ]]')) {
+        return;
+    }
+    
+    run("
+        cd {{deploy_path}}/current;
+        docker-compose restart
+    ", [ 'tty' => true ]);
+});
+
 task('server:down', function () {
     if (!test('[[ -e {{deploy_path}}/current ]]')) {
         return;

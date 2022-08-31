@@ -2,14 +2,14 @@
 
 run_process() {
     while true; do
-        yarn prod app process
+        yarn prod process
         sleep 60
     done
 }
 
 run_api() {
     while true; do
-        yarn prod app api
+        yarn prod api
         sleep 1
     done
 }
