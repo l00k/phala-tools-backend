@@ -29,14 +29,14 @@ export class MainTasker
         return this._historyCrawler.run();
     }
     
-    // @Task({
-    //     cronExpr: '40 * * * *'
-    // })
-    // @Timeout(5 * 60 * 1000)
-    // public processIssues () : Promise<any>
-    // {
-    //     return this._issuesCrawler.run();
-    // }
+    @Task({
+        cronExpr: '40 * * * *'
+    })
+    @Timeout(5 * 60 * 1000)
+    public processIssues () : Promise<any>
+    {
+        return this._issuesCrawler.run();
+    }
     
     @Task({
         cronExpr: '*/30 * * * *'

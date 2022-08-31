@@ -22,7 +22,7 @@ export class IssueController
         const pagination = new Api.Domain.Pagination();
         pagination.itemsPerPage = 10000;
         
-        return super.getCollection({}, {}, pagination);
+        return super._getCollection({}, {}, pagination);
     }
     
 }

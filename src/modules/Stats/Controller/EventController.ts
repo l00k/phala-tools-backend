@@ -41,7 +41,7 @@ export class EventController
             ]
         };
         
-        return super.getCollection(
+        return super._getCollection(
             finalFilters,
             {},
             pagination
