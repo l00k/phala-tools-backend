@@ -8,7 +8,7 @@ export class ProcessingApp
     extends BaseApp
 {
     
-    protected async _main ()
+    public async run () : Promise<void>
     {
         const objectManager = ObjectManager.getSingleton();
         

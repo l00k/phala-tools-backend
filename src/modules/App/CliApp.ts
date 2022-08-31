@@ -6,7 +6,7 @@ export class CliApp
     extends BaseCliApp
 {
     
-    protected async _main ()
+    public async run () : Promise<void>
     {
         this.loadModules([
             'Command'
