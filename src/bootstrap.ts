@@ -3,9 +3,7 @@ import { Logger, LoggerLevel } from '@inti5/utils/Logger';
 const env = process.env.NODE_ENV || 'production';
 const isDev = env !== 'production';
 
-Logger.LOGGER_LEVEL = isDev
-    ? LoggerLevel.Debug
-    : LoggerLevel.Warn;
+Logger.LOGGER_LEVEL = LoggerLevel.Debug;
 
 globalThis['__basedir'] = __dirname;
 
