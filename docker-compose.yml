@@ -28,6 +28,7 @@ services:
             dockerfile: app.Dockerfile
         image: ${COMPOSE_PROJECT_NAME}-node
         user: "1000:1000"
+        env_file: .env
         volumes:
             - .:/usr/src/app/:rw
 
