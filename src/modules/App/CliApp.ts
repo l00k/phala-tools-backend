@@ -1,14 +1,14 @@
-import { AbstractCliApp } from '#/BackendCore/Module/AbstractCliApp';
+import { BaseCliApp } from '#/BackendCore/Module/BaseCliApp';
 import * as CLI from 'classy-commander';
 
 
 export class CliApp
-    extends AbstractCliApp
+    extends BaseCliApp
 {
     
     protected async _main ()
     {
-        this._loadModules([
+        this.loadModules([
             'Command'
         ]);
         
