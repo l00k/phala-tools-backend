@@ -28,18 +28,19 @@
         "paths": {
             "#/*": ["./src/modules/*"],
             "@inti5/*": ["./src/core/*"],
-            "*": [
-                "./src/*",
-                "./tests/*"
-            ]
+            "etc/*": ["./etc/*"],
+            "migrations/*": ["./migrations/*"],
+            "modules/*": ["./modules/*"]
         }
     },
     "include": [
-        "./src/**/*.ts",
-        "./tests/**/*.ts"
+        "./**/*.ts",
     ],
     "exclude": [
-        "**/Ui/**",
-        "node_modules"
-    ]
+        "node_modules",
+        "**/tests/**/*.ts"
+    ],
+    "ts-node": {
+        "require": ["tsconfig-paths/register"]
+    }
 }

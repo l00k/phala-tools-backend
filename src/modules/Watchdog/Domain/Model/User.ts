@@ -7,7 +7,7 @@ import { Assert } from '@inti5/validator/Object';
 import * as ORM from '@mikro-orm/core';
 import { EntityData } from '@mikro-orm/core/typings';
 import * as Trans from 'class-transformer';
-import { Type } from 'core/graph-typing';
+import { Type } from '@inti5/graph-typing';
 
 
 @ORM.Entity({

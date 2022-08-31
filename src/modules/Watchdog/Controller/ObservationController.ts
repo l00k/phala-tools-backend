@@ -4,8 +4,8 @@ import { User } from '#/Watchdog/Domain/Model/User';
 import { API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-router';
 import { EntitySanitizationGraph } from '@inti5/graph-sanitizer';
+import { Type } from '@inti5/graph-typing';
 import { Assert, ValidationException } from '@inti5/validator/Method';
-import { Type } from 'core/graph-typing';
 
 
 const observationSanitizationGraph : EntitySanitizationGraph<Observation> = {
@@ -35,7 +35,7 @@ export class ObservationController
         @Router.AuthData()
             authData : any,
         @Router.Body()
-        @API.Deserialize({
+        @API.Deserialize<Observation>({
             stakePool: true,
             account: true,
             mode: true,
@@ -75,7 +75,7 @@ export class ObservationController
         @Router.Param.Id()
             id : number,
         @Router.Body()
-        @API.Deserialize({
+        @API.Deserialize<Observation>({
             stakePool: true,
             account: true,
             mode: true,

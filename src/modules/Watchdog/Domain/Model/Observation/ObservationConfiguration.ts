@@ -1,8 +1,8 @@
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import { API } from '@inti5/api-backend';
+import { Type } from '@inti5/graph-typing';
 import { Assert, AssertObject } from '@inti5/validator/Object';
 import * as Trans from 'class-transformer';
-import { Type } from 'core/graph-typing';
 
 
 @API.Resource('Watchdog/Observation/NotificationConfig')
