@@ -186,18 +186,18 @@ export class HistoryCrawler
                     orderBy: { id: ORM.QueryOrder.DESC }
                 }
             );
-            
-        const lastNonceToProcess = Math.min(
-            this._appState.value.lastProcessedNonce + maxEntries,
-            lastSnapshot.id
-        );
-        const entriesToProcess = lastNonceToProcess - this._appState.value.lastProcessedNonce;
     
-        for (let i = 0; i < entriesToProcess; ++i) {
+        for (let i = 0; i < maxEntries; ++i) {
             const snapshotId = this._appState.value.lastProcessedNonce + 1;
-        
+            
+            this._snapshot = await this._entityManager.getRepository(Snapshot)
+                .findOne(snapshotId);
+            if (!this._snapshot) {
+                break;
+            }
+            
             try {
-                await this._processHistoryEntry(snapshotId);
+                await this._processHistoryEntry();
                 
                 ++this._appState.value.lastProcessedNonce;
                 await this._entityManager.flush();
@@ -209,11 +209,8 @@ export class HistoryCrawler
         }
     }
     
-    protected async _processHistoryEntry(snapshotId : number) : Promise<boolean>
+    protected async _processHistoryEntry() : Promise<boolean>
     {
-        this._snapshot = await this._entityManager.getRepository(Snapshot)
-            .findOne(snapshotId);
-        
         this._tokenomicParameters =
             <any>(await this._phalaApi.query.phalaMining.tokenomicParameters.at(this._snapshot.blockHash)).toJSON();
 
