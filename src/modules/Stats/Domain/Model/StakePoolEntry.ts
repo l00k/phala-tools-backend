@@ -48,9 +48,6 @@ export class StakePoolEntry
     @ORM.OneToMany(() => HistoryEntry, entry => entry.stakePoolEntry, { lazy: true })
     public historyEntries : ORM.Collection<HistoryEntry>;
     
-    @ORM.OneToMany(() => Worker, worker => worker.stakePool, { lazy: true })
-    public workers : ORM.Collection<Worker>;
-    
     
     @ORM.ManyToMany(() => Issue, null, { lazy: true })
     @API.Property({ isCollection: true })
@@ -75,7 +72,6 @@ export class StakePoolEntry
         super(data, entityManager);
         
         this.historyEntries = new ORM.Collection<HistoryEntry>(this, []);
-        this.workers = new ORM.Collection<Worker>(this, []);
         this.issues = new ORM.Collection<Issue>(this, []);
         
         if (data) {

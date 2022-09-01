@@ -2,6 +2,7 @@
 namespace Deployer;
 
 use Deployer\Exception\Exception;
+use Deployer\Task\Context;
 
 require 'recipe/common.php';
 
@@ -133,6 +134,9 @@ task('deploy:shared:copy', function () {
 
 
 task('db:backup', function () {
+    $target = Context::get()->getHost();
+    $hostname = $target->getHostname();
+    
     $dumpname = date('Y-m-d-H-i-s') . '-' . uniqid() . '.sql';
 
     run("
@@ -143,12 +147,16 @@ task('db:backup', function () {
     $envPath = test('[[ -e {{deploy_path}}/shared ]]')
         ? 'shared/.env'
         : './.env';
+        
+    $statsModifier = $hostname === 'local'
+        ? '--column-statistics=0'
+        : '';
 
     writeln('Dumping...');
     run("
         cd {{deploy_path}}
         set -o allexport; source $envPath; set +o allexport
-        mysqldump -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME > .dep/dbdumps/$dumpname
+        mysqldump $statsModifier -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME > .dep/dbdumps/$dumpname
     ", [ 'tty' => true ]);
 });
 

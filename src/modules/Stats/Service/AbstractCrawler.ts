@@ -7,10 +7,10 @@ import { ApiMode } from '#/Polkadot';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { Worker } from '#/Stats/Domain/Model/Worker';
 import { InitializeSymbol, Inject, ObjectManager } from '@inti5/object-manager';
+import { Logger } from '@inti5/utils/Logger';
 import { EntityManager } from '@mikro-orm/core';
 import { ApiPromise } from '@polkadot/api';
 import { Header } from '@polkadot/types/interfaces/runtime';
-import { Logger } from '@inti5/utils/Logger';
 
 
 
@@ -41,7 +41,6 @@ export abstract class AbstractCrawler
     
     protected _stakePoolEntries : Record<number, StakePoolEntry> = {};
     protected _accounts : Record<string, Account> = {};
-    protected _workers : Record<string, Worker> = {};
     
     
     
@@ -92,8 +91,6 @@ export abstract class AbstractCrawler
     protected async _clearContext ()
     {
         this._stakePoolEntries = {};
-        this._accounts = {};
-        this._workers = {};
     }
     
     protected async _getOrCreateStakePool (onChainId : number) : Promise<StakePoolEntry>
@@ -125,34 +122,6 @@ export abstract class AbstractCrawler
         }
         
         return this._accounts[address];
-    }
-    
-    protected async _getOrCreateWorker (publicKey : string, stakePool : StakePoolEntry) : Promise<Worker>
-    {
-        if (!this._workers[publicKey]) {
-            const workerRepository = this._entityManager.getRepository(Worker);
-            
-            let worker = await workerRepository.findOne({ publicKey });
-            if (!worker) {
-                worker = new Worker({
-                    publicKey,
-                    stakePool,
-                }, this._entityManager);
-                
-                const workerOnChain : typeof Phala.KhalaTypes.WorkerInfo =
-                    <any>(await this._phalaApi.query.phalaRegistry.workers(publicKey)).toJSON();
-                
-                worker.operator = await this._getOrCreateAccount(workerOnChain.operator);
-                worker.initialScore = workerOnChain.initialScore;
-                worker.confidenceLevel = workerOnChain.confidenceLevel;
-                
-                this._txEntityManager.persist(worker);
-            }
-            
-            this._workers[publicKey] = worker;
-        }
-        
-        return this._workers[publicKey];
     }
     
 }

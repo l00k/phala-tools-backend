@@ -1,11 +1,3 @@
-import { ColumnType } from '#/App/Domain/DbConfig';
-import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
-import * as ExtORM from '#/BackendCore/ORM/Ext';
-import { Account } from '#/Phala/Domain/Model';
-import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
-import * as ORM from '@mikro-orm/core';
-
-
 export enum WorkerState
 {
     NotReady = 'NotReady',
@@ -22,11 +14,7 @@ export const MiningStates : string[] = [
 ];
 
 
-@ORM.Entity({
-    tableName: 'stats_worker'
-})
 export class Worker
-    extends AbstractModel<Worker>
 {
     
     protected static readonly CONFIDENCE_SCORE_MAP = {
@@ -43,52 +31,18 @@ export class Worker
     ];
     
     
-    @ORM.PrimaryKey()
-    public id : number;
-    
-    
-    @ORM.Property()
     public publicKey : string;
     
-    @ORM.Property({ nullable: true })
-    public bindingAccount : string;
-    
-    @ORM.ManyToOne(() => Account)
-    public operator : Account;
-    
-    @ORM.ManyToOne(() => StakePoolEntry, { nullable: true })
-    public stakePool : StakePoolEntry;
-    
-    @ORM.Property({ unsigned: true })
     public initialScore : number;
-    
-    @ORM.Property({ unsigned: true })
     public confidenceLevel : number;
     
-    @ORM.Enum({ items: () => WorkerState })
     public state : WorkerState = WorkerState.NotReady;
     
-    @ORM.Property({ ...ColumnType.ENC_BIG_DECIMAL })
     public ve : number;
-    
-    @ORM.Property({ ...ColumnType.ENC_BIG_DECIMAL })
     public v : number;
     
-    @ORM.Property({ unsigned: true })
     public pInit : number;
-    
-    @ORM.Property({ unsigned: true })
     public pInstant : number;
-    
-    @ORM.Property({ ...ColumnType.BALANCE })
-    public totalRewards : number = 0;
-    
-    
-    @ORM.Property({ onUpdate: () => new Date() })
-    public updatedAt : Date = new Date();
-    
-    // runtime values
-    public isDropped : boolean = true;
     
     
     public get confidenceScore () : number
@@ -110,11 +64,10 @@ export class Worker
     }
     
     
-    public constructor (data? : Partial<Worker>, entityManager? : ORM.EntityManager)
+    public constructor (data? : Partial<Worker>)
     {
-        super(data, entityManager);
         if (data) {
-            this.assign(data, { em: entityManager });
+            Object.assign(this, data);
         }
     }
     

@@ -5,6 +5,7 @@ import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
+import { RuntimeException } from '@inti5/utils/Exception';
 
 
 export class UnresponsiveWorkerReminderCrawler
@@ -25,16 +26,31 @@ export class UnresponsiveWorkerReminderCrawler
             }
         });
         
-        let count = 0;
+        // fetch state
+        const onChainMiners : typeof KhalaTypes.MinerInfo[] = <any>(
+            await this._api.query
+                .phalaMining.miners
+                .multi(
+                    issues.map(issue => issue.workerAccount)
+                )
+        ).map(raw => raw.toJSON());
         
-        for (const issue of issues) {
-            const workerStateRaw : any = await this._api.query.phalaMining.miners(issue.workerAccount);
-            const workerState : typeof KhalaTypes.MinerInfo = workerStateRaw.toJSON();
+        if (onChainMiners.length != issues.length) {
+            throw new RuntimeException(
+                'Workers data missing',
+                1662038027783
+            );
+        }
+        
+        let count = 0;
+        for (let idx = 0; idx < issues.length; ++idx) {
+            const issue = issues[idx];
+            const onChainMiner = onChainMiners[idx];
             
             // confirm unresponsivness
             if (
-                !workerState
-                || workerState.state != WorkerState.MiningUnresponsive
+                !onChainMiner
+                || onChainMiner.state != WorkerState.MiningUnresponsive
             ) {
                 // issue already resolved
                 this._entityManager.remove(issue);
