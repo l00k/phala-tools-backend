@@ -73,13 +73,14 @@ export class ApiProvider
             provider = new WsProvider(url);
             
             provider.on('connected', () => {
-                this._logger.log('Connected to node.');
+                this._logger.log('Connected to node:', url);
             });
             provider.on('disconnected', () => {
                 this._logger.log('Disconnected from node.');
             });
         }
         else {
+            this._logger.log('Http node:', url);
             provider = new HttpProvider(url);
         }
         

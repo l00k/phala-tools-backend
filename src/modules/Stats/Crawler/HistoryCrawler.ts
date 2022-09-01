@@ -60,7 +60,12 @@ export class HistoryCrawler
         await this._createSnapshots();
         
         // process entries
-        await this._processHistory(3);
+        const component = process.argv[2];
+        const maxEntries = component === 'cli'
+            ? 100000
+            : 3;
+        
+        await this._processHistory(maxEntries);
     }
     
     protected async _createSnapshots () : Promise<void>

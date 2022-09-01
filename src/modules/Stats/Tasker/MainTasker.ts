@@ -20,15 +20,15 @@ export class MainTasker
     protected _issuesCrawler : IssuesCrawler;
     
     
-    // @Task({
-    //     cronExpr: '30 */6 * * *'
-    // })
-    // @Timeout(30 * 60 * 1000)
-    // public processHistory () : Promise<any>
-    // {
-    //     return this._historyCrawler.run();
-    // }
-    
+    @Task({
+        cronExpr: '45 */6 * * *'
+    })
+    @Timeout(30 * 60 * 1000)
+    public processHistory () : Promise<any>
+    {
+        return this._historyCrawler.run();
+    }
+
     @Task({
         cronExpr: '40 * * * *'
     })
@@ -37,7 +37,7 @@ export class MainTasker
     {
         return this._issuesCrawler.run();
     }
-    
+
     @Task({
         cronExpr: '*/30 * * * *'
     })
