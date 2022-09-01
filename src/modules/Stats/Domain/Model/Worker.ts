@@ -68,10 +68,10 @@ export class Worker
     @ORM.Enum({ items: () => WorkerState })
     public state : WorkerState = WorkerState.NotReady;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.ENC_BIG_DECIMAL })
+    @ORM.Property({ ...ColumnType.ENC_BIG_DECIMAL })
     public ve : number;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.ENC_BIG_DECIMAL })
+    @ORM.Property({ ...ColumnType.ENC_BIG_DECIMAL })
     public v : number;
     
     @ORM.Property({ unsigned: true })
@@ -80,7 +80,7 @@ export class Worker
     @ORM.Property({ unsigned: true })
     public pInstant : number;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
+    @ORM.Property({ ...ColumnType.BALANCE })
     public totalRewards : number = 0;
     
     

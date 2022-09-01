@@ -50,11 +50,13 @@ export class IssuesCrawler
                     delta: { $gte: IssuesCrawler.BAD_BEHAVIOR_PERCENT_THRESHOLD }
                 }
             },
-            [
-                'stakePoolEntry',
-                'stakePoolEntry.stakePool'
-            ],
-            { stakePoolEntry: 'ASC', blockNumber: 'ASC' }
+            {
+                orderBy: { stakePoolEntry: 'ASC', blockNumber: 'ASC' },
+                populate: [
+                    'stakePoolEntry',
+                    'stakePoolEntry.stakePool'
+                ]
+            }
         );
         if (!commissionEvents.length) {
             return;
@@ -64,7 +66,7 @@ export class IssuesCrawler
         const blockHash : string = (await this._phalaApi.rpc.chain.getBlockHash(this._appState.value.badBehaviorLastBlock)).toString();
         const blockDateUts : number = <any>(await this._phalaApi.query.timestamp.now.at(blockHash)).toJSON();
         
-        const aboveDate = moment(blockDateUts).subtract(IssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD).toDate();
+        const aboveDate = moment.utc(blockDateUts).subtract(IssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD).toDate();
         const contributionEvents : Event<Contribution>[] = await eventRepository.find(
             {
                 type: { $eq: EventType.Contribution },
@@ -75,7 +77,7 @@ export class IssuesCrawler
         for (const commissionEvent of commissionEvents) {
             const stakePoolEntry = commissionEvent.stakePoolEntry;
             
-            const createDeltaTime = moment(commissionEvent.blockDate).diff(stakePoolEntry.createdAt, 'day', true);
+            const createDeltaTime = moment.utc(commissionEvent.blockDate).diff(stakePoolEntry.createdAt, 'day', true);
             if (createDeltaTime <= IssuesCrawler.NEW_STAKEPOOL_THRESHOLD) {
                 // it is new pool - skip this case
                 continue;
@@ -94,7 +96,7 @@ export class IssuesCrawler
                     return false;
                 }
                 
-                const deltaTime = moment(commissionEvent.blockDate).diff(contributionEvent.blockDate, 'day', true);
+                const deltaTime = moment.utc(commissionEvent.blockDate).diff(contributionEvent.blockDate, 'day', true);
                 if (deltaTime > IssuesCrawler.BAD_BEHAVIOR_DAY_THRESHOLD) {
                     return false;
                 }
@@ -149,10 +151,12 @@ export class IssuesCrawler
                 type: { $eq: EventType.Slash },
                 blockNumber: { $gt: this._appState.value.slashesLastBlock },
             },
-            [
-                'stakePoolEntry',
-                'stakePoolEntry.stakePool'
-            ]
+            {
+                populate: [
+                    'stakePoolEntry',
+                    'stakePoolEntry.stakePool'
+                ]
+            }
         );
         if (!slashEvents.length) {
             return;

@@ -47,7 +47,7 @@ export class Utility
     
     public static formatDate (date : Date) : string
     {
-        return moment(date).format('YYYY-MM-DD HH:mm:ss');
+        return moment.utc(date).format('YYYY-MM-DD HH:mm:ss');
     }
     
     public static formatAddress (address : string) : string

@@ -106,7 +106,7 @@ export class Event<T extends AbstractEventData = AbstractEventData>
     @ORM.ManyToOne(() => Account, { nullable: true })
     public targetAccount : Account;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE, nullable: true })
+    @ORM.Property({ ...ColumnType.BALANCE, nullable: true })
     @API.Property()
     public amount : number = 0;
     

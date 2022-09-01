@@ -17,7 +17,13 @@ export class EventController
         { path: '#PATH#/by_stakepool/:id' }
     )
     @API.Serialize<Api.Domain.Collection<Event>>({
-        items: '**',
+        items: {
+            blockNumber: true,
+            blockDate: true,
+            type: true,
+            amount: true,
+            additionalData: '**',
+        },
         total: true,
     })
     public async getEventsCollection (

@@ -37,7 +37,7 @@ export class NodeStateVerificator
     public getBest(): Promise<NodeState>
     {
         return this._runtimeCache.get('bestNode', async() => {
-            const dateThreshold : Date = moment().subtract(15, 'minute').toDate();
+            const dateThreshold : Date = moment.utc().subtract(15, 'minute').toDate();
         
             this._entityManager.clear();
             
@@ -69,7 +69,7 @@ export class NodeStateVerificator
         const result = new VerificationResult();
         
         {
-            const delta = moment().diff(nodeState.lastUpdate, 'minutes');
+            const delta = moment.utc().diff(nodeState.lastUpdate, 'minutes');
             if (delta > NodeState.HEARTBEAT_WINDOW) {
                 result.issues.push(`No heartbeat for over ${NodeState.HEARTBEAT_WINDOW} minutes`);
             }

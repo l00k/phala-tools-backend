@@ -14,7 +14,11 @@ export class IssueController
     
     @API.CRUD.GetCollection(() => Issue)
     @API.Serialize<Api.Domain.Collection<Issue>>({
-        items: '*',
+        items: {
+            name: true,
+            description: true,
+            color: true,
+        },
         total: true,
     })
     public async getCollection () : Promise<Api.Domain.Collection<Issue>>

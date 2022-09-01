@@ -1,7 +1,8 @@
 import { ColumnType } from '#/App/Domain/DbConfig';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
-import * as ExtORM from '#/BackendCore/ORM/Ext';
+import { Snapshot } from '#/Stats/Domain/Model/Snapshot';
 import { API } from '@inti5/api-backend';
+import { Type } from '@inti5/graph-typing';
 import * as ORM from '@mikro-orm/core';
 
 
@@ -17,18 +18,15 @@ export class NetworkState
     @API.Id()
     public id : number;
     
-    @ORM.Property({ unique: true })
-    @API.Property()
-    public entryNonce : number;
-    
-    @ORM.Property()
+    @ORM.OneToOne(() => Snapshot, null, { eager: true, orphanRemoval: false })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
-    public entryDate : Date;
+    @Type(() => Snapshot)
+    public snapshot : Snapshot;
     
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.ENC_BIG_DECIMAL })
+    @ORM.Property({ ...ColumnType.ENC_BIG_DECIMAL })
     @API.Property()
     public totalShares : number = 0;
     

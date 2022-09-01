@@ -21,11 +21,31 @@ export class StakePoolEntryController<P extends string = never>
     @API.Serialize<StakePoolEntry>({
         special: true,
         stakePool: {
-            $default: true,
-            owner: '*',
+            onChainId: true,
+            owner: {
+                address: true,
+                identity: true,
+                identityVerified: true,
+            }
         },
-        lastHistoryEntry: '*',
-        issues: '*',
+        lastHistoryEntry: {
+            snapshot: {
+                date: true,
+            },
+            intermediateStep: true,
+            commission: true,
+            workersNum: true,
+            workersActiveNum: true,
+            stakeTotal: true,
+            cap: true,
+            stakeFree: true,
+            stakeReleasing: true,
+            stakeRemaining: true,
+            withdrawals: true,
+            currentApr: true,
+            avgApr: true,
+        },
+        issues: true
     })
     public async getStakePool (
         @Router.Param.Id()
@@ -46,10 +66,30 @@ export class StakePoolEntryController<P extends string = never>
         items: {
             special: true,
             stakePool: {
-                $default: true,
-                owner: '*',
+                onChainId: true,
+                owner: {
+                    address: true,
+                    identity: true,
+                    identityVerified: true,
+                }
             },
-            lastHistoryEntry: '*',
+            lastHistoryEntry: {
+                snapshot: {
+                    date: true,
+                },
+                intermediateStep: true,
+                commission: true,
+                workersNum: true,
+                workersActiveNum: true,
+                stakeTotal: true,
+                cap: true,
+                stakeFree: true,
+                stakeReleasing: true,
+                stakeRemaining: true,
+                withdrawals: true,
+                currentApr: true,
+                avgApr: true,
+            },
             issues: true,
         },
         total: true,

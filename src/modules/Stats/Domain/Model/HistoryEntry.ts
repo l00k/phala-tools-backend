@@ -1,9 +1,11 @@
 import { ColumnType } from '#/App/Domain/DbConfig';
 import { AbstractModel } from '#/BackendCore/Domain/Model/AbstractModel';
 import * as ExtORM from '#/BackendCore/ORM/Ext';
+import { Snapshot } from '#/Stats/Domain/Model/Snapshot';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { HistoryEntryRepository } from '#/Stats/Domain/Repository/HistoryEntryRepository';
 import { API } from '@inti5/api-backend';
+import { Type } from '@inti5/graph-typing';
 import * as ORM from '@mikro-orm/core';
 
 
@@ -14,7 +16,7 @@ import * as ORM from '@mikro-orm/core';
 @ORM.Index({
     properties: [
         'stakePoolEntry',
-        'entryNonce'
+        'snapshot'
     ]
 })
 @API.Resource('Stats/HistoryEntry')
@@ -31,21 +33,19 @@ export class HistoryEntry
     @ORM.ManyToOne(() => StakePoolEntry)
     public stakePoolEntry : StakePoolEntry;
     
-    @ORM.Property({ index: true })
-    @API.Property()
-    public entryNonce : number;
-    
-    @ORM.Property()
+    @ORM.ManyToOne(() => Snapshot, { eager: true })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
-    public entryDate : Date;
+    @Type(() => Snapshot)
+    public snapshot : Snapshot;
+    
     
     @ORM.Property()
     public intermediateStep : number = 0;
     
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.PERCENT })
+    @ORM.Property({ ...ColumnType.PERCENT })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
@@ -63,50 +63,50 @@ export class HistoryEntry
     @API.Sortable()
     public workersActiveNum : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
+    @ORM.Property({ ...ColumnType.BALANCE })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public stakeTotal : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
+    @ORM.Property({ ...ColumnType.BALANCE })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public cap : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
+    @ORM.Property({ ...ColumnType.BALANCE })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public stakeFree : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
+    @ORM.Property({ ...ColumnType.BALANCE })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public stakeReleasing : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE, nullable: true })
+    @ORM.Property({ ...ColumnType.BALANCE, nullable: true })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public stakeRemaining : number = null;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.BALANCE })
+    @ORM.Property({ ...ColumnType.BALANCE })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public withdrawals : number = 0;
     
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.PERCENT })
+    @ORM.Property({ ...ColumnType.PERCENT })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
     public currentApr : number = 0;
     
-    @ORM.Property({ type: ExtORM.DecimalType, columnType: ColumnType.PERCENT, nullable: true })
+    @ORM.Property({ ...ColumnType.PERCENT, nullable: true })
     @API.Property()
     @API.Filterable()
     @API.Sortable()

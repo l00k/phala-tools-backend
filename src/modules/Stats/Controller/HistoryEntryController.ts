@@ -18,7 +18,23 @@ export class HistoryEntryController
         { path: '#PATH#/by_stakepool/:id' }
     )
     @API.Serialize<Api.Domain.Collection<HistoryEntry>>({
-        items: '*',
+        items: {
+            snapshot: {
+                date: true,
+            },
+            intermediateStep: true,
+            commission: true,
+            workersNum: true,
+            workersActiveNum: true,
+            stakeTotal: true,
+            cap: true,
+            stakeFree: true,
+            stakeReleasing: true,
+            stakeRemaining: true,
+            withdrawals: true,
+            currentApr: true,
+            avgApr: true,
+        },
         total: true,
     })
     public async getStakePoolHistoryCollection (
@@ -29,10 +45,8 @@ export class HistoryEntryController
     ) : Promise<Api.Domain.Collection<HistoryEntry>>
     {
         return super._getCollection(
-            {
-                stakePoolEntry: { id }
-            },
-            { entryNonce: ORM.QueryOrder.DESC },
+            { stakePoolEntry: { id } },
+            { snapshot: { id: ORM.QueryOrder.DESC } },
             pagination
         );
     }

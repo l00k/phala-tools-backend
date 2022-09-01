@@ -1,7 +1,5 @@
 import { Network } from '#/App/Domain/Type/Network';
-import { AppState } from '#/BackendCore/Domain/Model/AppState';
 import { HistoryCrawler } from '#/Stats/Crawler/HistoryCrawler';
-import { HistoryCrawlerState } from '#/Stats/Domain/Model/AppState/HistoryCrawlerState';
 import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
@@ -14,10 +12,6 @@ export class HistoryAprUpdater
     
     @Config('modules.app.network')
     protected _network : Network;
-    
-    
-    protected _appStateClass : any = HistoryCrawlerState;
-    protected _appState : AppState<HistoryCrawlerState>;
     
     
     protected async _process ()
@@ -34,7 +28,7 @@ export class HistoryAprUpdater
             
             const stakePoolEntries = await stakePoolEntryRepository.find({
                 historyEntries: {
-                    entryNonce,
+                    snapshot: { id: entryNonce },
                 }
             }, {
                 populate: [ 'historyEntries' ]
@@ -75,7 +69,7 @@ export class HistoryAprUpdater
         workingHistoryEntry.avgApr = historyEntryToCount
             .map(entry => entry.currentApr)
             .reduce((acc, curr) => acc + curr, 0) / historyEntryToCount.length;
-            
+        
         await this._entityManager.persist(workingHistoryEntry);
     }
     
