@@ -100,7 +100,7 @@ export abstract class AbstractPeriodicCrawler
                 }
                 if (observedValue === null) {
                     // skip
-                    this._logger.debug(`Undefined value`);
+                    this._logger.debug(`Skip`);
                     continue;
                 }
                 
