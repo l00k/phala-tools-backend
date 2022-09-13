@@ -2,8 +2,7 @@ version: '3.9'
 
 networks:
     default:
-        driver: bridge
-        name: ${COMPOSE_PROJECT_NAME}_default
+        name: internal
 
 services:
     db:

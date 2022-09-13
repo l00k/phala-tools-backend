@@ -26,15 +26,20 @@ set('copy_dirs', [
 ]);
 
 
-host('phala')
+host('phala-old')
     ->hostname('100k-dev-server')
     ->user('user')
     ->set('app_variant', 'phala')
     ->set('deploy_path', '/srv/phala-tools');
-
-host('khala')
+host('khala-old')
     ->hostname('100k-dev-server')
     ->user('user')
+    ->set('app_variant', 'khala')
+    ->set('deploy_path', '/srv/khala-tools');
+    
+host('khala')
+    ->hostname('ovh-server')
+    ->user('ubuntu')
     ->set('app_variant', 'khala')
     ->set('deploy_path', '/srv/khala-tools');
 
