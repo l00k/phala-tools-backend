@@ -1,9 +1,9 @@
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
-import { WorkerState } from '#/Stats/Domain/Model/Worker';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { WorkerState } from '#/Watchdog/Domain/Type/WorkerState';
 import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 import { RuntimeException } from '@inti5/utils/Exception';
 

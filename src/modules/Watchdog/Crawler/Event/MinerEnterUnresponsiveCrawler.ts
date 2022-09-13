@@ -1,10 +1,10 @@
 import { KhalaTypes } from '#/Phala';
 import { StakePool } from '#/Phala/Domain/Model';
-import { WorkerState } from '#/Stats/Domain/Model/Worker';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
+import { WorkerState } from '#/Watchdog/Domain/Type/WorkerState';
 import { AbstractEventCrawler } from '#/Watchdog/Service/EventCrawler/AbstractEventCrawler';
 import { Listen } from '#/Watchdog/Service/EventCrawler/Annotation';
 import { Event, EventType } from '#/Watchdog/Service/EventCrawler/Event';

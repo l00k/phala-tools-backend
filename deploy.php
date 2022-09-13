@@ -36,8 +36,13 @@ host('khala-old')
     ->user('user')
     ->set('app_variant', 'khala')
     ->set('deploy_path', '/srv/khala-tools');
-    
+
 host('khala')
+    ->hostname('ovh-server')
+    ->user('ubuntu')
+    ->set('app_variant', 'khala')
+    ->set('deploy_path', '/srv/khala-tools');
+host('phala')
     ->hostname('ovh-server')
     ->user('ubuntu')
     ->set('app_variant', 'khala')
