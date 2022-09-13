@@ -94,7 +94,7 @@ task('server:down', function () {
     
     run("
         cd {{deploy_path}}/current;
-        docker-compose down --remove-orphans
+        docker-compose down
     ", [ 'tty' => true ]);
 });
 
