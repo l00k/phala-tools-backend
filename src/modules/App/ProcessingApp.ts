@@ -18,8 +18,8 @@ export class ProcessingApp
         ]);
         
         // watchdog crawler
-        // const crawler = objectManager.getInstance(CrawlerService);
-        // await crawler.run();
+        const crawler = objectManager.getInstance(CrawlerService);
+        await crawler.run();
         
         // global taskers
         const tasker = objectManager.getInstance(TaskerService);
