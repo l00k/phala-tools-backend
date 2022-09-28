@@ -38,7 +38,9 @@ export default {
         },
         polkadot: {
             api: {
-                WS: 'wss://rpc.polkadot.io',
+                urls: {
+                    WS: 'wss://rpc.polkadot.io',
+                }
             },
             subscan: {
                 baseUrl: 'https://polkadot.api.subscan.io/api/'

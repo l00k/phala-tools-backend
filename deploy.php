@@ -35,7 +35,7 @@ host('khala')
     ->hostname('ovh-server')
     ->user('ubuntu')
     ->set('app_variant', 'khala')
-    ->set('deploy_path', '/srv/khala-tools');
+    ->set('deploy_path', '/srv/khala-100k-dev');
 
 localhost('local')
     ->user('l00k')
@@ -84,6 +84,7 @@ task('server:down', function () {
     run("
         cd {{deploy_path}}/current;
         docker-compose down
+        echo OK
     ", [ 'tty' => true ]);
 });
 

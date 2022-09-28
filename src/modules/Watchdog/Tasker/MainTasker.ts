@@ -8,7 +8,7 @@ import { Injectable, ObjectManager } from '@inti5/object-manager';
 import { Timeout } from '@inti5/utils/Timeout';
 
 
-@Injectable({ tag: 'tasker.handler' })
+//@Injectable({ tag: 'tasker.handler' })
 export class MainTasker
 {
     
