@@ -21,9 +21,9 @@ export class MainTasker
     
     
     @Task({
-        cronExpr: '45 * * * *'
+        cronExpr: '45 */12 * * *'
     })
-    @Timeout(15 * 60 * 1000)
+    @Timeout(45 * 60 * 1000)
     public processHistory () : Promise<any>
     {
         return this._historyCrawler.run();
