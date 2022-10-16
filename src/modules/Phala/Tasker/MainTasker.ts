@@ -17,14 +17,14 @@ export class MainTasker
     
     
     @Task({ cronExpr: '50 4 * * *' })
-    @Timeout(15 * 60 * 1000)
+    @Timeout(30 * 60 * 1000)
     public async updateAccounts ()
     {
         await this._accountsUpdater.run();
     }
     
     @Task({ cronExpr: '45 * * * *' })
-    @Timeout(15 * 60 * 1000)
+    @Timeout(30 * 60 * 1000)
     public async fetchNewStakePools ()
     {
         await this._stakePoolsFetcher.run();
