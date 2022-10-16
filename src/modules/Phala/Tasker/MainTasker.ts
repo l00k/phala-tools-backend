@@ -16,12 +16,12 @@ export class MainTasker
     protected _stakePoolsFetcher : StakePoolsCrawler;
     
     
-    @Task({ cronExpr: '50 4 * * *' })
-    @Timeout(30 * 60 * 1000)
-    public async updateAccounts ()
-    {
-        await this._accountsUpdater.run();
-    }
+    // @Task({ cronExpr: '50 4 * * *' })
+    // @Timeout(30 * 60 * 1000)
+    // public async updateAccounts ()
+    // {
+    //     await this._accountsUpdater.run();
+    // }
     
     @Task({ cronExpr: '45 * * * *' })
     @Timeout(30 * 60 * 1000)
