@@ -199,7 +199,7 @@ task('db:pull', function () {
     run("
         cd {{deploy_path}}
         set -o allexport; source shared/.env; set +o allexport
-        mysqldump -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME > .dep/dbdumps/$dumpname
+        mysqldump --column-statistics=0 -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME > .dep/dbdumps/$dumpname
     ", [ 'tty' => true ]);
 
     runLocally("
