@@ -1,5 +1,6 @@
 import { InitializeSymbol, Inject, Singleton } from '@inti5/object-manager';
 import { Config } from '@inti5/configuration';
+import { Exception } from '@inti5/utils/Exception';
 import { Logger } from '@inti5/utils/Logger';
 import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { zipObject } from 'lodash';
@@ -111,7 +112,14 @@ export class Subscan
     
     public async post(url : string, data? : any, config? : AxiosRequestConfig): Promise<AxiosResponse<SubscanResponse>>
     {
-        return <any> this._axios.post(url, data, config);
+        return <any> this._axios.post(
+            url,
+            data,
+            {
+                ...config,
+                validateStatus: () => true,
+            }
+        );
     }
     
     public async *getExtrinsics(filters : ExtrinsicFilter, ascendingOrder : boolean = true): AsyncGenerator<Extrinsic[], void, void>
@@ -143,16 +151,25 @@ export class Subscan
         while (true) {
             result = null;
         
-            try {
-                const { status, data } = await this.post('scan/extrinsics', filters);
-                if (status === 200) {
-                    result = data;
+            for (let t = 0; t < 3; ++t) {
+                try {
+                    const { status, data } = await this.post('scan/extrinsics', filters);
+                    if (status === 200) {
+                        result = data;
+                    }
+                }
+                catch (e) {
+                    this._logger.log('Request failed. Retrying in 1s');
+                    await sleep(1000);
+                    continue;
                 }
             }
-            catch (e) {
-                this._logger.log('Request failed. Retrying in 1s');
-                await sleep(1000);
-                continue;
+            
+            if (!result) {
+                throw new Exception(
+                    'Unable to fetch data',
+                    1666279966510
+                );
             }
             
             if (!result.data.extrinsics) {
@@ -220,17 +237,26 @@ export class Subscan
         let result : SubscanResponse;
         while (true) {
             result = null;
-        
-            try {
-                const { status, data } = await this.post('scan/events', filters);
-                if (status === 200) {
-                    result = data;
+            
+            for (let t = 0; t < 3; ++t) {
+                try {
+                    const { status, data } = await this.post('scan/events', filters);
+                    if (status === 200) {
+                        result = data;
+                        break;
+                    }
+                }
+                catch (e) {
+                    this._logger.log('Request failed. Retrying in 1s');
+                    await sleep(1000);
                 }
             }
-            catch (e) {
-                this._logger.log('Request failed. Retrying in 1s');
-                await sleep(1000);
-                continue;
+            
+            if (!result) {
+                throw new Exception(
+                    'Unable to fetch data',
+                    1666280005732
+                );
             }
             
             if (!result.data.events) {

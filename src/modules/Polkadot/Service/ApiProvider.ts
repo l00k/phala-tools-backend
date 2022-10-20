@@ -34,7 +34,7 @@ export class ApiProvider
     protected _api : ApiModeMap<ApiPromise> = {};
     
     
-    @Timeout(15000)
+    @Timeout(30000)
     public async getApi (apiMode : ApiMode = ApiMode.HTTP) : Promise<ApiPromise>
     {
         if (!this._apiPromise[apiMode]) {

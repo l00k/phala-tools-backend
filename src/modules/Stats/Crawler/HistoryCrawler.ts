@@ -19,6 +19,9 @@ import range from 'lodash/range';
 import moment from 'moment';
 
 
+const sleep = (ms : number) => new Promise(resolve => setTimeout(resolve, ms));
+
+
 export class HistoryCrawler
     extends AbstractCrawler
 {
@@ -208,16 +211,10 @@ export class HistoryCrawler
                 break;
             }
             
-            try {
-                await this._processHistoryEntry();
-                
-                ++this._appState.value.lastProcessedNonce;
-                await this._entityManager.flush();
-            }
-            catch (e) {
-                console.error(e);
-                break;
-            }
+            await this._processHistoryEntry();
+            
+            ++this._appState.value.lastProcessedNonce;
+            await this._entityManager.flush();
         }
     }
     
@@ -333,10 +330,30 @@ export class HistoryCrawler
                 );
             }
             
-            await this._processStakePool(
-                stakePoolId,
-                onChainStakePool
-            );
+            let done : boolean = false;
+            
+            for (let t=0; t<3; ++t) {
+                try {
+                    await this._processStakePool(
+                        stakePoolId,
+                        onChainStakePool
+                    );
+                    
+                    done = true;
+                    break;
+                }
+                catch (e) {
+                    this._logger.log('Request failed. Retrying in 1s');
+                    await sleep(1000);
+                }
+            }
+            
+            if (!done) {
+                throw new RuntimeException(
+                    'Unable to process stake pools',
+                    1666280122614
+                );
+            }
             
             if (stakePoolId % 50 == 0) {
                 const fraction = stakePoolId / this._stakePoolsCount;

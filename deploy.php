@@ -182,7 +182,7 @@ task('db:cleanup', function () {
     run("
         cd {{deploy_path}}
         set -o allexport; source $envPath; set +o allexport
-        mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME -e 'delete from `stats_historyentry` where entry_nonce = 1129;'
+        mysql -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u \$DB_USER -p\$DB_PASSWORD \$DB_NAME -e 'UPDATE `core_tasker_task` SET `last_execution`=NULL WHERE `id`=3;'
     ", ['tty' => true]);
 });
 
