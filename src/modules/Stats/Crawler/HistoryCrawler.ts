@@ -733,9 +733,14 @@ export class HistoryCrawler
     
     protected async _processNetworkState ()
     {
-        const networkState = new NetworkState({
-            snapshot: this._snapshot
-        }, this._entityManager);
+        const networkStateRepository = this._entityManager.getRepository(NetworkState);
+        
+        let networkState = await networkStateRepository.findOne({ snapshot: this._snapshot });
+        if (!networkState) {
+            networkState = new NetworkState({
+                snapshot: this._snapshot
+            }, this._entityManager);
+        }
         
         networkState.totalShares = Object.values(this._workers)
             .filter(worker => worker.isMiningState)
