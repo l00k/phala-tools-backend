@@ -40,6 +40,10 @@ export class HistoryEntry
     @Type(() => Snapshot)
     public snapshot : Snapshot;
     
+    @ORM.Property()
+    @API.Property()
+    public finalized : boolean = false;
+    
     
     @ORM.Property()
     public intermediateStep : number = 0;

@@ -52,6 +52,7 @@ export class HistoryCrawler
     protected _appState : AppState<HistoryCrawlerState>;
     
     protected _snapshot : Snapshot;
+    protected _isFinalized : boolean;
     protected _tokenomicParameters : typeof KhalaTypes.TokenomicParameters;
     
     protected _stakePoolsCount : number = 0;
@@ -211,9 +212,14 @@ export class HistoryCrawler
                 break;
             }
             
+            this._isFinalized = !moment.utc(this._snapshot.date).isAfter(moment.utc());
+            
             await this._processHistoryEntry();
             
-            ++this._appState.value.lastProcessedNonce;
+            if (this._isFinalized) {
+                ++this._appState.value.lastProcessedNonce;
+            }
+            
             await this._entityManager.flush();
         }
     }
@@ -228,7 +234,11 @@ export class HistoryCrawler
         ).toJSON();
         
         // log
-        this._logger.info('Next entry', this._snapshot.id);
+        this._logger.info(
+            'Next entry',
+            this._snapshot.id,
+            this._isFinalized ? 'finalized' : 'intermediate'
+        );
         
         await this._clearContext();
         
@@ -404,16 +414,20 @@ export class HistoryCrawler
         const stakePoolEntry : StakePoolEntry = await this._getOrCreateStakePool(onChainId);
         
         // fetch simple data
-        const historyEntry : HistoryEntry = new HistoryEntry({
-            stakePoolEntry: stakePoolEntry,
-            snapshot: this._snapshot,
+        const historyEntry : HistoryEntry = await this._getOrCreateHistoryEntry(
+            stakePoolEntry,
+            this._snapshot
+        );
+        
+        historyEntry.assign({
+            finalized: this._isFinalized,
             
             commission: Polkadot.Utility.parseRawPercent(onChainStakePool.payoutCommission || 0),
             cap: Phala.Utility.parseRawAmount(onChainStakePool.cap),
             stakeTotal: Phala.Utility.parseRawAmount(onChainStakePool.totalStake),
             stakeFree: Phala.Utility.parseRawAmount(onChainStakePool.freeStake),
             stakeReleasing: Phala.Utility.parseRawAmount(onChainStakePool.releasingStake),
-        }, this._entityManager);
+        });
         
         const withdrawals = onChainStakePool.withdrawQueue
             .reduce((acc, prev) => acc + Number(prev.shares), 0);
@@ -501,6 +515,30 @@ export class HistoryCrawler
         this._entityManager.persist(historyEntry);
         
         this._processedStakePools.push(stakePoolEntry);
+    }
+    
+    protected async _getOrCreateHistoryEntry(
+        stakePoolEntry : StakePoolEntry,
+        snapshot : Snapshot
+    ) : Promise<HistoryEntry>
+    {
+        const historyEntryRepository = this._entityManager.getRepository(HistoryEntry);
+    
+        let historyEntry : HistoryEntry = await historyEntryRepository.findOne({
+            stakePoolEntry,
+            snapshot,
+            finalized: false,
+        });
+        if (!historyEntry) {
+            historyEntry = new HistoryEntry({
+                stakePoolEntry,
+                snapshot
+            }, this._entityManager);
+            
+            historyEntryRepository.persist(historyEntry);
+        }
+        
+        return historyEntry;
     }
     
     
