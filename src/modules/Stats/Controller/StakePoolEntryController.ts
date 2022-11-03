@@ -1,13 +1,9 @@
 import { CrudController } from '#/BackendCore/Controller/CrudController';
-import { Filters } from '#/Stats/Controller/StakePoolDto/Filters';
 import { Modifiers } from '#/Stats/Controller/StakePoolDto/Modifiers';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import * as Api from '@inti5/api-backend';
 import { API } from '@inti5/api-backend';
 import * as Router from '@inti5/express-router';
-import * as ORM from '@mikro-orm/core';
-import * as Trans from 'class-transformer';
-import type { AutoPath } from '@mikro-orm/core/typings';
 
 
 @Router.Headers.CacheControl('public, max-age=900')
@@ -54,7 +50,7 @@ export class StakePoolEntryController<P extends string = never>
     {
         return super._getItem(
             id,
-            <any> [
+            <any>[
                 'stakePool.owner',
                 'issues',
             ]
@@ -95,7 +91,7 @@ export class StakePoolEntryController<P extends string = never>
         total: true,
     })
     public async getStakePoolsCollection (
-        @API.Filters(() => StakePoolEntry, Filters)
+        @API.Filters(() => StakePoolEntry)
             filters : Api.Domain.Filters<StakePoolEntry>,
         @API.Sorting(() => StakePoolEntry)
             sorting : Api.Domain.Sorting<StakePoolEntry>,
@@ -111,6 +107,8 @@ export class StakePoolEntryController<P extends string = never>
                 filters.toQueryFilters(),
             ]
         };
+        
+        console.dir(finalFilters, { depth: 10 });
         
         // build query and fetch collection
         const collection : Api.Domain.Collection<StakePoolEntry> = {
