@@ -27,11 +27,24 @@ services:
         volumes:
             - .:/usr/src/app/:rw
 
-    app_process:
+    app_process_tasker:
         depends_on:
             - db
         image: ${COMPOSE_PROJECT_NAME}-node
-        command: [ "./etc/run.sh", "process" ]
+        command: [ "./etc/run.sh", "process", "tasker" ]
+        user: "1000:1000"
+        restart: "always"
+        env_file: .env
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        volumes:
+            - .:/usr/src/app/:rw
+
+    app_process_watchdog:
+        depends_on:
+            - db
+        image: ${COMPOSE_PROJECT_NAME}-node
+        command: [ "./etc/run.sh", "process", "watchdog" ]
         user: "1000:1000"
         restart: "always"
         env_file: .env

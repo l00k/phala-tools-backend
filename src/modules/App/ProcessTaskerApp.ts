@@ -1,10 +1,9 @@
 import { BaseApp } from '#/BackendCore/Module/BaseApp';
 import { TaskerService } from '#/BackendCore/Service/Tasker/TaskerService';
-import { CrawlerService } from '#/Watchdog/Service/EventCrawler/CrawlerService';
 import { ObjectManager } from '@inti5/object-manager';
 
 
-export class ProcessingApp
+export class ProcessTaskerApp
     extends BaseApp
 {
     
@@ -16,10 +15,6 @@ export class ProcessingApp
             'Crawler',
             'Tasker'
         ]);
-        
-        // watchdog crawler
-        const crawler = objectManager.getInstance(CrawlerService);
-        await crawler.run();
         
         // global taskers
         const tasker = objectManager.getInstance(TaskerService);

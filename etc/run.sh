@@ -2,8 +2,8 @@
 
 run_process() {
     while true; do
-        yarn prod process
-        sleep 60
+        yarn prod process_$1
+        sleep 30
     done
 }
 
@@ -16,7 +16,7 @@ run_api() {
 
 case $1 in
     process)
-        run_process
+        run_process $2
         ;;
     api)
         run_api
