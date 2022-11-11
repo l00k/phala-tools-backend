@@ -18,6 +18,7 @@ export class NetworkStateController
             date: true,
         },
         totalShares: true,
+        phaPrice: true,
     })
     public async getLatest () : Promise<NetworkState>
     {

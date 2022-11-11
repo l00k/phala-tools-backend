@@ -1,9 +1,11 @@
 import { Network } from '#/App/Domain/Type/Network';
 import { HistoryCrawler } from '#/Stats/Crawler/HistoryCrawler';
+import { HistoryCrawlerState } from '#/Stats/Domain/Model/AppState/HistoryCrawlerState';
 import { HistoryEntry } from '#/Stats/Domain/Model/HistoryEntry';
 import { StakePoolEntry } from '#/Stats/Domain/Model/StakePoolEntry';
 import { AbstractCrawler } from '#/Stats/Service/AbstractCrawler';
 import { Config } from '@inti5/configuration';
+import { EntityRepository } from '@mikro-orm/core';
 
 
 export class HistoryAprUpdater
@@ -13,39 +15,44 @@ export class HistoryAprUpdater
     @Config('modules.app.network')
     protected _network : Network;
     
+    protected _appStateClass : any = HistoryCrawlerState;
+    
     
     protected async _process ()
     {
         this._logger.log('Updating history entries');
         
         const stakePoolEntryRepository = this._entityManager.getRepository(StakePoolEntry);
-        const historyEntryRepository = this._entityManager.getRepository(HistoryEntry);
+        const historyEntryRepository : EntityRepository<HistoryEntry> = this._entityManager.getRepository(HistoryEntry);
         
         const historyEntries : Record<number, HistoryEntry[]> = {};
+        
+        const stakePoolEntries : Record<number, StakePoolEntry> = Object.fromEntries(
+            (await stakePoolEntryRepository.findAll({ orderBy: { id: 'ASC' } }))
+                .map(stakePoolEntry => ([ stakePoolEntry.id, stakePoolEntry ]))
+        );
         
         for (let entryNonce = 1; entryNonce <= this._appState.value.lastProcessedNonce; ++entryNonce) {
             console.log('Nonce', entryNonce);
             
-            const stakePoolEntries = await stakePoolEntryRepository.find({
-                historyEntries: {
-                    snapshot: { id: entryNonce },
-                }
+            const workingHistoryEntries = await historyEntryRepository.find({
+                snapshot: entryNonce,
             }, {
-                populate: [ 'historyEntries' ]
+                orderBy: { stakePoolEntry: 'ASC' }
             });
             
-            console.log('StakePools num', stakePoolEntries.length);
+            console.log('StakePools num', workingHistoryEntries.length);
             
-            for (const stakePoolEntry of stakePoolEntries) {
+            for (const workingHistoryEntry of workingHistoryEntries) {
+                const stakePoolEntry = workingHistoryEntry.stakePoolEntry;
+            
                 if (!historyEntries[stakePoolEntry.id]) {
                     historyEntries[stakePoolEntry.id] = [];
                 }
                 
-                const workingHistoryEntry = stakePoolEntry.historyEntries[0];
-                
                 historyEntries[stakePoolEntry.id].push(workingHistoryEntry);
                 
-                await this._calculateAvgApr(
+                this._calculateAvgApr(
                     workingHistoryEntry,
                     historyEntries[stakePoolEntry.id]
                 );
@@ -57,7 +64,7 @@ export class HistoryAprUpdater
         }
     }
     
-    protected async _calculateAvgApr (
+    protected _calculateAvgApr (
         workingHistoryEntry : HistoryEntry,
         historyEntries : HistoryEntry[]
     )
@@ -69,8 +76,6 @@ export class HistoryAprUpdater
         workingHistoryEntry.avgApr = historyEntryToCount
             .map(entry => entry.currentApr)
             .reduce((acc, curr) => acc + curr, 0) / historyEntryToCount.length;
-        
-        await this._entityManager.persist(workingHistoryEntry);
     }
     
 }

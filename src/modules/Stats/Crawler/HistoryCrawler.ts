@@ -14,6 +14,7 @@ import { Config } from '@inti5/configuration';
 import { RuntimeException } from '@inti5/utils/Exception';
 import * as ORM from '@mikro-orm/core';
 import { ApiPromise } from '@polkadot/api';
+import axios from 'axios';
 import colors from 'colors';
 import range from 'lodash/range';
 import moment from 'moment';
@@ -745,8 +746,29 @@ export class HistoryCrawler
         networkState.totalShares = Object.values(this._workers)
             .filter(worker => worker.isMiningState)
             .reduce((acc, worker) => acc + worker.getShare(), 0);
+            
+        networkState.phaPrice = await this._getPhaPrice();
         
         this._entityManager.persist(networkState);
+    }
+    
+    protected async _getPhaPrice () : Promise<number>
+    {
+        for (let i=0; i<3; ++i) {
+            const { status, data } = await axios.get(
+                'https://api.coingecko.com/api/v3/simple/price?ids=pha&vs_currencies=usd',
+                { validateStatus: () => true, }
+            );
+            
+            if (status === 200) {
+                return Number(data.pha.usd);
+            }
+        }
+    
+        throw new RuntimeException(
+            'Unable to fetch PHA price',
+            1668175816819
+        );
     }
     
 }

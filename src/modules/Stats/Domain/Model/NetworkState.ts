@@ -30,6 +30,10 @@ export class NetworkState
     @API.Property()
     public totalShares : number = 0;
     
+    @ORM.Property({ ...ColumnType.PRICE })
+    @API.Property()
+    public phaPrice : number = 0;
+    
     
     public constructor (data? : Partial<NetworkState>, entityManager? : ORM.EntityManager)
     {
