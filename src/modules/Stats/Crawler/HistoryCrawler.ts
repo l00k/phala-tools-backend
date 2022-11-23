@@ -559,9 +559,6 @@ export class HistoryCrawler
         const budgetPerBlock = Phala.Utility.decodeBigNumber(this._tokenomicParameters.budgetPerBlock);
         const treasuryRatio = Phala.Utility.decodeBigNumber(this._tokenomicParameters.treasuryRatio);
         
-        const miningEra = await this._calculateMiningEra(this._snapshot.blockNumber);
-        const rewardsFractionInEra = Math.pow(HistoryCrawler.HALVING_FRACTION, miningEra);
-        
         const deltaTime : number = moment.utc(this._snapshot.date).diff(previousSnapshot.date, 'seconds');
         const deltaBlocks : number = this._snapshot.blockNumber - previousSnapshot.blockNumber;
         const avgBlockTime = deltaTime / deltaBlocks;
@@ -591,7 +588,6 @@ export class HistoryCrawler
                 }, 0);
             
             const currentApr = rewardPerBlock
-                * rewardsFractionInEra
                 * (1 - treasuryRatio)
                 * (1 - stakePoolEntry.lastHistoryEntry.commission)
                 * (31536000 / avgBlockTime)
