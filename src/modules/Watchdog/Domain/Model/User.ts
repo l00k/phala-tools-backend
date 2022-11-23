@@ -24,7 +24,7 @@ export class User
     extends AbstractModel<User>
 {
     
-    public static readonly MAX_OBSERVATION_COUNT = 10;
+    public static readonly MAX_OBSERVATION_COUNT = 50;
     public static readonly MAX_NODE_COUNT = 3;
     
     
