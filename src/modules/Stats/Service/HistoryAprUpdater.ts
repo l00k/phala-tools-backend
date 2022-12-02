@@ -16,11 +16,13 @@ export class HistoryAprUpdater
     protected _network : Network;
     
     protected _appStateClass : any = HistoryCrawlerState;
-    
+    protected _entriesNum : number;
     
     protected async _process ()
     {
         this._logger.log('Updating history entries');
+        
+        this._entriesNum = Math.ceil(30 / HistoryCrawler.HISTORY_ENTRY_INTERVAL);
         
         const stakePoolEntryRepository = this._entityManager.getRepository(StakePoolEntry);
         const historyEntryRepository : EntityRepository<HistoryEntry> = this._entityManager.getRepository(HistoryEntry);
@@ -32,7 +34,7 @@ export class HistoryAprUpdater
                 .map(stakePoolEntry => ([ stakePoolEntry.id, stakePoolEntry ]))
         );
         
-        for (let entryNonce = 1; entryNonce <= this._appState.value.lastProcessedNonce; ++entryNonce) {
+        for (let entryNonce = 390; entryNonce <= this._appState.value.lastProcessedNonce; ++entryNonce) {
             console.log('Nonce', entryNonce);
             
             const workingHistoryEntries = await historyEntryRepository.find({
@@ -51,7 +53,16 @@ export class HistoryAprUpdater
                 }
                 
                 historyEntries[stakePoolEntry.id].push(workingHistoryEntry);
-                
+            }
+            
+            const entriesNum = historyEntries[1].length;
+            if (entriesNum < this._entriesNum) {
+                console.log('skip');
+                continue;
+            }
+            
+            for (const workingHistoryEntry of workingHistoryEntries) {
+                const stakePoolEntry = workingHistoryEntry.stakePoolEntry;
                 this._calculateAvgApr(
                     workingHistoryEntry,
                     historyEntries[stakePoolEntry.id]
@@ -69,9 +80,7 @@ export class HistoryAprUpdater
         historyEntries : HistoryEntry[]
     )
     {
-        const entriesNum = Math.ceil(30 / HistoryCrawler.HISTORY_ENTRY_INTERVAL);
-        
-        const historyEntryToCount = historyEntries.slice(-entriesNum);
+        const historyEntryToCount = historyEntries.slice(-this._entriesNum);
         
         workingHistoryEntry.avgApr = historyEntryToCount
             .map(entry => entry.currentApr)

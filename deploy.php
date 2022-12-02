@@ -236,7 +236,14 @@ task('db:push', function () {
     runLocally("
         cd $localCwd
         set -o allexport; source $localCwd/.env; set +o allexport
-        mysqldump --column-statistics=0 -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME > .dep/dbdumps/$dumpname
+        mysqldump --column-statistics=0 -h 127.0.0.1 -P \$DB_PORT_EXTERNAL -u root -proot \$DB_NAME \
+            --ignore-table=db.watchdog_issue_stucked_node \
+            --ignore-table=db.watchdog_issue_stucked_node \
+            --ignore-table=db.watchdog_issue_unresp_worker \
+            --ignore-table=db.watchdog_observation \
+            --ignore-table=db.watchdog_state_node \
+            --ignore-table=db.watchdog_user \
+            > .dep/dbdumps/$dumpname
     ", [ 'tty' => true ]);
 
     run("
