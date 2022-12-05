@@ -108,8 +108,6 @@ export class StakePoolEntryController<P extends string = never>
             ]
         };
         
-        console.dir(finalFilters, { depth: 10 });
-        
         // build query and fetch collection
         const collection : Api.Domain.Collection<StakePoolEntry> = {
             items: [],
