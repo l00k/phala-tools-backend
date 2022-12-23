@@ -26,7 +26,7 @@ export class StakePoolEntry
     public id : number;
     
     
-    @ORM.OneToOne(() => StakePool, null, { nullable: true, eager: true })
+    @ORM.OneToOne(() => StakePool, { nullable: true, eager: true })
     @API.Property()
     @API.Filterable()
     @API.Sortable()
@@ -38,7 +38,7 @@ export class StakePoolEntry
     @API.Property()
     public special : string;
     
-    @ORM.OneToOne(() => HistoryEntry, null, { nullable: true, eager: true })
+    @ORM.OneToOne(() => HistoryEntry, { nullable: true, eager: true })
     @API.Property()
     @API.Filterable()
     @API.Sortable()

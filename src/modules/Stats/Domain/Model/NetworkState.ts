@@ -18,7 +18,7 @@ export class NetworkState
     @API.Id()
     public id : number;
     
-    @ORM.OneToOne(() => Snapshot, null, { eager: true, orphanRemoval: false })
+    @ORM.OneToOne(() => Snapshot, { eager: true, orphanRemoval: false })
     @API.Property()
     @API.Filterable()
     @API.Sortable()

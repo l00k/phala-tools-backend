@@ -15,7 +15,7 @@
         "src/modules/*"
     ],
     "dependencies": {
-        "@mikro-orm/cli": "^5.2.4",
+        "@mikro-orm/cli": "^5.4.2",
         "patch-package": "^6.4.7",
         "postinstall-postinstall": "^2.1.0",
         "ts-node": "^10.9.1",
