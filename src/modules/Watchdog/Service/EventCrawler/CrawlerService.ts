@@ -1,5 +1,4 @@
 import { AppState } from '#/BackendCore/Domain/Model/AppState';
-import { Exception } from '#/BackendCore/Exception';
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { ApiProvider } from '#/Phala/Service/ApiProvider';
 import { ApiMode } from '#/Polkadot';
@@ -7,6 +6,7 @@ import { CrawlerState } from '#/Watchdog/Domain/Model/AppState/CrawlerState';
 import { AbstractEventCrawler } from '#/Watchdog/Service/EventCrawler/AbstractEventCrawler';
 import { Event } from '#/Watchdog/Service/EventCrawler/Event';
 import { Inject } from '@inti5/object-manager';
+import { Exception } from '@inti5/utils/Exception';
 import { Logger } from '@inti5/utils/Logger';
 import { EntityManager } from '@mikro-orm/mysql';
 import { ApiPromise } from '@polkadot/api';
