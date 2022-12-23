@@ -1,11 +1,8 @@
 export enum EventType
 {
-    MinerEnterUnresponsive = 'phalaMining::MinerEnterUnresponsive',
-    MinerExitUnresponsive = 'phalaMining::MinerExitUnresponsive',
-    MinerSettled = 'phalaMining::MinerSettled',
-    PoolCommissionSet = 'phalaStakePool::PoolCommissionSet',
-    Contribution = 'phalaStakePool::Contribution',
-    Withdrawal = 'phalaStakePool::Withdrawal',
+    WorkerEnterUnresponsive = 'phalaComputation::WorkerEnterUnresponsive',
+    WorkerExitUnresponsive = 'phalaComputation::WorkerExitUnresponsive',
+    PoolCommissionSet = 'phalaStakePoolv2::PoolCommissionSet',
 };
 
 

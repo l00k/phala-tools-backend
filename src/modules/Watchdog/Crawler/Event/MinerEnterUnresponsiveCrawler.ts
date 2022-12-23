@@ -25,7 +25,7 @@ export class MinerEnterUnresponsiveCrawler
     
     
     @Listen([
-        EventType.MinerEnterUnresponsive
+        EventType.WorkerEnterUnresponsive
     ])
     protected async _handle (event : Event) : Promise<boolean>
     {
