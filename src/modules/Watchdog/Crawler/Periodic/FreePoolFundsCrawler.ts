@@ -18,10 +18,15 @@ export class FreePoolFundsCrawler
     
     protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
     {
-        const onChainStakePoolRaw : any = await this._api.query.phalaStakePool.stakePools(onChainId);
-        const onChainStakePool : typeof KhalaTypes.PoolInfo = onChainStakePoolRaw.toJSON();
+        // todo ld 2022-12-23 20:40:10
+        return 0;
+    
+        const stakePoolBase : any = <any>(
+            await this._api.query.phalaBasePool.pools(onChainId)
+        ).toJSON();
+        const stakePool : typeof KhalaTypes.PoolInfo = stakePoolBase.stakePool;
         
-        return PhalaUtility.parseRawAmount(onChainStakePool.freeStake);
+        return PhalaUtility.parseRawAmount(stakePool.freeStake);
     }
     
     protected _prepareMessage (

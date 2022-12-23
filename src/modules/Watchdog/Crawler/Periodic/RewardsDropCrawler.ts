@@ -1,10 +1,10 @@
-import { Exception } from '#/BackendCore/Exception';
 import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
+import { Exception } from '@inti5/utils/Exception';
 import { Header } from '@polkadot/types/interfaces/runtime';
 
 
@@ -21,6 +21,9 @@ export class RewardsDropCrawler
     
     protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
     {
+        // todo ld 2022-12-23 20:41:03
+        return 0;
+    
         const finalizedHead = await this._api.rpc.chain.getFinalizedHead();
         const finalizedBlockHeader : Header = await this._api.rpc.chain.getHeader(finalizedHead);
         const finalizedBlockNumber = finalizedBlockHeader.number.toNumber();
@@ -71,14 +74,16 @@ export class RewardsDropCrawler
     {
         const blockHash : string = (await this._api.rpc.chain.getBlockHash(blockNumber)).toString();
         
-        const historyStakePoolRaw : any = await this._api.query.phalaStakePool.stakePools.at(blockHash, onChainId);
-        const historyStakePool : typeof KhalaTypes.PoolInfo = historyStakePoolRaw.toJSON();
+        const stakePoolBase : any = <any>(
+            await this._api.query.phalaBasePool.pools.at(blockHash, onChainId)
+        ).toJSON();
+        const stakePool : typeof KhalaTypes.PoolInfo = stakePoolBase.stakePool;
         
-        if (!historyStakePool) {
+        if (!stakePool) {
             throw new Exception('Unable to fetch history data', 1637407485035);
         }
         
-        return 10 ** 12 * PhalaUtility.decodeBigNumber(historyStakePool.rewardAcc);
+        return 10 ** 12 * PhalaUtility.decodeBigNumber(stakePool.rewardAcc);
     }
     
     protected _prepareMessage (

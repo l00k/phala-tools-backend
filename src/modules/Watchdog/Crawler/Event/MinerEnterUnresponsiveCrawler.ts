@@ -36,7 +36,7 @@ export class MinerEnterUnresponsiveCrawler
         const workerState : typeof KhalaTypes.MinerInfo = workerStateRaw.toJSON();
         if (
             !workerState
-            || workerState.state != WorkerState.MiningUnresponsive
+            || workerState.state != WorkerState.WorkerUnresponsive
         ) {
             return false;
         }

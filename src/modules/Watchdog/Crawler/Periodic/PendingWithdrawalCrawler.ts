@@ -18,14 +18,16 @@ export class PendingWithdrawalCrawler
     
     protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
     {
-        const onChainStakePoolRaw : any = await this._api.query.phalaStakePool.stakePools(onChainId);
-        const onChainStakePool : typeof KhalaTypes.PoolInfo = onChainStakePoolRaw.toJSON();
+        const stakePoolBase : any = <any>(
+            await this._api.query.phalaBasePool.pools(onChainId)
+        ).toJSON();
+        const stakePool : typeof KhalaTypes.PoolInfo = stakePoolBase.stakePool;
         
-        if (onChainStakePool.withdrawQueue.length == 0) {
+        if (stakePool.withdrawQueue.length == 0) {
             return null;
         }
         
-        const totalRaw = onChainStakePool.withdrawQueue.reduce((acc, r) => acc + Number(r.shares), 0);
+        const totalRaw = stakePool.withdrawQueue.reduce((acc, r) => acc + Number(r.shares), 0);
         return PhalaUtility.parseRawAmount(totalRaw);
     }
     

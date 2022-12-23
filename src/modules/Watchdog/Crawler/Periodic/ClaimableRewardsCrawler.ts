@@ -21,25 +21,30 @@ export class ClaimableRewardsCrawler
         observation : Observation
     ) : Promise<number>
     {
-        const onChainStakePoolRaw : any = await this._api.query.phalaStakePool.stakePools(onChainId);
-        const onChainStakePool : typeof KhalaTypes.PoolInfo = onChainStakePoolRaw.toJSON();
+        // todo ld 2022-12-23 20:41:41
+        return 0;
+    
+        const stakePoolBase : any = <any>(
+            await this._api.query.phalaBasePool.pools(onChainId)
+        ).toJSON();
+        const stakePool : typeof KhalaTypes.PoolInfo = stakePoolBase.stakePool;
         
         let availableRewardsRaw : number = 0;
         
         if (observation.mode === ObservationMode.Owner) {
-            availableRewardsRaw += Number(onChainStakePool.ownerReward);
+            availableRewardsRaw += Number(stakePool.ownerReward);
         }
         
         if (observation.account) {
             const onChainStakerRaw : any = await this._api.query.phalaStakePool.poolStakers([
-                onChainStakePool.pid,
+                stakePool.pid,
                 observation.account.address
             ]);
             const onChainStaker : typeof KhalaTypes.UserStakeInfo = onChainStakerRaw.toJSON();
             
             if (onChainStaker) {
                 availableRewardsRaw += Number(onChainStaker.availableRewards)
-                    + Number(onChainStaker.shares) * PhalaUtility.decodeBigNumber(Number(onChainStakePool.rewardAcc))
+                    + Number(onChainStaker.shares) * PhalaUtility.decodeBigNumber(Number(stakePool.rewardAcc))
                     - Number(onChainStaker.rewardDebt);
             }
         }

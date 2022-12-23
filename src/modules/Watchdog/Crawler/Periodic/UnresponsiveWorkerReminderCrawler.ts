@@ -29,7 +29,7 @@ export class UnresponsiveWorkerReminderCrawler
         // fetch state
         const onChainMiners : typeof KhalaTypes.MinerInfo[] = <any>(
             await this._api.query
-                .phalaMining.miners
+                .phalaComputation.sessions
                 .multi(
                     issues.map(issue => issue.workerAccount)
                 )
@@ -50,7 +50,7 @@ export class UnresponsiveWorkerReminderCrawler
             // confirm unresponsivness
             if (
                 !onChainMiner
-                || onChainMiner.state != WorkerState.MiningUnresponsive
+                || onChainMiner.state != WorkerState.WorkerUnresponsive
             ) {
                 // issue already resolved
                 this._entityManager.remove(issue);
