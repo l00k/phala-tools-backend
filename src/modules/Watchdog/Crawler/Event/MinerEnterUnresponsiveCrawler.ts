@@ -32,7 +32,7 @@ export class MinerEnterUnresponsiveCrawler
         const workerAccount : string = event.data[0];
         
         // confirm unresponsivness
-        const workerStateRaw : any = await this._api.query.phalaMining.miners(workerAccount);
+        const workerStateRaw : any = await this._api.query.phalaComputation.sessions(workerAccount);
         const workerState : typeof KhalaTypes.MinerInfo = workerStateRaw.toJSON();
         if (
             !workerState
@@ -41,8 +41,8 @@ export class MinerEnterUnresponsiveCrawler
             return false;
         }
         
-        const workerPubKey = (await this._api.query.phalaMining.minerBindings(workerAccount)).toString();
-        const onChainIdRaw : any = await this._api.query.phalaStakePool.workerAssignments(workerPubKey);
+        const workerPubKey = (await this._api.query.phalaComputation.workerBindings(workerAccount)).toString();
+        const onChainIdRaw : any = await this._api.query.phalaStakePoolv2.workerAssignments(workerPubKey);
         const onChainId : number = Number(onChainIdRaw.toJSON());
         
         // load pool

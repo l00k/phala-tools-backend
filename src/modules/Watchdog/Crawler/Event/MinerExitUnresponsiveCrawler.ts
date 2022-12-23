@@ -18,7 +18,7 @@ export class MinerExitUnresponsiveCrawler
         const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
         
         const workerAccount : string = event.data[0];
-        const workerPubKey = (await this._api.query.phalaMining.minerBindings(workerAccount)).toString();
+        const workerPubKey = (await this._api.query.phalaComputation.workerBindings(workerAccount)).toString();
         
         // delete worker entry
         const count = await issueRepository.nativeDelete({
