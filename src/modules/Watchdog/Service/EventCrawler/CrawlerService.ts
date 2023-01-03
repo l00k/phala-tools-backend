@@ -60,6 +60,11 @@ export class CrawlerService
             this._logger.debug('No handlers');
         }
         
+        this._logger.dir(
+            Object.values(this._handlers)
+                .map(handler => handler.constructor.name)
+        );
+        
         // await handlers init
         for (const handler of Object.values(this._handlers)) {
             await handler.init();

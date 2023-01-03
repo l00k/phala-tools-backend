@@ -1,4 +1,3 @@
-import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { StakePool } from '#/Phala/Domain/Model';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
@@ -49,10 +48,12 @@ export class PoolCommissionSetCrawler
         // fetch previous commission value
         const previousBlockHash : string = (await this._api.rpc.chain.getBlockHash(event.blockNumber - 1)).toString();
         
-        const onChainStakePoolBeforeRaw : any = await this._api.query.phalaStakePool.stakePools.at(previousBlockHash, onChainId);
-        const onChainStakePoolBefore : typeof KhalaTypes.PoolInfo = onChainStakePoolBeforeRaw.toJSON();
+        const onChainStakePoolBeforeWrapped = (
+            await this._api.query.phalaBasePool.pools.at(previousBlockHash, onChainId)
+        ).unwrap();
+        const onChainStakePoolBefore = onChainStakePoolBeforeWrapped.asStakePool;
         
-        const previousCommissionPercent = onChainStakePoolBefore.payoutCommission / 10000;
+        const previousCommissionPercent = Number(onChainStakePoolBefore.payoutCommission) / 10000;
         const commissionDelta = newCommissionPercent - previousCommissionPercent;
         
         await this._processObservations(

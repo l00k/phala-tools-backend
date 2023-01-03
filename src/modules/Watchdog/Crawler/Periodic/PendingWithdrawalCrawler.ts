@@ -1,5 +1,4 @@
 import { Utility as PhalaUtility } from '#/Phala';
-import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
@@ -18,16 +17,24 @@ export class PendingWithdrawalCrawler
     
     protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
     {
-        const stakePoolBase : any = <any>(
+        const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
-        ).toJSON();
-        const stakePool : typeof KhalaTypes.PoolInfo = stakePoolBase.stakePool;
+        ).unwrap();
+        const stakePool = stakePoolWrapped.asStakePool;
         
-        if (stakePool.withdrawQueue.length == 0) {
-            return null;
+        let totalRaw : number = 0;
+        
+        // todo ld 2023-01-03 14:45:31
+        for (const withdrawingNft of stakePool.basepool.withdrawQueue) {
+            const nftProps : any[] = <any> (
+                await this._api.query.rmrkCore.properties(stakePool.basepool.cid, withdrawingNft.nftId)
+            ).toJSON();
+            
+            const valueProp = nftProps.find(prop => prop[0][2] === 'stake-info');
+            
+            totalRaw += Number(valueProp[1]);
         }
         
-        const totalRaw = stakePool.withdrawQueue.reduce((acc, r) => acc + Number(r.shares), 0);
         return PhalaUtility.parseRawAmount(totalRaw);
     }
     

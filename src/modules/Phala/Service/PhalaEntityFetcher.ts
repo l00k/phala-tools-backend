@@ -1,5 +1,5 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
-import { ApiProvider, KhalaTypes } from '#/Phala';
+import { ApiProvider, Typing } from '#/Phala';
 import { Account } from '#/Phala/Domain/Model/Account';
 import { StakePool } from '#/Phala/Domain/Model/StakePool';
 import { ApiMode } from '#/Polkadot';
@@ -52,7 +52,7 @@ export class PhalaEntityFetcher
         if (!stakePool) {
             const api = await this._apiProvider.getApi(this._apiMode);
             
-            const onChainStakePool : typeof KhalaTypes.PoolInfo =
+            const onChainStakePool : typeof Typing.PoolInfo =
                 <any>(await api.query.phalaStakePool.stakePools(onChainId)).toJSON();
             if (!onChainStakePool) {
                 return null;

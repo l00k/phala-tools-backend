@@ -14,20 +14,12 @@ export class ObservationNotifications
     
     @API.Property()
     @Assert()
-    public [ObservationType.RewardsDrop] : number;
-    
-    @API.Property()
-    @Assert()
     public [ObservationType.PoolCommissionChange] : number;
     
     
     @API.Property()
     @Assert()
     public [ObservationType.UnresponsiveWorker] : number;
-    
-    @API.Property()
-    @Assert()
-    public [ObservationType.StuckedNode] : number;
     
     @API.Property()
     @Assert()

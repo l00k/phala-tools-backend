@@ -1,4 +1,3 @@
-import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { Utility as PhalaUtility } from '#/Phala/Utility';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
@@ -21,32 +20,19 @@ export class ClaimableRewardsCrawler
         observation : Observation
     ) : Promise<number>
     {
-        // todo ld 2022-12-23 20:41:41
-        return 0;
-    
-        const stakePoolBase : any = <any>(
+        const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
-        ).toJSON();
-        const stakePool : typeof KhalaTypes.PoolInfo = stakePoolBase.stakePool;
+        ).unwrap();
+        const stakePool = stakePoolWrapped.asStakePool;
         
         let availableRewardsRaw : number = 0;
         
         if (observation.mode === ObservationMode.Owner) {
-            availableRewardsRaw += Number(stakePool.ownerReward);
-        }
-        
-        if (observation.account) {
-            const onChainStakerRaw : any = await this._api.query.phalaStakePool.poolStakers([
-                stakePool.pid,
-                observation.account.address
-            ]);
-            const onChainStaker : typeof KhalaTypes.UserStakeInfo = onChainStakerRaw.toJSON();
+            const accountBalance = (
+                await this._api.query.assets.account(10000, stakePool.ownerRewardAccount)
+            ).unwrap();
             
-            if (onChainStaker) {
-                availableRewardsRaw += Number(onChainStaker.availableRewards)
-                    + Number(onChainStaker.shares) * PhalaUtility.decodeBigNumber(Number(stakePool.rewardAcc))
-                    - Number(onChainStaker.rewardDebt);
-            }
+            availableRewardsRaw += Number(accountBalance.balance);
         }
         
         if (availableRewardsRaw === 0) {

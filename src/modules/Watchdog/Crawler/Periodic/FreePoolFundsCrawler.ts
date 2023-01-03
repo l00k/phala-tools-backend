@@ -1,5 +1,4 @@
 import { Utility as PhalaUtility } from '#/Phala';
-import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
@@ -18,15 +17,17 @@ export class FreePoolFundsCrawler
     
     protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
     {
-        // todo ld 2022-12-23 20:40:10
-        return 0;
-    
-        const stakePoolBase : any = <any>(
+        const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
-        ).toJSON();
-        const stakePool : typeof KhalaTypes.PoolInfo = stakePoolBase.stakePool;
+        ).unwrap();
+        const stakePool = stakePoolWrapped.asStakePool;
         
-        return PhalaUtility.parseRawAmount(stakePool.freeStake);
+        const lockBalance = (
+            await this._api.query.assets.account(10000, stakePool.lockAccount)
+        ).unwrap();
+        
+        const freeFundsRaw = Number(stakePool.basepool.totalValue) - Number(lockBalance.balance);
+        return PhalaUtility.parseRawAmount(freeFundsRaw);
     }
     
     protected _prepareMessage (

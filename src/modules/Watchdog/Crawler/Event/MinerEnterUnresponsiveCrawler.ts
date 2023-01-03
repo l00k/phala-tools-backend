@@ -1,4 +1,4 @@
-import { KhalaTypes } from '#/Phala';
+import { Typing } from '#/Phala';
 import { StakePool } from '#/Phala/Domain/Model';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
@@ -33,7 +33,7 @@ export class MinerEnterUnresponsiveCrawler
         
         // confirm unresponsivness
         const workerStateRaw : any = await this._api.query.phalaComputation.sessions(workerAccount);
-        const workerState : typeof KhalaTypes.MinerInfo = workerStateRaw.toJSON();
+        const workerState : typeof Typing.MinerInfo = workerStateRaw.toJSON();
         if (
             !workerState
             || workerState.state != WorkerState.WorkerUnresponsive

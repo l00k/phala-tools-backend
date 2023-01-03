@@ -3,7 +3,8 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
-        "@phala/typedefs": "^0.2.31"
+        "@phala/typedefs": "^0.2.32",
+        "@polkadot/typegen": "^9.10.5"
     },
     "devDependencies": {}
 }

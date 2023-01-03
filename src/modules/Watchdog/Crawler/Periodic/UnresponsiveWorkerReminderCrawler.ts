@@ -1,4 +1,3 @@
-import { KhalaTypes } from '#/Phala/Api/KhalaTypes';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
@@ -27,13 +26,13 @@ export class UnresponsiveWorkerReminderCrawler
         });
         
         // fetch state
-        const onChainMiners : typeof KhalaTypes.MinerInfo[] = <any>(
+        const onChainMiners = (
             await this._api.query
                 .phalaComputation.sessions
                 .multi(
                     issues.map(issue => issue.workerAccount)
                 )
-        ).map(raw => raw.toJSON());
+        ).map(raw => raw.unwrap());
         
         if (onChainMiners.length != issues.length) {
             throw new RuntimeException(
@@ -50,7 +49,7 @@ export class UnresponsiveWorkerReminderCrawler
             // confirm unresponsivness
             if (
                 !onChainMiner
-                || onChainMiner.state != WorkerState.WorkerUnresponsive
+                || onChainMiner.state.type != WorkerState.WorkerUnresponsive
             ) {
                 // issue already resolved
                 this._entityManager.remove(issue);
