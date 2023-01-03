@@ -5,11 +5,14 @@ import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import { WorkerState } from '#/Watchdog/Domain/Type/WorkerState';
 import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 import { RuntimeException } from '@inti5/utils/Exception';
+import moment from 'moment';
 
 
 export class UnresponsiveWorkerReminderCrawler
     extends AbstractPeriodicCrawler
 {
+
+    protected static readonly UNRESPONSIVNESS_THRESHOLD : number = 5;
     
     protected readonly _messageTitle : string = '🚨 Worker still in unresponsive state';
     protected readonly _observationType : ObservationType = ObservationType.UnresponsiveWorker;
@@ -53,6 +56,12 @@ export class UnresponsiveWorkerReminderCrawler
             ) {
                 // issue already resolved
                 this._entityManager.remove(issue);
+                continue;
+            }
+            
+            // confirm it is above threshold
+            const deltaTime = moment.utc().diff(issue.occurrenceDate, 'minutes');
+            if (deltaTime < UnresponsiveWorkerReminderCrawler.UNRESPONSIVNESS_THRESHOLD) {
                 continue;
             }
             
