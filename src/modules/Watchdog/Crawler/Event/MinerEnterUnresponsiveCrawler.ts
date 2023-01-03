@@ -1,4 +1,3 @@
-import { Typing } from '#/Phala';
 import { StakePool } from '#/Phala/Domain/Model';
 import { UnresponsiveWorker } from '#/Watchdog/Domain/Model/Issue/UnresponsiveWorker';
 import { Observation } from '#/Watchdog/Domain/Model/Observation';
@@ -32,18 +31,26 @@ export class MinerEnterUnresponsiveCrawler
         const workerAccount : string = event.data[0];
         
         // confirm unresponsivness
-        const workerStateRaw : any = await this._api.query.phalaComputation.sessions(workerAccount);
-        const workerState : typeof Typing.MinerInfo = workerStateRaw.toJSON();
+        const workerState = (
+            await this._api.query
+                .phalaComputation.sessions(workerAccount)
+        ).unwrap();
         if (
             !workerState
-            || workerState.state != WorkerState.WorkerUnresponsive
+            || workerState.state.type != WorkerState.WorkerUnresponsive
         ) {
             return false;
         }
         
-        const workerPubKey = (await this._api.query.phalaComputation.workerBindings(workerAccount)).toString();
-        const onChainIdRaw : any = await this._api.query.phalaStakePoolv2.workerAssignments(workerPubKey);
-        const onChainId : number = Number(onChainIdRaw.toJSON());
+        const workerPubKey = (
+            await this._api.query
+                .phalaComputation.sessionBindings(workerAccount)
+        ).toString();
+        
+        const onChainId : number = <any>(
+            await this._api.query
+            .phalaStakePoolv2.workerAssignments(workerPubKey)
+        ).toJSON();
         
         // load pool
         const stakePoolRepository = this._entityManager.getRepository(StakePool);

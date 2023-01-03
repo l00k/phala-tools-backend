@@ -2,7 +2,6 @@ import * as Polkadot from '#/Polkadot';
 import { Config } from '@inti5/configuration';
 import { Inject, Singleton } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
-import { khala as Khala } from '@phala/typedefs';
 import { ApiPromise } from '@polkadot/api';
 import { ProviderInterface } from '@polkadot/rpc-provider/types';
 
@@ -25,8 +24,7 @@ export class ApiProvider
     protected _createApi (provider : ProviderInterface) : Promise<ApiPromise>
     {
         return ApiPromise.create({
-            provider,
-            types: Khala,
+            provider
         });
     }
     
