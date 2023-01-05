@@ -22,6 +22,15 @@ export class PendingWithdrawalCrawler
         ).unwrap();
         const stakePool = stakePoolWrapped.asStakePool;
         
+        if (!stakePool.basepool.withdrawQueue.length) {
+            return null;
+        }
+        
+        const poolValueShareCoeff = 1
+            / Number(stakePool.basepool.totalShares)
+            * Number(stakePool.basepool.totalValue)
+            / 1e12;
+            
         let totalWithdrawing : number = 0;
         
         for (const withdrawingNft of stakePool.basepool.withdrawQueue) {
@@ -35,17 +44,14 @@ export class PendingWithdrawalCrawler
             ).toJSON();
             
             const nftShareParsed : any = this._api.createType('NftAttr', nftShareRaw).toJSON();
-            totalWithdrawing += Number(nftShareParsed.shares)
-                / Number(stakePool.basepool.totalShares)
-                * Number(stakePool.basepool.totalValue)
-                / 1e12;
+            totalWithdrawing += Number(nftShareParsed.shares) * poolValueShareCoeff;
         }
         
         if (totalWithdrawing == 0) {
             return null;
         }
         
-        return PhalaUtility.parseRawAmount(totalWithdrawing);
+        return totalWithdrawing;
     }
     
     protected _prepareMessage (
