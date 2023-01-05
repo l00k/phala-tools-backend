@@ -42,7 +42,7 @@ export class PendingWithdrawalCrawler
         }
         
         if (totalWithdrawing == 0) {
-            return 0;
+            return null;
         }
         
         return PhalaUtility.parseRawAmount(totalWithdrawing);
