@@ -22,20 +22,30 @@ export class PendingWithdrawalCrawler
         ).unwrap();
         const stakePool = stakePoolWrapped.asStakePool;
         
-        let totalRaw : number = 0;
+        let totalWithdrawing : number = 0;
         
-        // todo ld 2023-01-03 14:45:31
         for (const withdrawingNft of stakePool.basepool.withdrawQueue) {
-            const nftProps : any[] = <any> (
-                await this._api.query.rmrkCore.properties(stakePool.basepool.cid, withdrawingNft.nftId)
+            const nftShareRaw : string = <any> (
+                await this._api.query
+                    .rmrkCore.properties(
+                        stakePool.basepool.cid,
+                        withdrawingNft.nftId,
+                        'stake-info'
+                    )
             ).toJSON();
             
-            const valueProp = nftProps.find(prop => prop[0][2] === 'stake-info');
-            
-            totalRaw += Number(valueProp[1]);
+            const nftShareParsed : any = this._api.createType('NftAttr', nftShareRaw).toJSON();
+            totalWithdrawing += Number(nftShareParsed.shares)
+                / Number(stakePool.basepool.totalShares)
+                * Number(stakePool.basepool.totalValue)
+                / 1e12;
         }
         
-        return PhalaUtility.parseRawAmount(totalRaw);
+        if (totalWithdrawing == 0) {
+            return 0;
+        }
+        
+        return PhalaUtility.parseRawAmount(totalWithdrawing);
     }
     
     protected _prepareMessage (

@@ -1,0 +1,24 @@
+diff --git a/node_modules/@polkadot/util/cjs/logger.js b/node_modules/@polkadot/util/cjs/logger.js
+index 922c3dc..24e0731 100644
+--- a/node_modules/@polkadot/util/cjs/logger.js
++++ b/node_modules/@polkadot/util/cjs/logger.js
+@@ -59,7 +59,6 @@ function apply(log, type, values) {
+     const fnResult = values[0]();
+     return apply(log, type, Array.isArray(fnResult) ? fnResult : [fnResult], maxSize);
+   }
+-  console[logTo[log]]((0, _formatDate.formatDate)(new Date()), type, ...values.map(loggerFormat).map(formatWithLength(maxSize)));
+ }
+ function noop() {
+   // noop
+diff --git a/node_modules/@polkadot/util/logger.js b/node_modules/@polkadot/util/logger.js
+index afcd883..922e467 100644
+--- a/node_modules/@polkadot/util/logger.js
++++ b/node_modules/@polkadot/util/logger.js
+@@ -51,7 +51,6 @@ function apply(log, type, values, maxSize = -1) {
+     const fnResult = values[0]();
+     return apply(log, type, Array.isArray(fnResult) ? fnResult : [fnResult], maxSize);
+   }
+-  console[logTo[log]](formatDate(new Date()), type, ...values.map(loggerFormat).map(formatWithLength(maxSize)));
+ }
+ function noop() {
+   // noop
