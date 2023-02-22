@@ -1,11 +1,10 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
-import { ApiProvider, Typing } from '#/Phala';
+import { ApiProvider } from '#/Phala';
 import { Account } from '#/Phala/Domain/Model/Account';
 import { StakePool } from '#/Phala/Domain/Model/StakePool';
 import { ApiMode } from '#/Polkadot';
 import { Inject } from '@inti5/object-manager';
 import { Logger } from '@inti5/utils/Logger';
-import { EntityManager } from '@mikro-orm/mysql';
 import * as PolkadotUtils from '@polkadot/util';
 
 
@@ -52,7 +51,7 @@ export class PhalaEntityFetcher
         if (!stakePool) {
             const api = await this._apiProvider.getApi(this._apiMode);
             
-            const onChainStakePool : typeof Typing.PoolInfo =
+            const onChainStakePool : any =
                 <any>(await api.query.phalaStakePool.stakePools(onChainId)).toJSON();
             if (!onChainStakePool) {
                 return null;

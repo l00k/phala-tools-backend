@@ -5,7 +5,7 @@ import { ValidationException } from '@inti5/validator';
 import express from 'express';
 
 
-export abstract class AbstractOwnerController<T>
+export abstract class AbstractOwnerController<T extends object>
     extends CrudController<T>
 {
     

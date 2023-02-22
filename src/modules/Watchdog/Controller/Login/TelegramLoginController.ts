@@ -39,7 +39,8 @@ export class TelegramLoginController
     )
     {
         try {
-            const verified = this._verifyTelegramLogin(body);
+            const verified = await this._verifyTelegramLogin(body);
+            console.log('verified', verified);
             if (!verified) {
                 return false;
             }
