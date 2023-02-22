@@ -10,7 +10,7 @@ export class TelegramLoginDto
             onlyInteger: true,
         }
     })
-    public id : string;
+    public id : number;
     
     @Assert({
         presence: true,
@@ -33,7 +33,7 @@ export class TelegramLoginDto
     @Assert({
         presence: true,
     })
-    public authDate : string;
+    public authDate : number;
     
     @Assert({
         presence: true,
