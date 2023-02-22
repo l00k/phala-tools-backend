@@ -1,16 +1,15 @@
 import { EntityManagerWrapper } from '#/BackendCore/Service/EntityManagerWrapper';
 import { JwtSigner } from '#/BackendCore/Service/JwtSigner';
-import { TelegramConfig } from '#/Messaging/Domain/types';
 import { MessagingChannel } from '#/Messaging/Domain/MessagingChannel';
+import { TelegramConfig } from '#/Messaging/Domain/types';
 import { TelegramLoginDto } from '#/Watchdog/Controller/Login/Dto/TelegramLoginDto';
 import { User } from '#/Watchdog/Domain/Model/User';
+import { Config } from '@inti5/configuration';
 import { Body, Controller, Endpoint } from '@inti5/express-router';
 import { Inject } from '@inti5/object-manager';
-import { Assert, Validate } from '@inti5/validator/Method';
-import { Config } from '@inti5/configuration';
 import { Logger } from '@inti5/utils/Logger';
+import { Assert, Validate } from '@inti5/validator/Method';
 import crypto from 'crypto';
-import rateLimit from 'express-rate-limit';
 
 
 export class TelegramLoginController
@@ -28,6 +27,16 @@ export class TelegramLoginController
     
     @Config('modules.messaging.telegram')
     protected _telegramConfig : TelegramConfig;
+    
+    
+    protected static FIELDS_MAP : Record<string, string> = {
+        auth_date: 'authDate',
+        first_name: 'firstName',
+        id: 'id',
+        last_name: 'lastName',
+        photo_url: 'photoUrl',
+        username: 'username'
+    };
     
     
     @Endpoint.POST('/login/telegram')
@@ -58,16 +67,14 @@ export class TelegramLoginController
     
     protected async _verifyTelegramLogin (telegramUser : TelegramLoginDto)
     {
-        const fields = Object.keys(telegramUser)
-            .filter(field => [ 'hash' ].includes(field))
-            .sort();
-        const text = fields
-            .map(field => `${field}=${telegramUser[field]}`)
+        const text = Object.entries(TelegramLoginController.FIELDS_MAP)
+            .filter(([ targetField, srcField ]) => !!telegramUser[srcField])
+            .map(([ targetField, srcField ]) => `${targetField}=${telegramUser[srcField]}`)
             .join('\n');
         
         const secretKey = crypto.createHash('sha256')
             .update(this._telegramConfig.botToken)
-            .digest('hex');
+            .digest();
         
         const hmac = crypto.createHmac('sha256', secretKey)
             .update(text)
@@ -83,12 +90,12 @@ export class TelegramLoginController
         
         let user = await userRepository.findOne({
             msgChannel: MessagingChannel.Telegram,
-            msgUserId: telegramUser.id,
+            msgUserId: telegramUser.id.toString(),
         });
         if (!user) {
             user = new User({
                 msgChannel: MessagingChannel.Telegram,
-                msgUserId: telegramUser.id,
+                msgUserId: telegramUser.id.toString(),
                 username: telegramUser.username,
             }, entityManager);
             
