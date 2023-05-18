@@ -1,9 +1,14 @@
+import { Network } from '#/App/Domain/Type/Network';
+import { GlobalContext } from '#/App/GlobalContext';
 import { Logger, LoggerLevel } from '@inti5/utils/Logger';
 
 const env = process.env.NODE_ENV || 'production';
 const isDev = env !== 'production';
 
-Logger.LOGGER_LEVEL = LoggerLevel.Debug;
+Logger.LOGGER_LEVEL = isDev
+    ? LoggerLevel.Debug
+    : LoggerLevel.Log
+;
 
 globalThis['__basedir'] = __dirname;
 
@@ -12,6 +17,10 @@ const component = process.argv[2];
 (async() => {
     const dotenv = require('dotenv');
     dotenv.config();
+    
+    GlobalContext.NETWORK = <any>process.env.APP_NETWORK
+        ?? Network.Khala
+    ;
     
     const { ObjectManager } = require('@inti5/object-manager');
     const objectManager = ObjectManager.getSingleton();

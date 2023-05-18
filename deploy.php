@@ -31,6 +31,12 @@ host('khala')
     ->user('ubuntu')
     ->set('app_variant', 'khala')
     ->set('deploy_path', '/srv/khala-100k-dev');
+    
+host('phala')
+    ->hostname('ovh-server')
+    ->user('ubuntu')
+    ->set('app_variant', 'phala')
+    ->set('deploy_path', '/srv/phala-100k-dev');
 
 localhost('local')
     ->user('l00k')
