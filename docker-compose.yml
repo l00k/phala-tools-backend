@@ -1,22 +1,6 @@
 version: '3.9'
 
 services:
-    db:
-        image: mysql:5.7
-        user: "1000:1000"
-        restart: "always"
-        env_file: .env
-        environment:
-            - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=$DB_NAME
-            - MYSQL_USER=$DB_USER
-            - MYSQL_PASSWORD=$DB_PASSWORD
-        ports:
-            - 127.0.0.1:$DB_PORT_EXTERNAL:$DB_PORT
-        volumes:
-            - ./.db-data:/var/lib/mysql
-            - ./etc/mysql.conf.d:/etc/mysql/conf.d
-
     node:
         build:
             context: .
@@ -27,9 +11,7 @@ services:
         volumes:
             - .:/usr/src/app/:rw
 
-    app_process_tasker:
-        depends_on:
-            - db
+    tasker:
         image: ${COMPOSE_PROJECT_NAME}-node
         command: [ "./etc/run.sh", "process", "tasker" ]
         user: "1000:1000"
@@ -40,9 +22,7 @@ services:
         volumes:
             - .:/usr/src/app/:rw
 
-    app_process_watchdog:
-        depends_on:
-            - db
+    watchdog:
         image: ${COMPOSE_PROJECT_NAME}-node
         command: [ "./etc/run.sh", "process", "watchdog" ]
         user: "1000:1000"
@@ -53,9 +33,7 @@ services:
         volumes:
             - .:/usr/src/app/:rw
 
-    app_api:
-        depends_on:
-            - db
+    api:
         image: ${COMPOSE_PROJECT_NAME}-node
         command: [ "./etc/run.sh", "api" ]
         user: "1000:1000"
