@@ -51,9 +51,10 @@ export class PhalaEntityFetcher
         if (!stakePool) {
             const api = await this._apiProvider.getApi(this._apiMode);
             
-            const onChainStakePool : any =
-                <any>(await api.query.phalaStakePool.stakePools(onChainId)).toJSON();
-            if (!onChainStakePool) {
+            const onChainData = <any>(
+                await api.query.phalaBasePool.pools(onChainId)
+            ).toJSON();
+            if (!onChainData) {
                 return null;
             }
             
@@ -61,7 +62,9 @@ export class PhalaEntityFetcher
                 onChainId,
             }, entityManager);
             
-            stakePool.owner = await this.getOrCreateAccount(onChainStakePool.owner);
+            stakePool.owner = await this.getOrCreateAccount(
+                (onChainData.stakePool ?? onChainData.vault).basepool.owner
+            );
             
             await stakePoolRepository.persistAndFlush(stakePool);
         }
