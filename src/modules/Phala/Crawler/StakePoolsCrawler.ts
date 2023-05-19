@@ -23,8 +23,9 @@ export class StakePoolsCrawler
         // check last stake pool
         const lastStoredStakePool = await stakePoolRepository.findOne(
             { onChainId: { $ne: null } },
-            [],
-            { onChainId: 'DESC' }
+            {
+                orderBy: { onChainId: 'DESC' }
+            }
         );
         const lastStoredStakePoolId : number = lastStoredStakePool
             ? lastStoredStakePool.onChainId
