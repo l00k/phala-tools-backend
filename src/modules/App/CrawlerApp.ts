@@ -19,11 +19,12 @@ export class CrawlerApp
         
         // watchdog crawler
         const crawler = objectManager.getInstance(CrawlerService);
-        await crawler.run();
-        
-        // tasker
         const tasker = objectManager.getInstance(TaskerService);
-        await tasker.run();
+        
+        await Promise.allSettled([
+            crawler.run(),
+            tasker.run(),
+        ]);
     }
     
 }
