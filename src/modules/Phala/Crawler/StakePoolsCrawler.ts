@@ -17,7 +17,7 @@ export class StakePoolsCrawler
         const stakePoolRepository = this._entityManager.getRepository(StakePool);
         
         // get stake pool count
-        const stakePoolCount : number = <any>(await this._api.query.phalaStakePool.poolCount()).toJSON();
+        const stakePoolCount : number = <any>(await this._api.query.phalaBasePool.poolCount()).toJSON();
         const lastStakePoolId = stakePoolCount - 1;
         
         // check last stake pool

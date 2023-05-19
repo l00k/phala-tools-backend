@@ -12,6 +12,7 @@ set('repository', 'git@github.com:l00k/phala-tools-backend.git');
 set('git_tty', true);
 set('allow_anonymous_stats', false);
 
+set('keep_releases', 3);
 
 set('shared_files:copy', [
     'src/etc/local/config.ts',
