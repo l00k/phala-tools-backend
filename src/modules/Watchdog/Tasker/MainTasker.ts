@@ -51,14 +51,4 @@ export class MainTasker
         return crawler.run();
     }
     
-    @Task({
-        cronExpr: '*/15 * * * *'
-    })
-    @Timeout(5 * 60 * 1000)
-    public async processNodeStucked ()
-    {
-        const crawler = ObjectManager.getSingleton().getInstance(UnresponsiveWorkerReminderCrawler);
-        return crawler.run();
-    }
-    
 }
