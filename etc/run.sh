@@ -15,7 +15,7 @@ run_api() {
 }
 
 case $1 in
-    process)
+    crawler)
         run_crawler
         ;;
     api)
