@@ -89,7 +89,7 @@ task('server:down', function () {
     
     run("
         cd {{deploy_path}}/current;
-        docker-compose down
+        docker-compose down --remove-orphans
         echo OK
     ", [ 'tty' => true ]);
 });
@@ -115,8 +115,8 @@ task('server:up', function () {
         docker-compose run node yarn install --only=production
         docker-compose run node yarn mikro-orm migration:up
 
-        docker-compose down
-        docker-compose up -d api tasker watchdog
+        docker-compose down --remove-orphans
+        docker-compose up -d api crawler
     ", [ 'tty' => true ]);
 });
 
