@@ -35,6 +35,9 @@ export class StakePoolsCrawler
             return false;
         }
         
+        const delta = lastStakePoolId - lastStoredStakePoolId;
+        this._logger.log('Fetching', delta, 'new pools');
+        
         for (let pid = lastStoredStakePoolId + 1; pid < stakePoolCount; ++pid) {
             await this._phalaEntityFetcher.getOrCreateStakePool(pid);
         }
