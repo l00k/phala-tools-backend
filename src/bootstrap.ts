@@ -31,13 +31,9 @@ const component = process.argv[2];
         const { CliApp } = require('#/App/CliApp');
         app = objectManager.getInstance(CliApp);
     }
-    else if (component == 'process_tasker') {
-        const { ProcessTaskerApp } = require('#/App/ProcessTaskerApp');
-        app = objectManager.getInstance(ProcessTaskerApp);
-    }
-    else if (component == 'process_watchdog') {
-        const { ProcessWatchdogApp } = require('#/App/ProcessWatchdogApp');
-        app = objectManager.getInstance(ProcessWatchdogApp);
+    else if (component == 'crawler') {
+        const { CrawlerApp } = require('#/App/CrawlerApp');
+        app = objectManager.getInstance(CrawlerApp);
     }
     else if (component == 'api') {
         const { ApiApp } = require('#/App/ApiApp');

@@ -12,17 +12,12 @@ set('repository', 'git@github.com:l00k/phala-tools-backend.git');
 set('git_tty', true);
 set('allow_anonymous_stats', false);
 
-set('shared_dirs', [
-    '.db-data',
-]);
+
 set('shared_files:copy', [
     'src/etc/local/config.ts',
     'src/etc/local/variants/khala.ts',
     'src/etc/local/variants/phala.ts',
     '.env',
-]);
-set('copy_dirs', [
-    'node_modules',
 ]);
 
 
@@ -53,7 +48,6 @@ task('deploy', [
     'deploy:update_code',
     'deploy:shared',
     'deploy:shared:copy',
-    'deploy:copy_dirs',
     'deploy:writable',
     'deploy:clear_paths',
     'server:down',
@@ -65,6 +59,17 @@ task('deploy', [
 
 after('deploy:failed', 'deploy:unlock');
 
+
+
+task('copy_from_prev_release', function () {
+    if (has('previous_release')) {
+        foreach (get('copy_entries') as $file) {
+            if (test("[ -e {{previous_release}}/$file ]")) {
+                run("cp -r {{previous_release}}/$file {{release_path}}/$file");
+            }
+        }
+    }
+});
 
 task('server:restart', function () {
     if (!test('[[ -e {{deploy_path}}/current ]]')) {
@@ -89,6 +94,14 @@ task('server:down', function () {
     ", [ 'tty' => true ]);
 });
 
+task('tmp', function () {
+    run("
+        cd {{deploy_path}}/release
+        cp -r {{deploy_path}}/current/node_modules .
+        chown -R 1000:1000 node_modules
+    ", [ 'tty' => true ]);
+});
+
 task('server:up', function () {
     run("
         cd {{deploy_path}}/current
@@ -99,12 +112,11 @@ task('server:up', function () {
         cd {{deploy_path}}/current;
         docker-compose build
 
-        docker-compose up -d db
-
         docker-compose run node yarn install --only=production
         docker-compose run node yarn mikro-orm migration:up
 
-        docker-compose up -d
+        docker-compose down
+        docker-compose up -d api tasker watchdog
     ", [ 'tty' => true ]);
 });
 

@@ -1,22 +1,22 @@
 #!/bin/bash
 
-run_process() {
+run_crawler() {
     while true; do
-        yarn prod process_$1
-        sleep 30
+        yarn prod crawler
+        sleep 10
     done
 }
 
 run_api() {
     while true; do
         yarn prod api
-        sleep 1
+        sleep 10
     done
 }
 
 case $1 in
     process)
-        run_process $2
+        run_crawler
         ;;
     api)
         run_api

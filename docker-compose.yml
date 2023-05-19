@@ -13,20 +13,9 @@ services:
         volumes:
             - .:/usr/src/app/:rw
 
-    tasker:
+    crawler:
         image: ${COMPOSE_PROJECT_NAME}-node
-        command: [ "./etc/run.sh", "process", "tasker" ]
-        user: "1000:1000"
-        restart: "always"
-        env_file: .env
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
-        volumes:
-            - .:/usr/src/app/:rw
-
-    watchdog:
-        image: ${COMPOSE_PROJECT_NAME}-node
-        command: [ "./etc/run.sh", "process", "watchdog" ]
+        command: [ "./etc/run.sh", "crawler" ]
         user: "1000:1000"
         restart: "always"
         env_file: .env
