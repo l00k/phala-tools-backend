@@ -27,7 +27,7 @@ export class PhalaEntityFetcher
     protected _accounts : Record<string, Account> = {};
     
     
-    public constructor (apiMode = ApiMode.HTTP)
+    public constructor (apiMode = ApiMode.WS)
     {
         this._apiMode = apiMode;
     }
