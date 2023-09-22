@@ -6,21 +6,29 @@ import { WorkerState } from '#/Watchdog/Domain/Type/WorkerState';
 import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 import { RuntimeException } from '@inti5/utils/Exception';
 import moment from 'moment';
+import { NotificationKind } from 'rxjs';
 
 
 export class UnresponsiveWorkerReminderCrawler
     extends AbstractPeriodicCrawler
 {
 
-    protected static readonly UNRESPONSIVNESS_THRESHOLD : number = 5;
+    protected static readonly UNRESPONSIVNESS_THRESHOLD : number = 300;
     
     protected readonly _messageTitle : string = '🚨 Worker still in unresponsive state';
     protected readonly _observationType : ObservationType = ObservationType.UnresponsiveWorker;
     protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
-    protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
+    protected _stakePoolWorkers : Record<number, any[]> = {}
+    
+    protected async _getObservedValuePerObservation (
+        onChainId : number,
+        observation : Observation
+    ) : Promise<number>
     {
+        const config = observation.config[ObservationType.UnresponsiveWorker];
+    
         const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
         const issues : UnresponsiveWorker[] = await issueRepository.find({
             stakePool: {
@@ -29,13 +37,16 @@ export class UnresponsiveWorkerReminderCrawler
         });
         
         // fetch state
-        const onChainMiners = (
-            await this._api.query
-                .phalaComputation.sessions
-                .multi(
-                    issues.map(issue => issue.workerAccount)
-                )
-        ).map(raw => raw.unwrap());
+        let onChainMiners = this._stakePoolWorkers[onChainId];
+        if (!onChainMiners) {
+            this._stakePoolWorkers[onChainId] = onChainMiners = (
+                await this._api.query
+                    .phalaComputation.sessions
+                    .multi(
+                        issues.map(issue => issue.workerAccount)
+                    )
+            ).map(raw => raw.unwrap());
+        }
         
         if (onChainMiners.length != issues.length) {
             throw new RuntimeException(
@@ -44,7 +55,8 @@ export class UnresponsiveWorkerReminderCrawler
             );
         }
         
-        let count = 0;
+        let weightCount = 0;
+        
         for (let idx = 0; idx < issues.length; ++idx) {
             const issue = issues[idx];
             const onChainMiner = onChainMiners[idx];
@@ -59,18 +71,16 @@ export class UnresponsiveWorkerReminderCrawler
                 continue;
             }
             
-            // confirm it is above threshold
-            const deltaTime = moment.utc().diff(issue.occurrenceDate, 'minutes');
-            if (deltaTime < UnresponsiveWorkerReminderCrawler.UNRESPONSIVNESS_THRESHOLD) {
-                continue;
-            }
-            
-            ++count;
+            const deltaTime = moment.utc().diff(issue.occurrenceDate, 'seconds');
+            weightCount += Math.floor(
+                deltaTime / config.frequency
+            );
         }
         
-        return count > 0
-            ? count
-            : null;
+        return weightCount > 0
+            ? weightCount
+            : null
+            ;
     }
     
     protected _prepareMessage (

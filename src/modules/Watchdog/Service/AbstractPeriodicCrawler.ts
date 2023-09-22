@@ -81,6 +81,8 @@ export abstract class AbstractPeriodicCrawler
             
             this._logger.debug('StakePool', onChainId);
             
+            const generalValue = await this._getObservedValuePerStakePool(onChainId);
+            
             for (const observation of observations) {
                 this._logger.debug('Observation', observation.id);
                 
@@ -96,7 +98,7 @@ export abstract class AbstractPeriodicCrawler
                     observation
                 );
                 if (observedValue === null) {
-                    observedValue = await this._getObservedValuePerStakePool(onChainId);
+                    observedValue = generalValue;
                 }
                 if (observedValue === null) {
                     // skip
