@@ -18,7 +18,7 @@ export class ClaimableRewardsCrawler
     protected async _getObservedValuePerObservation (
         onChainId : number,
         observation : Observation
-    ) : Promise<number>
+    ) : Promise<[ number, string ]>
     {
         const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
@@ -40,10 +40,13 @@ export class ClaimableRewardsCrawler
             return null;
         }
         
-        return PhalaUtility.parseRawAmount(availableRewardsRaw);
+        return [
+            PhalaUtility.parseRawAmount(availableRewardsRaw),
+            undefined
+        ];
     }
     
-    protected _prepareMessage (
+    protected _prepareGeneralMessage (
         onChainId : number,
         observation : Observation,
         observedValue : number

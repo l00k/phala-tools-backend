@@ -6,13 +6,12 @@ import { WorkerState } from '#/Watchdog/Domain/Type/WorkerState';
 import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
 import { RuntimeException } from '@inti5/utils/Exception';
 import moment from 'moment';
-import { NotificationKind } from 'rxjs';
 
 
 export class UnresponsiveWorkerReminderCrawler
     extends AbstractPeriodicCrawler
 {
-
+    
     protected static readonly UNRESPONSIVNESS_THRESHOLD : number = 300;
     
     protected readonly _messageTitle : string = '🚨 Worker still in unresponsive state';
@@ -20,15 +19,15 @@ export class UnresponsiveWorkerReminderCrawler
     protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
-    protected _stakePoolWorkers : Record<number, any[]> = {}
+    protected _stakePoolWorkers : Record<number, any[]> = {};
     
     protected async _getObservedValuePerObservation (
         onChainId : number,
         observation : Observation
-    ) : Promise<number>
+    ) : Promise<[ number, string ]>
     {
         const config = observation.config[ObservationType.UnresponsiveWorker];
-    
+        
         const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
         const issues : UnresponsiveWorker[] = await issueRepository.find({
             stakePool: {
@@ -55,6 +54,7 @@ export class UnresponsiveWorkerReminderCrawler
             );
         }
         
+        let count = 0;
         let weightCount = 0;
         
         for (let idx = 0; idx < issues.length; ++idx) {
@@ -72,20 +72,21 @@ export class UnresponsiveWorkerReminderCrawler
             }
             
             const deltaTime = moment.utc().diff(issue.occurrenceDate, 'seconds');
+            
+            ++count;
             weightCount += Math.floor(
                 deltaTime / config.frequency
             );
         }
         
-        return weightCount > 0
-            ? weightCount
-            : null
-            ;
+        return [
+            weightCount > 0 ? weightCount : 0,
+            this._prepareSpecificMessage(onChainId, count),
+        ];
     }
     
-    protected _prepareMessage (
+    protected _prepareSpecificMessage (
         onChainId : number,
-        observation : Observation,
         observedValue : number
     ) : string
     {

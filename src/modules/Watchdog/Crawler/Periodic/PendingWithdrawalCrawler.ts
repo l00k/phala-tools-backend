@@ -1,5 +1,3 @@
-import { Utility as PhalaUtility } from '#/Phala';
-import { Observation } from '#/Watchdog/Domain/Model/Observation';
 import { ObservationMode } from '#/Watchdog/Domain/Type/ObservationMode';
 import { ObservationType } from '#/Watchdog/Domain/Type/ObservationType';
 import { AbstractPeriodicCrawler } from '#/Watchdog/Service/AbstractPeriodicCrawler';
@@ -15,7 +13,9 @@ export class PendingWithdrawalCrawler
     protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
-    protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
+    protected async _getObservedValuePerStakePool (
+        onChainId : number
+    ) : Promise<[ number, string ]>
     {
         const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
@@ -30,11 +30,12 @@ export class PendingWithdrawalCrawler
             / Number(stakePool.basepool.totalShares)
             * Number(stakePool.basepool.totalValue)
             / 1e12;
-            
+        
         let totalWithdrawing : number = 0;
+        let deadline : number = 1e15;
         
         for (const withdrawingNft of stakePool.basepool.withdrawQueue) {
-            const nftShareRaw : string = <any> (
+            const nftShareRaw : string = <any>(
                 await this._api.query
                     .rmrkCore.properties(
                         stakePool.basepool.cid,
@@ -45,24 +46,32 @@ export class PendingWithdrawalCrawler
             
             const nftShareParsed : any = this._api.createType('NftAttr', nftShareRaw).toJSON();
             totalWithdrawing += Number(nftShareParsed.shares) * poolValueShareCoeff;
+            deadline = Math.min(deadline, withdrawingNft.startTime.toNumber());
         }
         
         if (totalWithdrawing == 0) {
             return null;
         }
         
-        return totalWithdrawing;
+        return [
+            totalWithdrawing,
+            this._prepareSpecificMessage(onChainId, totalWithdrawing, deadline)
+        ];
     }
     
-    protected _prepareMessage (
+    protected _prepareSpecificMessage (
         onChainId : number,
-        observation : Observation,
-        observedValue : number
+        observedValue : number,
+        deadline : number
     ) : string
     {
         const totalText = Utility.formatCoin(observedValue, true);
+        const timeleft = (Date.now() - deadline) / (24 * 3600 * 1000);
         
-        return '`#' + onChainId + '` total `' + totalText + '`';
+        return '`#' + onChainId
+            + '` total `' + totalText
+            + '` timeleft `' + timeleft.toFixed(1) + 'd'
+            + '`';
     }
     
 }

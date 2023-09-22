@@ -15,7 +15,9 @@ export class FreePoolFundsCrawler
     protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
-    protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
+    protected async _getObservedValuePerStakePool (
+        onChainId : number
+    ) : Promise<[ number, string ]>
     {
         const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
@@ -27,10 +29,13 @@ export class FreePoolFundsCrawler
         ).unwrap();
         
         const freeFundsRaw = Number(stakePool.basepool.totalValue) - Number(lockBalance.balance);
-        return PhalaUtility.parseRawAmount(freeFundsRaw);
+        return [
+            PhalaUtility.parseRawAmount(freeFundsRaw),
+            undefined
+        ];
     }
     
-    protected _prepareMessage (
+    protected _prepareGeneralMessage (
         onChainId : number,
         observation : Observation,
         observedValue : number

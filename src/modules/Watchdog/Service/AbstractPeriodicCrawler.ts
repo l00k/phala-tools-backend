@@ -81,7 +81,7 @@ export abstract class AbstractPeriodicCrawler
             
             this._logger.debug('StakePool', onChainId);
             
-            const generalValue = await this._getObservedValuePerStakePool(onChainId);
+            const generalValue : [ number, string ] = await this._getObservedValuePerStakePool(onChainId);
             
             for (const observation of observations) {
                 this._logger.debug('Observation', observation.id);
@@ -93,7 +93,7 @@ export abstract class AbstractPeriodicCrawler
                     continue;
                 }
                 
-                let observedValue : number = await this._getObservedValuePerObservation(
+                let observedValue = await this._getObservedValuePerObservation(
                     onChainId,
                     observation
                 );
@@ -106,18 +106,22 @@ export abstract class AbstractPeriodicCrawler
                     continue;
                 }
                 
+                let [ value, message ] = observedValue;
+                
                 const threshold = observation.config[this._observationType].threshold;
-                if (observedValue < threshold) {
+                if (value < threshold) {
                     // below threshold - skip
-                    this._logger.debug(`Value ${observedValue.toFixed(2)} below threshold ${threshold.toFixed(2)}`);
+                    this._logger.debug(`Value ${value.toFixed(2)} below threshold ${threshold.toFixed(2)}`);
                     continue;
                 }
                 
-                const message = this._prepareMessage(
-                    onChainId,
-                    observation,
-                    observedValue
-                );
+                if (!message) {
+                    message = this._prepareGeneralMessage(
+                        onChainId,
+                        observation,
+                        value
+                    );
+                }
                 
                 this._notificationAggregator.aggregate(
                     observation.user.msgChannel,
@@ -158,7 +162,9 @@ export abstract class AbstractPeriodicCrawler
         return await observationRepository.find(filters);
     }
     
-    protected async _getObservedValuePerStakePool (onChainId : number) : Promise<number>
+    protected async _getObservedValuePerStakePool (
+        onChainId : number
+    ) : Promise<[ number, string ]>
     {
         return null;
     }
@@ -166,12 +172,12 @@ export abstract class AbstractPeriodicCrawler
     protected async _getObservedValuePerObservation (
         onChainId : number,
         observation : Observation
-    ) : Promise<number>
+    ) : Promise<[ number, string ]>
     {
         return null;
     }
     
-    protected _prepareMessage (
+    protected _prepareGeneralMessage (
         onChainId : number,
         observation : Observation,
         observedValue : number
