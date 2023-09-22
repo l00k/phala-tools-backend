@@ -21,16 +21,26 @@ export class FreePoolFundsCrawler
     {
         const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
-        ).unwrap();
-        const stakePool = stakePoolWrapped.asStakePool;
+        ).unwrapOr(null);
+        if (!stakePoolWrapped) {
+            return null;
+        }
         
-        const lockBalance = (
-            await this._api.query.assets.account(10000, stakePool.lockAccount)
-        ).unwrap();
+        const stakePool = stakePoolWrapped.isStakePool
+            ? stakePoolWrapped.asStakePool
+            : stakePoolWrapped.asVault
+            ;
         
-        const freeFundsRaw = Number(stakePool.basepool.totalValue) - Number(lockBalance.balance);
+        const assets = (
+            <any> await this._api.query
+                .assets.account(10000, stakePool.basepool.poolAccountId)
+        ).unwrapOr(null);
+        if (!assets) {
+            return null;
+        }
+        
         return [
-            PhalaUtility.parseRawAmount(freeFundsRaw),
+            PhalaUtility.parseRawAmount(assets.balance),
             undefined
         ];
     }

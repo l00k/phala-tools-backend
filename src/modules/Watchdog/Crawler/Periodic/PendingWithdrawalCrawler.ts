@@ -46,7 +46,12 @@ export class PendingWithdrawalCrawler
             
             const nftShareParsed : any = this._api.createType('NftAttr', nftShareRaw).toJSON();
             totalWithdrawing += Number(nftShareParsed.shares) * poolValueShareCoeff;
-            deadline = Math.min(deadline, withdrawingNft.startTime.toNumber());
+            
+            const endTime = withdrawingNft.startTime.toNumber() + (7 * 24 * 3600);
+            deadline = Math.min(
+                deadline,
+                endTime
+            );
         }
         
         if (totalWithdrawing == 0) {
@@ -66,7 +71,7 @@ export class PendingWithdrawalCrawler
     ) : string
     {
         const totalText = Utility.formatCoin(observedValue, true);
-        const timeleft = (Date.now() - deadline) / (24 * 3600 * 1000);
+        const timeleft = (Date.now() / 1000 - deadline) / (24 * 3600);
         
         return '`#' + onChainId
             + '` total `' + totalText

@@ -22,17 +22,31 @@ export class ClaimableRewardsCrawler
     {
         const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
-        ).unwrap();
-        const stakePool = stakePoolWrapped.asStakePool;
+        ).unwrapOr(null);
+        if (!stakePoolWrapped) {
+            return null;
+        }
+        
+        const stakePool = stakePoolWrapped.isStakePool
+            ? stakePoolWrapped.asStakePool
+            : stakePoolWrapped.asVault
+            ;
         
         let availableRewardsRaw : number = 0;
         
         if (observation.mode === ObservationMode.Owner) {
-            const accountBalance = (
-                await this._api.query.assets.account(10000, stakePool.ownerRewardAccount)
-            ).unwrap();
-            
-            availableRewardsRaw += Number(accountBalance.balance);
+            if (stakePoolWrapped.isStakePool) {
+                const assets = (
+                    <any> await this._api.query
+                        .assets.account(10000, stakePool.ownerRewardAccount)
+                ).unwrapOr(null);
+                if (assets) {
+                    availableRewardsRaw += assets.balance.toNumber();
+                }
+            }
+            else {
+                // todo
+            }
         }
         
         if (availableRewardsRaw === 0) {
