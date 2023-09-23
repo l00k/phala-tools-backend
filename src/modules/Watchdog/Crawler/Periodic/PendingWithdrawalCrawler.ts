@@ -58,20 +58,22 @@ export class PendingWithdrawalCrawler
             return null;
         }
         
+        const now = Date.now() / 1000;
+        const timeleft = (deadline - now) / (24 * 3600);
+        
         return [
             totalWithdrawing,
-            this._prepareSpecificMessage(onChainId, totalWithdrawing, deadline)
+            this._prepareSpecificMessage(onChainId, totalWithdrawing, timeleft)
         ];
     }
     
     protected _prepareSpecificMessage (
         onChainId : number,
         observedValue : number,
-        deadline : number
+        timeleft : number
     ) : string
     {
         const totalText = Utility.formatCoin(observedValue, true);
-        const timeleft = (Date.now() / 1000 - deadline) / (24 * 3600);
         
         return '`#' + onChainId
             + '` total `' + totalText

@@ -25,12 +25,14 @@ set('shared_files:copy', [
 host('khala')
     ->hostname('ovh-server')
     ->user('ubuntu')
+    ->roles([ 'all' ])
     ->set('app_variant', 'khala')
     ->set('deploy_path', '/srv/khala-100k-dev');
     
 host('phala')
     ->hostname('ovh-server')
     ->user('ubuntu')
+    ->roles([ 'all' ])
     ->set('app_variant', 'phala')
     ->set('deploy_path', '/srv/phala-100k-dev');
 
