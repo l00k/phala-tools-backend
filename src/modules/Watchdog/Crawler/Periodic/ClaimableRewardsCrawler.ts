@@ -41,7 +41,7 @@ export class ClaimableRewardsCrawler
                         .assets.account(10000, stakePool.ownerRewardAccount)
                 ).unwrapOr(null);
                 if (assets) {
-                    availableRewardsRaw += assets.balance.toNumber();
+                    availableRewardsRaw += Number(assets.balance.toString());
                 }
             }
             else {

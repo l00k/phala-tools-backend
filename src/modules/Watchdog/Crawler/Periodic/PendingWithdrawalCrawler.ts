@@ -20,8 +20,11 @@ export class PendingWithdrawalCrawler
         const stakePoolWrapped = (
             await this._api.query.phalaBasePool.pools(onChainId)
         ).unwrap();
-        const stakePool = stakePoolWrapped.asStakePool;
-        
+        const stakePool = stakePoolWrapped?.isStakePool
+            ? stakePoolWrapped.asStakePool
+            : stakePoolWrapped.asVault
+            ;
+            
         if (!stakePool.basepool.withdrawQueue.length) {
             return null;
         }
