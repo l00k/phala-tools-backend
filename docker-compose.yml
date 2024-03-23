@@ -8,6 +8,9 @@ services:
         image: ${COMPOSE_PROJECT_NAME}-node
         user: "1000:1000"
         env_file: .env
+        logging:
+            options:
+                max-size: "100m"
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
@@ -19,6 +22,9 @@ services:
         user: "1000:1000"
         restart: "always"
         env_file: .env
+        logging:
+            options:
+                max-size: "100m"
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
@@ -30,6 +36,9 @@ services:
         user: "1000:1000"
         restart: "always"
         env_file: .env
+        logging:
+            options:
+                max-size: "100m"
         extra_hosts:
             - "host.docker.internal:host-gateway"
         ports:
