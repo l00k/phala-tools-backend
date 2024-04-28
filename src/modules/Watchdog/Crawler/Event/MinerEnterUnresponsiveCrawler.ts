@@ -20,6 +20,9 @@ export class MinerEnterUnresponsiveCrawler
     protected readonly _observationMode : ObservationMode = ObservationMode.Owner;
     
     
+    protected _unresponsiveWorkersCounter : { [onChainId : number] : number } = {};
+    
+    
     @Listen([
         EventType.WorkerEnterUnresponsive
     ])
@@ -57,6 +60,12 @@ export class MinerEnterUnresponsiveCrawler
             return false;
         }
         
+        if (!this._unresponsiveWorkersCounter[onChainId]) {
+            this._unresponsiveWorkersCounter[onChainId] = 0;
+        }
+        
+        ++this._unresponsiveWorkersCounter[onChainId];
+        
         // create issue if it doesn't exists yet
         const issueRepository = this._entityManager.getRepository(UnresponsiveWorker);
         const issueAlreadyExists = await issueRepository.findOne({
@@ -77,6 +86,39 @@ export class MinerEnterUnresponsiveCrawler
         }
         
         return true;
+    }
+    
+    public async postProcess ()
+    {
+        await this._handleGrouppedEvents();
+        
+        // clear counters
+        this._unresponsiveWorkersCounter = {};
+        
+        await super.postProcess();
+    }
+    
+    protected async _handleGrouppedEvents ()
+    {
+        for (const [ onChainIdStr, unresponsiveCount ] of Object.entries(this._unresponsiveWorkersCounter)) {
+            const onChainId = Number(onChainIdStr);
+            
+            await this._processObservations(
+                onChainId,
+                unresponsiveCount
+            );
+        }
+    }
+    
+    protected _prepareMessage (
+        onChainId : number,
+        observation : Observation,
+        observedValue : number,
+        additionalData : any = null
+    ) : string
+    {
+        return '`#' + onChainId + '` '
+            + observedValue + ' worker(s) in unresponsive state';
     }
     
 }
